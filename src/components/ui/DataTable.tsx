@@ -167,7 +167,7 @@ export function DataTable<T extends Record<string, any>>({
                     <div className="flex items-center gap-1.5">
                       <span>{col.header}</span>
                       {col.sortable && (
-                        <ArrowUpDown className="h-3 w-3 opacity-60 hover:opacity-100" />
+                        <ArrowUpDown className="h-3 w-3 opacity-60 hover:opacity-100 transition-opacity" />
                       )}
                     </div>
                   </th>
@@ -181,7 +181,7 @@ export function DataTable<T extends Record<string, any>>({
                     key={row.id || rowIdx}
                     onClick={() => onRowClick && onRowClick(row)}
                     className={cn(
-                      'transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/40',
+                      'transition-colors duration-150 hover:bg-blue-50/40 dark:hover:bg-slate-800/50',
                       onRowClick && 'cursor-pointer'
                     )}
                   >

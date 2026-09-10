@@ -23,6 +23,12 @@ import {
   Award,
   Receipt,
   HelpCircle,
+  MessageSquare,
+  Mail,
+  ListTodo,
+  User,
+  FileQuestion,
+  Megaphone,
 } from 'lucide-react';
 import { UserRole } from '../types';
 
@@ -44,9 +50,10 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
     case 'saas_owner':
       return [
         {
+          sectionTitle: 'PLATFORM MANAGEMENT',
           items: [
-            { title: 'Dashboard', href: '/saas', icon: LayoutDashboard },
-            { title: 'Organizations', href: '/saas/organizations', icon: Building2, badge: '48' },
+            { title: 'Super Admin Overview', href: '/saas', icon: LayoutDashboard },
+            { title: 'Organizations', href: '/saas/organizations', icon: Building2, badge: 'Active' },
             { title: 'Subscriptions', href: '/saas/subscriptions', icon: CreditCard },
             { title: 'Plans & Pricing', href: '/saas/plans', icon: Layers },
             { title: 'Billing & Invoices', href: '/saas/billing', icon: DollarSign },
@@ -61,9 +68,10 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
     case 'manager':
       return [
         {
+          sectionTitle: 'MANAGEMENT',
           items: [
             { title: 'Team Dashboard', href: '/dashboard', icon: LayoutDashboard },
-            { title: 'My Team', href: '/employees', icon: Users, badge: '14' },
+            { title: 'Team Members', href: '/employees', icon: Users, badge: '14' },
             { title: 'Team Attendance', href: '/attendance', icon: Clock },
             { title: 'Clock In / Out', href: '/clock-in', icon: UserCheck },
             { title: 'Leave Approvals', href: '/leave/requests', icon: CalendarDays, badge: '3' },
@@ -78,6 +86,7 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
     case 'recruiter':
       return [
         {
+          sectionTitle: 'TALENT ACQUISITION',
           items: [
             { title: 'ATS Dashboard', href: '/dashboard', icon: LayoutDashboard },
             { title: 'Job Openings', href: '/recruitment/jobs', icon: Briefcase, badge: '4' },
@@ -92,6 +101,7 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
     case 'payroll_admin':
       return [
         {
+          sectionTitle: 'FINANCE & PAYROLL',
           items: [
             { title: 'Payroll Dashboard', href: '/dashboard', icon: LayoutDashboard },
             { title: 'Process Payroll', href: '/payroll', icon: DollarSign },
@@ -108,22 +118,50 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
     case 'employee':
       return [
         {
-          sectionTitle: 'MY PORTAL',
+          sectionTitle: 'WORK',
           items: [
             { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-            { title: 'My Profile', href: '/my-profile', icon: Users },
-            { title: 'My Attendance', href: '/attendance', icon: UserCheck },
-            { title: 'My Leave', href: '/leave', icon: CalendarDays },
-            { title: 'My Payroll', href: '/payroll', icon: DollarSign },
-            { title: 'My Payslips', href: '/payroll/payslips', icon: FileSpreadsheet },
-            { title: 'My Documents', href: '/operations/documents', icon: FileText },
-            { title: 'My Assets', href: '/operations/assets', icon: Package },
-            { title: 'My Goals', href: '/performance/goals', icon: Target },
-            { title: 'My Performance', href: '/performance', icon: BarChart3 },
-            { title: 'My Timesheets', href: '/timesheets', icon: Clock },
-            { title: 'My Expenses', href: '/operations/expenses', icon: Receipt },
-            { title: 'Announcements', href: '/calendar', icon: Sparkles },
-            { title: 'Help & Support', href: '/settings', icon: HelpCircle },
+            { title: 'Tasks', href: '/tasks', icon: ListTodo, badge: '4' },
+            { title: 'Timesheet', href: '/timesheets', icon: Clock },
+            { title: 'Calendar', href: '/calendar', icon: CalendarDays },
+          ]
+        },
+        {
+          sectionTitle: 'PEOPLE',
+          items: [
+            { title: 'Profile', href: '/profile', icon: User },
+            { title: 'Chat', href: '/chat', icon: MessageSquare, badge: '3' },
+            { title: 'Email', href: '/email', icon: Mail, badge: 'New' },
+          ]
+        },
+        {
+          sectionTitle: 'HR',
+          items: [
+            { title: 'Attendance', href: '/attendance', icon: UserCheck },
+            { title: 'Leave', href: '/leave', icon: CalendarDays },
+            // Payroll module commented out as requested by user
+            // { title: 'Payroll', href: '/payroll', icon: DollarSign },
+            // { title: 'Payslips', href: '/payroll/payslips', icon: FileSpreadsheet },
+            { title: 'Documents', href: '/operations/documents', icon: FileText },
+            // Performance module commented out as requested by user
+            // { title: 'Performance', href: '/performance', icon: BarChart3 },
+            // Expenses module commented out as requested by user
+            // { title: 'Expenses', href: '/operations/expenses', icon: Receipt },
+            { title: 'Assets', href: '/operations/assets', icon: Package },
+          ]
+        },
+        {
+          sectionTitle: 'COMPANY',
+          items: [
+            { title: 'Announcements', href: '/announcements', icon: Megaphone },
+            { title: 'Holidays', href: '/leave/holidays', icon: Calendar },
+            { title: 'Requests', href: '/requests', icon: FileQuestion },
+          ]
+        },
+        {
+          sectionTitle: 'SUPPORT',
+          items: [
+            { title: 'Help & Support', href: '/help', icon: HelpCircle },
           ]
         }
       ];

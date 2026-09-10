@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { CommandPalette } from './components/CommandPalette';
@@ -10,6 +10,7 @@ import { Linkedin, Twitter, Facebook, Youtube } from 'lucide-react';
 
 export const AppLayout: React.FC = () => {
   const { sidebarCollapsed, isClockedIn, tickClockTimer, isDarkMode, toggleDarkMode } = useAppStore();
+  const location = useLocation();
 
   useEffect(() => {
     let interval: any = null;
@@ -38,9 +39,11 @@ export const AppLayout: React.FC = () => {
         {/* Top Header */}
         <Header />
 
-        {/* Page View Outlet */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-7 max-w-[1800px] w-full mx-auto animate-fade-in">
-          <Outlet />
+        {/* Page View Outlet with smooth subtle page transition */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-7 max-w-[1800px] w-full mx-auto">
+          <div key={location.pathname} className="animate-page-enter">
+            <Outlet />
+          </div>
         </main>
 
         {/* Global Footer Matching Reference Image */}

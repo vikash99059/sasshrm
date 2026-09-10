@@ -31,6 +31,13 @@ import { DesignationsPage } from '../pages/employees/DesignationsPage';
 import { TeamsPage } from '../pages/employees/TeamsPage';
 import { OrgStructurePage } from '../pages/employees/OrgStructurePage';
 
+// Communication & Work Tracking (Chat, Email, Tasks, Requests, Announcements)
+import { ChatPage } from '../pages/chat/ChatPage';
+import { EmailPage } from '../pages/email/EmailPage';
+import { TasksPage } from '../pages/tasks/TasksPage';
+import { RequestsPage } from '../pages/requests/RequestsPage';
+import { AnnouncementsPage } from '../pages/company/AnnouncementsPage';
+
 // Attendance & Leave
 import { AttendancePage } from '../pages/attendance/AttendancePage';
 import { ClockInPage } from '../pages/attendance/ClockInPage';
@@ -60,10 +67,11 @@ import { AssetsPage } from '../pages/operations/AssetsPage';
 import { DocumentsPage } from '../pages/operations/DocumentsPage';
 import { TrainingPage } from '../pages/operations/TrainingPage';
 
-// Calendar, Reports, Settings
+// Calendar, Reports, Settings & Support
 import { CalendarPage } from '../pages/calendar/CalendarPage';
 import { ReportsPage } from '../pages/reports/ReportsPage';
 import { SettingsPage } from '../pages/settings/SettingsPage';
+import { HelpSupportPage } from '../pages/support/HelpSupportPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -92,6 +100,13 @@ export const AppRoutes: React.FC = () => {
         <Route path="/payroll/dashboard" element={<DashboardPage forcedRole="payroll_admin" />} />
         <Route path="/manager/dashboard" element={<DashboardPage forcedRole="manager" />} />
         <Route path="/employee/dashboard" element={<DashboardPage forcedRole="employee" />} />
+
+        {/* Work, Communication & Collaboration */}
+        <Route path="/tasks" element={<TasksPage />} />
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/email" element={<EmailPage />} />
+        <Route path="/requests" element={<RequestsPage />} />
+        <Route path="/announcements" element={<AnnouncementsPage />} />
 
         {/* SaaS Specific Sub-pages */}
         <Route path="/saas" element={<DashboardPage forcedRole="saas_owner" />} />
@@ -149,10 +164,12 @@ export const AppRoutes: React.FC = () => {
         <Route path="/operations/documents" element={<DocumentsPage />} />
         <Route path="/operations/training" element={<TrainingPage />} />
 
-        {/* Calendar, Reports, Settings */}
+        {/* Calendar, Reports, Settings & Support */}
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/help" element={<HelpSupportPage />} />
+        <Route path="/support" element={<HelpSupportPage />} />
       </Route>
 
       {/* Fallback */}
