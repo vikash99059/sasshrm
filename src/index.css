@@ -45,6 +45,7 @@
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -59,6 +60,7 @@
   position: relative;
   transition: color 0.2s ease;
 }
+
 .nav-underline-sweep::after {
   content: '';
   position: absolute;
@@ -70,6 +72,7 @@
   border-radius: 9999px;
   transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .nav-underline-sweep:hover::after {
   width: 100%;
 }
@@ -79,6 +82,7 @@
   position: relative;
   overflow: hidden;
 }
+
 .hover-shine-sweep::after {
   content: '';
   position: absolute;
@@ -91,6 +95,7 @@
   pointer-events: none;
   transition: all 0.75s ease;
 }
+
 .hover-shine-sweep:hover::after {
   left: 130%;
 }
@@ -99,10 +104,12 @@
 .hover-card-lift {
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
 }
+
 .hover-card-lift:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 36px -10px rgba(15, 23, 42, 0.12);
 }
+
 .dark .hover-card-lift:hover {
   box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.6);
 }
@@ -111,6 +118,7 @@
 .hover-glow-border {
   transition: all 0.25s ease;
 }
+
 .hover-glow-border:hover {
   border-color: rgba(59, 130, 246, 0.55);
   box-shadow: 0 0 20px -3px rgba(59, 130, 246, 0.25);
@@ -120,6 +128,7 @@
 .group:hover .hover-arrow-motion {
   transform: translateX(4px);
 }
+
 .hover-arrow-motion {
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -128,6 +137,7 @@
 .group:hover .hover-icon-slide {
   transform: translate(2px, -2px);
 }
+
 .hover-icon-slide {
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -137,6 +147,7 @@
   background-size: 200% auto;
   transition: background-position 0.4s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
+
 .hover-gradient-shift:hover {
   background-position: right center;
   box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
@@ -147,9 +158,11 @@
 .img-zoom-container {
   overflow: hidden;
 }
+
 .img-zoom-container img {
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .img-zoom-container:hover img {
   transform: scale(1.05);
 }
@@ -159,6 +172,7 @@
   position: relative;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .glass-glow-card:hover {
   border-color: rgba(99, 102, 241, 0.45);
   box-shadow: 0 12px 30px -8px rgba(99, 102, 241, 0.18);
@@ -168,6 +182,7 @@
 .hover-stat-pop {
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
 }
+
 .hover-stat-pop:hover {
   transform: translateY(-2px) scale(1.02);
 }
@@ -176,9 +191,11 @@
 .hover-magnetic-btn {
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
 }
+
 .hover-magnetic-btn:hover {
   transform: translateY(-1.5px) scale(1.015);
 }
+
 .hover-magnetic-btn:active {
   transform: translateY(0.5px) scale(0.99);
 }
@@ -187,9 +204,11 @@
 .hover-input-glow {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 .hover-input-glow:hover {
   border-color: #93c5fd;
 }
+
 .dark .hover-input-glow:hover {
   border-color: #3b82f6;
 }
@@ -198,6 +217,7 @@
 .hover-avatar-ring {
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
 }
+
 .hover-avatar-ring:hover {
   transform: scale(1.06);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
@@ -211,6 +231,7 @@
     opacity: 0;
     transform: translateX(-30px);
   }
+
   100% {
     opacity: 1;
     transform: translateX(0);
@@ -222,6 +243,7 @@
     opacity: 0;
     transform: translateX(30px);
   }
+
   100% {
     opacity: 1;
     transform: translateX(0);
@@ -229,18 +251,24 @@
 }
 
 @keyframes floatGentle {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-6px);
   }
 }
 
 @keyframes floatGentleAlt {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(6px);
   }
@@ -264,4 +292,176 @@
 
 .animate-float-alt {
   animation: floatGentleAlt 4s ease-in-out 0.8s infinite;
+}
+
+@keyframes loginCardEntry {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.005);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ══════════════════════════════════════════════
+   INNOVATIVE LOGIN PAGE ANIMATIONS
+   ══════════════════════════════════════════════ */
+
+/* Floating orb movements */
+@keyframes orbFloat1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  30% {
+    transform: translate(-30px, 25px) scale(1.08);
+  }
+
+  60% {
+    transform: translate(20px, -20px) scale(0.95);
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes orbFloat2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  40% {
+    transform: translate(40px, -30px) scale(1.1);
+  }
+
+  70% {
+    transform: translate(-15px, 20px) scale(0.92);
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes orbFloat3 {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+
+  50% {
+    transform: translate(25px, -40px) scale(1.15) rotate(180deg);
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1) rotate(360deg);
+  }
+}
+
+/* Sparkling star dots */
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  20% {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 0.9;
+    transform: scale(1.4);
+  }
+
+  60% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  80% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+/* Staggered card field entries */
+@keyframes staggerUp {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-stagger-1 {
+  animation: staggerUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.10s both;
+}
+
+.anim-stagger-2 {
+  animation: staggerUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.20s both;
+}
+
+.anim-stagger-3 {
+  animation: staggerUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.30s both;
+}
+
+.anim-stagger-4 {
+  animation: staggerUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.40s both;
+}
+
+.anim-stagger-5 {
+  animation: staggerUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.50s both;
+}
+
+.anim-stagger-6 {
+  animation: staggerUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.60s both;
+}
+
+/* Card border glow pulse */
+@keyframes cardGlowPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 25px 60px -15px rgba(0, 35, 80, 0.12), 0 0 0 0 rgba(29, 104, 254, 0);
+  }
+
+  50% {
+    box-shadow: 0 25px 60px -15px rgba(0, 35, 80, 0.18), 0 0 32px 4px rgba(29, 104, 254, 0.10);
+  }
+}
+
+.anim-card-glow {
+  animation: loginCardEntry 0.6s cubic-bezier(0.22, 1, 0.36, 1) both,
+    cardGlowPulse 4s ease-in-out 0.8s infinite;
 }

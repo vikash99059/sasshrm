@@ -254,19 +254,17 @@ export const LandingPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F6F9FD] dark:bg-dark-bg text-slate-900 dark:text-slate-100 flex flex-col selection:bg-blue-600 selection:text-white font-sans overflow-x-hidden">
-      {/* 1. FLOATING HEADER */}
+    <div className="min-h-screen bg-[#F6F9FD] dark:bg-dark-bg text-slate-900 dark:text-slate-100 flex flex-col selection:bg-blue-600 selection:text-white font-sans overflow-x-clip">
+      {/* 1. FLOATING STICKY HEADER */}
       <header
-        className={`sticky top-0 z-50 px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
-          isScrolled ? 'pt-2 sm:pt-2.5' : 'pt-3 sm:pt-4'
-        }`}
+        className={`sticky top-0 z-[100] w-full px-4 sm:px-6 lg:px-8 transition-all duration-300 ${isScrolled ? 'pt-2 sm:pt-2.5 pb-1' : 'pt-3 sm:pt-4 pb-2'
+          }`}
       >
         <div
-          className={`max-w-[1360px] mx-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 rounded-2xl sm:rounded-full px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between transition-all duration-300 ${
-            isScrolled
-              ? 'shadow-[0_10px_30px_-5px_rgba(0,0,0,0.12)] border-slate-300/80 dark:border-slate-700/80'
-              : 'shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)]'
-          }`}
+          className={`max-w-[1360px] mx-auto bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border rounded-2xl sm:rounded-full px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between transition-all duration-300 ${isScrolled
+              ? 'shadow-[0_12px_35px_-5px_rgba(0,35,80,0.15)] border-slate-300/90 dark:border-slate-700/90 bg-white/95 dark:bg-slate-900/95'
+              : 'shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] border-slate-200/80 dark:border-slate-800/80 dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)]'
+            }`}
         >
           {/* Logo with 3D Blue Cube/Diamond Icon */}
           <Link to="/" className="flex items-center gap-2.5 group">

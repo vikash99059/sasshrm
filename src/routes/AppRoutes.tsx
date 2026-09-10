@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts
 import { AppLayout } from '../layouts/AppLayout';
-import { AuthLayout } from '../layouts/AuthLayout';
 
 // Public & Auth Pages
 import { LandingPage } from '../pages/LandingPage';
@@ -72,13 +71,14 @@ export const AppRoutes: React.FC = () => {
       {/* Public Landing Page */}
       <Route path="/" element={<LandingPage />} />
 
-      {/* Dedicated Split-Screen Authentication Layout matching reference */}
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/2fa" element={<TwoFactorPage />} />
-      </Route>
+      {/* Standalone Full-Page Login Route */}
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Standalone Auth Routes */}
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/2fa" element={<TwoFactorPage />} />
+
 
       {/* Main SaaS & HRM Application Workspace (AppLayout) */}
       <Route element={<AppLayout />}>
