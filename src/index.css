@@ -315,21 +315,21 @@
   will-change: transform, opacity;
 }
 
-/* 2. Modal Scale & Fade In (220ms) */
+/* 2. Modal Scale - Center Pop (100% Solid Opacity, No translateY) */
 @keyframes modalPop {
   0% {
-    opacity: 0;
-    transform: scale(0.96) translateY(4px);
+    opacity: 1;
+    transform: scale(0.98);
   }
   100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1);
   }
 }
 
 .animate-modal-pop {
-  animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity;
+  animation: modalPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform;
 }
 
 /* 3. Drawer Slide In (260ms) */
