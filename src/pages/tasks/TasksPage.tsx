@@ -16,7 +16,6 @@ import {
   Plus,
   MoreHorizontal,
   Calendar,
-  Layers,
   Kanban,
   BarChart2,
   List,
@@ -326,7 +325,7 @@ const INITIAL_TASKS: TaskItem[] = [
 export const TasksPage: React.FC = () => {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<TaskItem[]>(INITIAL_TASKS);
-  const [viewMode, setViewMode] = useState<'list' | 'kanban' | 'calendar' | 'gantt'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('All');
   const [selectedPriorityFilter, setSelectedPriorityFilter] = useState<string>('All');
@@ -680,12 +679,13 @@ export const TasksPage: React.FC = () => {
           {/* Top Control Bar: View Switcher Tabs (Left) + Search & Filter (Right) */}
           <div className="p-3.5 border-b border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             
-            {/* View Switcher Pills */}
+            {/* View Switcher Pills - List View & Kanban View only */}
             <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/70 p-1 rounded-xl">
               <button
+                type="button"
                 onClick={() => setViewMode('list')}
                 className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer',
+                  'flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap',
                   viewMode === 'list'
                     ? 'bg-blue-600 text-white shadow-2xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -696,9 +696,10 @@ export const TasksPage: React.FC = () => {
               </button>
 
               <button
+                type="button"
                 onClick={() => setViewMode('kanban')}
                 className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer',
+                  'flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap',
                   viewMode === 'kanban'
                     ? 'bg-blue-600 text-white shadow-2xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -706,32 +707,6 @@ export const TasksPage: React.FC = () => {
               >
                 <Kanban className="w-3.5 h-3.5" />
                 <span>Kanban View</span>
-              </button>
-
-              <button
-                onClick={() => setViewMode('calendar')}
-                className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer',
-                  viewMode === 'calendar'
-                    ? 'bg-blue-600 text-white shadow-2xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                )}
-              >
-                <Calendar className="w-3.5 h-3.5" />
-                <span>Calendar View</span>
-              </button>
-
-              <button
-                onClick={() => setViewMode('gantt')}
-                className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer hidden md:flex',
-                  viewMode === 'gantt'
-                    ? 'bg-blue-600 text-white shadow-2xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                )}
-              >
-                <Layers className="w-3.5 h-3.5" />
-                <span>Gantt View</span>
               </button>
             </div>
 
@@ -1047,47 +1022,7 @@ export const TasksPage: React.FC = () => {
             </div>
           )}
 
-          {/* Calendar View Mode */}
-          {viewMode === 'calendar' && (
-            <div className="p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="font-bold text-xs text-slate-900 dark:text-white">Upcoming April 2025 Schedule</h4>
-                <span className="text-xs text-blue-600 font-semibold cursor-pointer" onClick={() => navigate('/calendar')}>
-                  Open Full Company Calendar →
-                </span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
-                {filteredTasks.slice(0, 8).map((task) => (
-                  <div key={task.id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#161622] space-y-1 text-xs">
-                    <span className="text-[10px] font-bold text-blue-600">{task.dueDate}</span>
-                    <p className="font-bold text-slate-800 dark:text-white truncate">{task.name}</p>
-                    <p className="text-[10px] text-slate-400">{task.assignee.name} • {task.priority} Priority</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
-          {/* Gantt View Mode */}
-          {viewMode === 'gantt' && (
-            <div className="p-4 space-y-3">
-              <h4 className="font-bold text-xs text-slate-900 dark:text-white mb-2">Project Sprint Timeline</h4>
-              <div className="space-y-2">
-                {filteredTasks.slice(0, 6).map((task, idx) => (
-                  <div key={task.id} className="p-2 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-between text-xs gap-3">
-                    <span className="font-bold text-slate-800 dark:text-slate-200 w-36 truncate">{task.name}</span>
-                    <div className="flex-1 h-3 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden relative">
-                      <div
-                        className="h-full bg-blue-600 rounded-full"
-                        style={{ width: `${task.progress}%`, marginLeft: `${idx * 8}%` }}
-                      />
-                    </div>
-                    <span className="text-[10px] font-mono text-slate-400 w-16 text-right">{task.progress}%</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Table Footer: "Showing 1 to 8 of 15 tasks" + Pagination */}
           <div className="p-3.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
@@ -1155,7 +1090,8 @@ export const TasksPage: React.FC = () => {
 
             <div className="flex items-center justify-end">
               <button
-                onClick={() => setViewMode('calendar')}
+                type="button"
+                onClick={() => navigate('/calendar')}
                 className="text-[11px] font-bold text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <span>View All</span>
