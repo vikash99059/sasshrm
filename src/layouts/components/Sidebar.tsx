@@ -6,6 +6,7 @@ import { cn } from '../../utils';
 import {
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Sparkles,
   LogOut,
   Building,
@@ -25,6 +26,21 @@ export const Sidebar: React.FC = () => {
 
   const location = useLocation();
   const navSections = getNavigationForRole(currentRole);
+
+  const [openDropdowns, setOpenDropdowns] = React.useState<{ [key: string]: boolean }>({
+    '/chat': true,
+  });
+
+  const toggleDropdown = (href: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setOpenDropdowns((prev) => ({
+      ...prev,
+      [href]: !prev[href],
+    }));
+  };
 
   return (
     <>
@@ -83,6 +99,7 @@ export const Sidebar: React.FC = () => {
               )}
               {section.items.map((item) => {
                 const Icon = item.icon;
+                const hasChildren = item.children && item.children.length > 0;
                 const isExact = location.pathname === item.href;
                 const isSubPath = item.href !== '/' &&
                   item.href !== '/dashboard' &&
@@ -98,48 +115,104 @@ export const Sidebar: React.FC = () => {
                   item.href !== '/calendar' &&
                   location.pathname.startsWith(item.href + '/');
                 const isEmployeeProfile = item.href === '/profile' && (location.pathname === '/profile' || location.pathname === '/my-profile');
-                const isActive = isExact || isSubPath || isEmployeeProfile;
+                const isActive = isExact || isSubPath || isEmployeeProfile || (hasChildren && location.pathname.startsWith(item.href));
+                const isDropdownOpen = !!openDropdowns[item.href] || location.pathname.startsWith(item.href);
 
                 return (
-                  <Link
-                    key={item.href + item.title}
-                    to={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={cn(
-                      'group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 relative overflow-hidden',
-                      isActive
-                        ? 'bg-blue-50/90 text-blue-600 shadow-2xs dark:bg-blue-950/60 dark:text-blue-400 font-bold'
-                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:translate-x-0.5 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100',
-                      sidebarCollapsed && 'justify-center px-0 hover:translate-x-0'
-                    )}
-                    title={sidebarCollapsed ? item.title : undefined}
-                  >
-                    {/* Active Menu Indicator from Animation Reference Image */}
-                    {isActive && (
-                      <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-blue-600 dark:bg-blue-400 transition-all duration-200" />
-                    )}
-                    <Icon
-                      className={cn(
-                        'h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110',
-                        isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 group-hover:text-slate-600 dark:text-slate-400 dark:group-hover:text-slate-200'
-                      )}
-                    />
-                    {!sidebarCollapsed && (
-                      <span className="truncate flex-1">{item.title}</span>
-                    )}
-                    {!sidebarCollapsed && item.badge && (
-                      <span
+                  <div key={item.href + item.title} className="space-y-0.5">
+                    <div className="flex items-center">
+                      <Link
+                        to={item.href}
+                        onClick={() => {
+                          if (hasChildren) {
+                            setOpenDropdowns((prev) => ({ ...prev, [item.href]: true }));
+                          }
+                          setMobileMenuOpen(false);
+                        }}
                         className={cn(
-                          'rounded-full px-1.5 py-0.5 text-[9px] font-bold group-hover:scale-105 transition-transform',
+                          'group flex-1 flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 relative overflow-hidden',
                           isActive
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-blue-50 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
+                            ? 'bg-blue-50/90 text-blue-600 shadow-2xs dark:bg-blue-950/60 dark:text-blue-400 font-bold'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:translate-x-0.5 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100',
+                          sidebarCollapsed && 'justify-center px-0 hover:translate-x-0'
                         )}
+                        title={sidebarCollapsed ? item.title : undefined}
                       >
-                        {item.badge}
-                      </span>
+                        {/* Active Menu Indicator */}
+                        {isActive && (
+                          <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-blue-600 dark:bg-blue-400 transition-all duration-200" />
+                        )}
+                        <Icon
+                          className={cn(
+                            'h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110',
+                            isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 group-hover:text-slate-600 dark:text-slate-400 dark:group-hover:text-slate-200'
+                          )}
+                        />
+                        {!sidebarCollapsed && (
+                          <span className="truncate flex-1">{item.title}</span>
+                        )}
+                        {!sidebarCollapsed && item.badge && (
+                          <span
+                            className={cn(
+                              'rounded-full px-1.5 py-0.5 text-[9px] font-bold group-hover:scale-105 transition-transform mr-1',
+                              isActive
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-blue-50 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
+                            )}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+
+                      {/* Dropdown Toggle Chevron */}
+                      {hasChildren && !sidebarCollapsed && (
+                        <button
+                          type="button"
+                          onClick={(e) => toggleDropdown(item.href, e)}
+                          title="Toggle sub-menu"
+                          className="p-1.5 mr-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <ChevronDown
+                            className={cn(
+                              'h-3.5 w-3.5 transition-transform duration-200',
+                              isDropdownOpen ? 'rotate-0 text-blue-600 dark:text-blue-400' : '-rotate-90'
+                            )}
+                          />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Dropdown Children Sub-items */}
+                    {hasChildren && isDropdownOpen && !sidebarCollapsed && (
+                      <div className="ml-6 pl-2.5 my-1 border-l-2 border-blue-100 dark:border-slate-800 space-y-1 animate-fadeIn">
+                        {item.children!.map((child) => {
+                          const isChildActive =
+                            location.pathname + location.search === child.href ||
+                            (!location.search && child.href === '/chat?tab=chat' && location.pathname === '/chat');
+
+                          return (
+                            <Link
+                              key={child.href + child.title}
+                              to={child.href}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className={cn(
+                                'flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all',
+                                isChildActive
+                                  ? 'text-blue-600 dark:text-blue-400 font-bold bg-blue-50/90 dark:bg-blue-950/50 shadow-2xs'
+                                  : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50'
+                              )}
+                            >
+                              <span className="truncate flex items-center gap-1.5">
+                                <span className={cn('w-1.5 h-1.5 rounded-full', isChildActive ? 'bg-blue-600 dark:bg-blue-400' : 'bg-slate-300 dark:bg-slate-700')} />
+                                {child.title}
+                              </span>
+                            </Link>
+                          );
+                        })}
+                      </div>
                     )}
-                  </Link>
+                  </div>
                 );
               })}
             </div>

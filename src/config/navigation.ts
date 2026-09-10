@@ -71,6 +71,19 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
           sectionTitle: 'MANAGEMENT',
           items: [
             { title: 'Team Dashboard', href: '/dashboard', icon: LayoutDashboard },
+            {
+              title: 'Chat & Teams',
+              href: '/chat',
+              icon: MessageSquare,
+              badge: '3',
+              children: [
+                { title: 'Chat', href: '/chat?tab=chat' },
+                { title: 'Teams', href: '/chat?tab=teams' },
+                { title: 'Calendar', href: '/chat?tab=calendar' },
+                { title: 'Calls', href: '/chat?tab=calls' },
+                { title: 'Files', href: '/chat?tab=files' },
+              ]
+            },
             { title: 'Team Members', href: '/employees', icon: Users, badge: '14' },
             { title: 'Team Attendance', href: '/attendance', icon: Clock },
             { title: 'Clock In / Out', href: '/clock-in', icon: UserCheck },
@@ -89,6 +102,18 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
           sectionTitle: 'TALENT ACQUISITION',
           items: [
             { title: 'ATS Dashboard', href: '/dashboard', icon: LayoutDashboard },
+            {
+              title: 'Chat & Teams',
+              href: '/chat',
+              icon: MessageSquare,
+              children: [
+                { title: 'Chat', href: '/chat?tab=chat' },
+                { title: 'Teams', href: '/chat?tab=teams' },
+                { title: 'Calendar', href: '/chat?tab=calendar' },
+                { title: 'Calls', href: '/chat?tab=calls' },
+                { title: 'Files', href: '/chat?tab=files' },
+              ]
+            },
             { title: 'Job Openings', href: '/recruitment/jobs', icon: Briefcase, badge: '4' },
             { title: 'Candidates Kanban', href: '/recruitment/candidates', icon: Users },
             { title: 'Interviews Schedule', href: '/recruitment/interviews', icon: Calendar },
@@ -104,6 +129,18 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
           sectionTitle: 'FINANCE & PAYROLL',
           items: [
             { title: 'Payroll Dashboard', href: '/dashboard', icon: LayoutDashboard },
+            {
+              title: 'Chat & Teams',
+              href: '/chat',
+              icon: MessageSquare,
+              children: [
+                { title: 'Chat', href: '/chat?tab=chat' },
+                { title: 'Teams', href: '/chat?tab=teams' },
+                { title: 'Calendar', href: '/chat?tab=calendar' },
+                { title: 'Calls', href: '/chat?tab=calls' },
+                { title: 'Files', href: '/chat?tab=files' },
+              ]
+            },
             { title: 'Process Payroll', href: '/payroll', icon: DollarSign },
             { title: 'Salary Structures', href: '/payroll/salary-structure', icon: CreditCard },
             { title: 'Employee Payslips', href: '/payroll/payslips', icon: FileSpreadsheet },
@@ -130,7 +167,19 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
           sectionTitle: 'PEOPLE',
           items: [
             { title: 'Profile', href: '/profile', icon: User },
-            { title: 'Chat', href: '/chat', icon: MessageSquare, badge: '3' },
+            {
+              title: 'Chat & Teams',
+              href: '/chat',
+              icon: MessageSquare,
+              badge: '3',
+              children: [
+                { title: 'Chat', href: '/chat?tab=chat' },
+                { title: 'Teams', href: '/chat?tab=teams' },
+                { title: 'Calendar', href: '/chat?tab=calendar' },
+                { title: 'Calls', href: '/chat?tab=calls' },
+                { title: 'Files', href: '/chat?tab=files' },
+              ]
+            },
             { title: 'Email', href: '/email', icon: Mail, badge: 'New' },
           ]
         },
@@ -176,6 +225,19 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
           sectionTitle: 'MAIN',
           items: [
             { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+            {
+              title: 'Chat & Teams',
+              href: '/chat',
+              icon: MessageSquare,
+              badge: '3',
+              children: [
+                { title: 'Chat', href: '/chat?tab=chat' },
+                { title: 'Teams', href: '/chat?tab=teams' },
+                { title: 'Calendar', href: '/chat?tab=calendar' },
+                { title: 'Calls', href: '/chat?tab=calls' },
+                { title: 'Files', href: '/chat?tab=files' },
+              ]
+            },
             { title: 'Analytics', href: '/reports', icon: BarChart3 },
           ]
         },

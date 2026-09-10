@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
 import { cn } from '../../utils';
 import { Modal } from '../../components/ui/Modal';
@@ -179,8 +180,7 @@ const PRAISE_BADGES = [
 export const ChatPage: React.FC = () => {
   const { currentUser } = useAppStore();
 
-  // Leftmost Teams App Rail State
-  const [activeRailTab, setActiveRailTab] = useState<'activity' | 'chat' | 'teams' | 'calendar' | 'calls' | 'files'>('chat');
+  const [searchParams] = useSearchParams();
 
   // Channel List Pane Filter State
   const [activeTab, setActiveTab] = useState<'all' | 'direct' | 'team' | 'hr'>('all');
@@ -431,6 +431,24 @@ export const ChatPage: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, activeChatId, channelViewTab]);
+
+  // Sync view based on sidebar dropdown navigation (?tab=teams|chat|calendar|calls|files)
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'teams') {
+      setActiveTab('team');
+      setChannelViewTab('posts');
+    } else if (tab === 'chat') {
+      setActiveTab('all');
+      setChannelViewTab('posts');
+    } else if (tab === 'files') {
+      setChannelViewTab('files');
+    } else if (tab === 'calendar') {
+      setIsMeetingModalOpen(true);
+    } else if (tab === 'calls') {
+      setIsAudioCallOpen(true);
+    }
+  }, [searchParams]);
 
   // Call timer simulation
   useEffect(() => {
@@ -720,129 +738,12 @@ export const ChatPage: React.FC = () => {
       </div>
 
       {/* =======================================================================
-          AUTHENTIC MICROSOFT TEAMS 3-PANE WORKSPACE:
-          1. Vertical App Rail (60px)
-          2. Channels / Chat List Pane (280px)
-          3. Conversation Feed & Interactive Tabs (Flex-1)
+          MICROSOFT TEAMS COLLABORATION WORKSPACE
          ======================================================================= */}
       <div className="flex-1 min-h-0 flex bg-white dark:bg-[#111118] rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs overflow-hidden">
         
         {/* =====================================================================
-            PANE 1: THE ICONIC MICROSOFT TEAMS LEFT APP RAIL (60px)
-           ===================================================================== */}
-        <div className="w-14 sm:w-16 bg-[#2B2B40] dark:bg-[#181824] flex flex-col items-center justify-between py-3 flex-shrink-0 select-none z-20">
-          
-          {/* Top Rail App Icons */}
-          <div className="flex flex-col items-center gap-2 w-full">
-            {/* Activity Button */}
-            <button
-              onClick={() => setActiveRailTab('activity')}
-              title="Activity"
-              className={cn(
-                'relative w-11 h-11 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer group',
-                activeRailTab === 'activity'
-                  ? 'bg-[#5B5FC7] text-white shadow-sm'
-                  : 'text-slate-300 hover:text-white hover:bg-white/10'
-              )}
-            >
-              <Bell className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
-              <span className="text-[9px] font-medium mt-0.5 scale-90">Activity</span>
-              <span className="absolute top-1 right-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-[#2B2B40]" />
-            </button>
-
-            {/* Chat Button (Default Active) */}
-            <button
-              onClick={() => setActiveRailTab('chat')}
-              title="Chat"
-              className={cn(
-                'relative w-11 h-11 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer group',
-                activeRailTab === 'chat'
-                  ? 'bg-[#5B5FC7] text-white shadow-sm'
-                  : 'text-slate-300 hover:text-white hover:bg-white/10'
-              )}
-            >
-              <MessageSquare className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
-              <span className="text-[9px] font-medium mt-0.5 scale-90">Chat</span>
-              <span className="absolute top-1 right-1.5 px-1 min-w-3.5 h-3.5 rounded-full bg-rose-500 text-[8px] font-bold text-white flex items-center justify-center ring-2 ring-[#2B2B40]">
-                2
-              </span>
-            </button>
-
-            {/* Teams & Channels Button */}
-            <button
-              onClick={() => setActiveRailTab('teams')}
-              title="Teams"
-              className={cn(
-                'relative w-11 h-11 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer group',
-                activeRailTab === 'teams'
-                  ? 'bg-[#5B5FC7] text-white shadow-sm'
-                  : 'text-slate-300 hover:text-white hover:bg-white/10'
-              )}
-            >
-              <Users className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
-              <span className="text-[9px] font-medium mt-0.5 scale-90">Teams</span>
-            </button>
-
-            {/* Calendar / Meetings */}
-            <button
-              onClick={() => setIsMeetingModalOpen(true)}
-              title="Calendar & Meetings"
-              className={cn(
-                'relative w-11 h-11 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer group',
-                activeRailTab === 'calendar'
-                  ? 'bg-[#5B5FC7] text-white shadow-sm'
-                  : 'text-slate-300 hover:text-white hover:bg-white/10'
-              )}
-            >
-              <Calendar className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
-              <span className="text-[9px] font-medium mt-0.5 scale-90">Calendar</span>
-            </button>
-
-            {/* Calls */}
-            <button
-              onClick={() => setIsAudioCallOpen(true)}
-              title="Calls"
-              className={cn(
-                'relative w-11 h-11 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer group',
-                activeRailTab === 'calls'
-                  ? 'bg-[#5B5FC7] text-white shadow-sm'
-                  : 'text-slate-300 hover:text-white hover:bg-white/10'
-              )}
-            >
-              <Phone className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
-              <span className="text-[9px] font-medium mt-0.5 scale-90">Calls</span>
-            </button>
-
-            {/* OneDrive / Files */}
-            <button
-              onClick={() => setChannelViewTab('files')}
-              title="Files & Cloud"
-              className={cn(
-                'relative w-11 h-11 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer group',
-                activeRailTab === 'files'
-                  ? 'bg-[#5B5FC7] text-white shadow-sm'
-                  : 'text-slate-300 hover:text-white hover:bg-white/10'
-              )}
-            >
-              <Folder className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
-              <span className="text-[9px] font-medium mt-0.5 scale-90">Files</span>
-            </button>
-          </div>
-
-          {/* Bottom Rail Settings / Help */}
-          <div className="flex flex-col items-center gap-2">
-            <button
-              onClick={() => alert('Microsoft Teams Settings: Notifications, Devices, Audio/Video Preferences.')}
-              title="Teams Settings"
-              className="w-10 h-10 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer"
-            >
-              <Settings className="h-4.5 w-4.5" />
-            </button>
-          </div>
-        </div>
-
-        {/* =====================================================================
-            PANE 2: CHANNELS & CHAT LIST (TEAMS STYLE ACCORDIONS)
+            LEFT PANE: CHANNELS & CHATS ACCORDION LIST
            ===================================================================== */}
         <div className="w-64 sm:w-72 md:w-80 border-r border-slate-200/80 dark:border-slate-800 flex flex-col bg-slate-50/70 dark:bg-[#13131B] flex-shrink-0">
           
