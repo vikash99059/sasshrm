@@ -96,18 +96,18 @@ export const AttendancePage: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6 animate-page-enter">
+    <div className="space-y-4 animate-page-enter">
       {/* =========================================================================
           TOP HEADER: ICON + TITLE + SUBTITLE & 3D CLOCK/CALENDAR ILLUSTRATION
          ========================================================================= */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         {/* Left: Icon, Title and Subtitle */}
-        <div className="flex items-center gap-3.5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-xs flex-shrink-0">
-            <CalendarCheck className="h-6 w-6" />
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-xs flex-shrink-0">
+            <CalendarCheck className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               Attendance
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -116,67 +116,153 @@ export const AttendancePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Soft 3D Clock & Calendar Illustration matching reference */}
-        <div className="hidden md:flex items-center justify-end relative pr-4">
+        {/* Right: Big, Vibrant, Highly-Attractive 3D Clock & Calendar Illustration */}
+        <div className="hidden md:flex items-center justify-end relative pr-2">
           <div className="relative flex items-center justify-center">
-            {/* Ambient Soft Glow Behind Graphic */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-blue-400/20 via-sky-300/20 to-blue-500/20 rounded-full blur-xl pointer-events-none" />
+            {/* Ambient Multi-Tone Radiant Glow */}
+            <div className="absolute -inset-3 bg-gradient-to-r from-blue-500/25 via-sky-400/25 to-indigo-500/20 rounded-full blur-xl pointer-events-none" />
 
-            {/* SVG 3D Clock & Calendar Graphic */}
-            <svg width="130" height="75" viewBox="0 0 160 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Soft Leaf Decorative Background */}
-              <path d="M15 50C25 40 38 45 42 60C30 65 20 62 15 50Z" fill="#BFDBFE" fillOpacity="0.6" />
-              <path d="M145 25C135 15 122 20 118 35C130 40 140 37 145 25Z" fill="#BFDBFE" fillOpacity="0.5" />
-              <path d="M155 45C142 38 135 48 136 62C148 62 154 55 155 45Z" fill="#93C5FD" fillOpacity="0.5" />
+            {/* Enlarged 3D Clock & Calendar Graphic */}
+            <svg width="180" height="98" viewBox="0 0 215 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Soft Leaves Decorative Background */}
+              <path d="M12 68C22 52 40 58 46 76C32 82 20 80 12 68Z" fill="#93C5FD" fillOpacity="0.5" />
+              <path d="M198 30C185 18 168 25 162 44C178 50 192 46 198 30Z" fill="#60A5FA" fillOpacity="0.45" />
+              <path d="M210 58C194 48 184 62 186 80C202 78 208 70 210 58Z" fill="#38BDF8" fillOpacity="0.55" />
 
-              {/* 3D Round Clock Base */}
-              <circle cx="65" cy="46" r="32" fill="url(#clockGrad)" filter="url(#clockShadow)" />
-              <circle cx="65" cy="46" r="28" fill="#F8FAFC" />
-              <circle cx="65" cy="46" r="24" fill="white" />
-              {/* Clock Hands */}
-              <circle cx="65" cy="46" r="2.5" fill="#2563EB" />
-              <line x1="65" y1="46" x2="65" y2="30" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" />
-              <line x1="65" y1="46" x2="77" y2="40" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" />
+              {/* Sparkle Stars */}
+              <path d="M48 24L50 18L52 24L58 26L52 28L50 34L48 28L42 26L48 24Z" fill="#38BDF8" fillOpacity="0.8" />
+              <path d="M174 15L175.5 10L177 15L182 16.5L177 18L175.5 23L174 18L169 16.5L174 15Z" fill="#60A5FA" fillOpacity="0.75" />
 
-              {/* 3D Slanted Calendar */}
-              <g transform="translate(85, 24) rotate(8)">
-                <rect x="0" y="4" width="44" height="48" rx="7" fill="url(#calBodyGrad)" filter="url(#calShadow)" />
-                <rect x="0" y="0" width="44" height="15" rx="5" fill="#2563EB" />
-                {/* Spiral ring binders */}
-                <circle cx="10" cy="2" r="2.5" fill="#CBD5E1" stroke="#3B82F6" strokeWidth="1" />
-                <circle cx="22" cy="2" r="2.5" fill="#CBD5E1" stroke="#3B82F6" strokeWidth="1" />
-                <circle cx="34" cy="2" r="2.5" fill="#CBD5E1" stroke="#3B82F6" strokeWidth="1" />
-                {/* Calendar grid dots */}
-                <rect x="6" y="20" width="6" height="5" rx="1.5" fill="#94A3B8" opacity="0.6" />
-                <rect x="15" y="20" width="6" height="5" rx="1.5" fill="#94A3B8" opacity="0.6" />
-                <rect x="24" y="20" width="6" height="5" rx="1.5" fill="#94A3B8" opacity="0.6" />
-                <rect x="33" y="20" width="6" height="5" rx="1.5" fill="#94A3B8" opacity="0.6" />
+              {/* 3D Round Clock Base (Larger, High-Definition) */}
+              <g transform="translate(10, 0)">
+                {/* Outer Shadow Bezel */}
+                <circle cx="70" cy="56" r="42" fill="url(#clockOuterBezelGrad)" filter="url(#clockDropShadow)" />
+                {/* Metallic Chrome Ring */}
+                <circle cx="70" cy="56" r="38" fill="url(#clockMetallicRingGrad)" />
+                {/* Dial Face Background */}
+                <circle cx="70" cy="56" r="33" fill="#FFFFFF" />
+                <circle cx="70" cy="56" r="33" fill="url(#clockDialSoftGrad)" />
 
-                <rect x="6" y="28" width="6" height="5" rx="1.5" fill="#94A3B8" opacity="0.6" />
-                <rect x="15" y="28" width="6" height="5" rx="1.5" fill="#2563EB" />
-                <rect x="24" y="28" width="6" height="5" rx="1.5" fill="#94A3B8" opacity="0.6" />
-                <rect x="33" y="28" width="6" height="5" rx="1.5" fill="#94A3B8" opacity="0.6" />
+                {/* Dial Hour Tick Marks */}
+                <circle cx="70" cy="28" r="2" fill="#2563EB" />
+                <circle cx="98" cy="56" r="2" fill="#2563EB" />
+                <circle cx="70" cy="84" r="2" fill="#2563EB" />
+                <circle cx="42" cy="56" r="2" fill="#2563EB" />
 
-                <rect x="6" y="36" width="6" height="5" rx="1.5" fill="#94A3B8" opacity="0.6" />
-                <rect x="15" y="36" width="6" height="5" rx="1.5" fill="#94A3B8" opacity="0.6" />
-                <rect x="24" y="36" width="6" height="5" rx="1.5" fill="#94A3B8" opacity="0.6" />
-                <rect x="33" y="36" width="6" height="5" rx="1.5" fill="#94A3B8" opacity="0.6" />
+                {/* Additional subtle minute ticks */}
+                <circle cx="84" cy="32" r="1" fill="#93C5FD" />
+                <circle cx="94" cy="42" r="1" fill="#93C5FD" />
+                <circle cx="94" cy="70" r="1" fill="#93C5FD" />
+                <circle cx="84" cy="80" r="1" fill="#93C5FD" />
+                <circle cx="56" cy="80" r="1" fill="#93C5FD" />
+                <circle cx="46" cy="70" r="1" fill="#93C5FD" />
+                <circle cx="46" cy="42" r="1" fill="#93C5FD" />
+                <circle cx="56" cy="32" r="1" fill="#93C5FD" />
+
+                {/* Clock Hands: 10:10 Aesthetic Position */}
+                <line x1="70" y1="56" x2="52" y2="38" stroke="#1D4ED8" strokeWidth="3.5" strokeLinecap="round" filter="url(#handsShadow)" />
+                <line x1="70" y1="56" x2="88" y2="44" stroke="#2563EB" strokeWidth="3" strokeLinecap="round" filter="url(#handsShadow)" />
+                {/* Second Hand (Cyan Accent) */}
+                <line x1="70" y1="56" x2="70" y2="28" stroke="#06B6D4" strokeWidth="1.5" strokeLinecap="round" />
+
+                {/* Center Chrome Nut */}
+                <circle cx="70" cy="56" r="4" fill="#1E40AF" />
+                <circle cx="70" cy="56" r="2" fill="#E2E8F0" />
+
+                {/* Glossy Curved Glass Reflection Arc */}
+                <path d="M 44 42 A 30 30 0 0 1 96 42 A 28 28 0 0 0 44 42 Z" fill="url(#clockGlossGrad)" opacity="0.6" />
+              </g>
+
+              {/* 3D Slanted Calendar (Enlarged, Rich isometric tilt) */}
+              <g transform="translate(112, 22) rotate(6)">
+                {/* Drop shadow & Calendar Backboard */}
+                <rect x="0" y="6" width="60" height="66" rx="10" fill="url(#calBaseGrad)" filter="url(#calDropShadow)" />
+                
+                {/* Deep Royal Blue Header Spine */}
+                <rect x="0" y="0" width="60" height="20" rx="8" fill="url(#calHeaderGrad)" />
+                
+                {/* Silver / Metallic Binding Rings */}
+                <circle cx="12" cy="3" r="3" fill="#F8FAFC" stroke="#1D4ED8" strokeWidth="1.5" />
+                <circle cx="30" cy="3" r="3" fill="#F8FAFC" stroke="#1D4ED8" strokeWidth="1.5" />
+                <circle cx="48" cy="3" r="3" fill="#F8FAFC" stroke="#1D4ED8" strokeWidth="1.5" />
+
+                {/* Calendar Grid Status Pills & Dates */}
+                {/* Row 1 */}
+                <rect x="8" y="27" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
+                <rect x="20" y="27" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
+                <rect x="32" y="27" width="8" height="6" rx="2" fill="#10B981" />
+                <rect x="44" y="27" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
+
+                {/* Row 2 */}
+                <rect x="8" y="38" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
+                <rect x="20" y="38" width="8" height="6" rx="2" fill="#2563EB" />
+                <rect x="32" y="38" width="8" height="6" rx="2" fill="#10B981" />
+                <rect x="44" y="38" width="8" height="6" rx="2" fill="#8B5CF6" />
+
+                {/* Row 3 */}
+                <rect x="8" y="49" width="8" height="6" rx="2" fill="#10B981" />
+                <rect x="20" y="49" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
+                <rect x="32" y="49" width="8" height="6" rx="2" fill="#2563EB" />
+                <rect x="44" y="49" width="8" height="6" rx="2" fill="#10B981" />
+
+                {/* Row 4 */}
+                <rect x="8" y="60" width="8" height="5" rx="1.5" fill="#93C5FD" opacity="0.4" />
+                <rect x="20" y="60" width="8" height="5" rx="1.5" fill="#93C5FD" opacity="0.4" />
+                <rect x="32" y="60" width="8" height="5" rx="1.5" fill="#93C5FD" opacity="0.4" />
+                <rect x="44" y="60" width="8" height="5" rx="1.5" fill="#93C5FD" opacity="0.4" />
+              </g>
+
+              {/* Floating 3D Check Badge over the setup */}
+              <g transform="translate(150, 75)" filter="url(#badgeShadow)">
+                <rect x="0" y="0" width="54" height="20" rx="10" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1" />
+                <circle cx="10" cy="10" r="5.5" fill="#10B981" />
+                <path d="M8 10L9.5 11.5L12.5 8.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                <text x="19" y="13.5" fill="#0F172A" fontSize="8.5" fontWeight="bold" fontFamily="sans-serif">Present</text>
               </g>
 
               <defs>
-                <linearGradient id="clockGrad" x1="40" y1="20" x2="90" y2="80" gradientUnits="userSpaceOnUse">
+                {/* Clock Bezel & Dial Gradients */}
+                <linearGradient id="clockOuterBezelGrad" x1="30" y1="20" x2="110" y2="100" gradientUnits="userSpaceOnUse">
                   <stop stopColor="#38BDF8" />
-                  <stop offset="1" stopColor="#2563EB" />
+                  <stop offset="0.5" stopColor="#2563EB" />
+                  <stop offset="1" stopColor="#1E3A8A" />
                 </linearGradient>
-                <linearGradient id="calBodyGrad" x1="0" y1="0" x2="44" y2="52" gradientUnits="userSpaceOnUse">
+                <linearGradient id="clockMetallicRingGrad" x1="40" y1="24" x2="100" y2="92" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#F8FAFC" />
+                  <stop offset="0.5" stopColor="#E2E8F0" />
+                  <stop offset="1" stopColor="#CBD5E1" />
+                </linearGradient>
+                <linearGradient id="clockDialSoftGrad" x1="70" y1="23" x2="70" y2="89" gradientUnits="userSpaceOnUse">
                   <stop stopColor="#FFFFFF" />
-                  <stop offset="1" stopColor="#F1F5F9" />
+                  <stop offset="1" stopColor="#EFF6FF" />
                 </linearGradient>
-                <filter id="clockShadow" x="25" y="10" width="80" height="80" filterUnits="userSpaceOnUse">
-                  <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#1E40AF" floodOpacity="0.25" />
+                <linearGradient id="clockGlossGrad" x1="70" y1="30" x2="70" y2="50" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#FFFFFF" stopOpacity="0.8" />
+                  <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
+                </linearGradient>
+
+                {/* Calendar Gradients */}
+                <linearGradient id="calBaseGrad" x1="0" y1="0" x2="60" y2="72" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#FFFFFF" />
+                  <stop offset="1" stopColor="#F8FAFC" />
+                </linearGradient>
+                <linearGradient id="calHeaderGrad" x1="0" y1="0" x2="60" y2="20" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#3B82F6" />
+                  <stop offset="1" stopColor="#1D4ED8" />
+                </linearGradient>
+
+                {/* High Fidelity Drop Shadows */}
+                <filter id="clockDropShadow" x="18" y="8" width="104" height="104" filterUnits="userSpaceOnUse">
+                  <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#1E40AF" floodOpacity="0.28" />
                 </filter>
-                <filter id="calShadow" x="-5" y="0" width="56" height="60" filterUnits="userSpaceOnUse">
-                  <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#0F172A" floodOpacity="0.15" />
+                <filter id="handsShadow" x="40" y="30" width="60" height="40" filterUnits="userSpaceOnUse">
+                  <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#0F172A" floodOpacity="0.25" />
+                </filter>
+                <filter id="calDropShadow" x="-8" y="0" width="76" height="82" filterUnits="userSpaceOnUse">
+                  <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#0F172A" floodOpacity="0.18" />
+                </filter>
+                <filter id="badgeShadow" x="-4" y="-2" width="62" height="28" filterUnits="userSpaceOnUse">
+                  <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#0F172A" floodOpacity="0.12" />
                 </filter>
               </defs>
             </svg>
@@ -185,104 +271,104 @@ export const AttendancePage: React.FC = () => {
       </div>
 
       {/* =========================================================================
-          TOP 4 KPI STAT CARDS (COMPACT HEIGHT, ICON & METRIC IN ONE ROW BESIDE)
+          TOP 4 KPI STAT CARDS (COMPACT HEIGHT, BALANCED PADDING, SHARP ALIGNMENT)
          ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {/* 1. Present Days */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 shadow-xs flex-shrink-0">
+        <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 shadow-xs flex-shrink-0">
               <CalendarCheck className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
                 Present Days
               </span>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                   18
                 </span>
               </div>
-              <span className="text-[11px] text-slate-400 block mt-0.5">This Month</span>
+              <span className="text-[10.5px] text-slate-400 block">This Month</span>
             </div>
           </div>
           <div className="self-end pb-0.5">
-            <span className="inline-flex items-center gap-0.5 rounded-lg bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-0.5 rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-bold text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
               <ArrowUpRight className="h-3 w-3 stroke-[2.5]" /> 12%
             </span>
           </div>
         </div>
 
         {/* 2. Absent Days */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-50 text-rose-500 dark:bg-rose-950/60 dark:text-rose-400 shadow-xs flex-shrink-0">
+        <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-500 dark:bg-rose-950/60 dark:text-rose-400 shadow-xs flex-shrink-0">
               <CalendarX className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
                 Absent Days
               </span>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                   2
                 </span>
               </div>
-              <span className="text-[11px] text-slate-400 block mt-0.5">This Month</span>
+              <span className="text-[10.5px] text-slate-400 block">This Month</span>
             </div>
           </div>
           <div className="self-end pb-0.5">
-            <span className="inline-flex items-center gap-0.5 rounded-lg bg-rose-50 px-2 py-0.5 text-xs font-bold text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
+            <span className="inline-flex items-center gap-0.5 rounded-md bg-rose-50 px-1.5 py-0.5 text-[11px] font-bold text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
               <ArrowDownRight className="h-3 w-3 stroke-[2.5]" /> 50%
             </span>
           </div>
         </div>
 
         {/* 3. Leave Days */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400 shadow-xs flex-shrink-0">
+        <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400 shadow-xs flex-shrink-0">
               <FileText className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
                 Leave Days
               </span>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                   1
                 </span>
               </div>
-              <span className="text-[11px] text-slate-400 block mt-0.5">This Month</span>
+              <span className="text-[10.5px] text-slate-400 block">This Month</span>
             </div>
           </div>
           <div className="self-end pb-0.5">
-            <span className="inline-flex items-center gap-0.5 rounded-lg bg-purple-50 px-2 py-0.5 text-xs font-bold text-purple-600 dark:bg-purple-950/40 dark:text-purple-400">
+            <span className="inline-flex items-center gap-0.5 rounded-md bg-purple-50 px-1.5 py-0.5 text-[11px] font-bold text-purple-600 dark:bg-purple-950/40 dark:text-purple-400">
               <ArrowUpRight className="h-3 w-3 stroke-[2.5]" /> 0%
             </span>
           </div>
         </div>
 
         {/* 4. Total Working Hours */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-xs flex-shrink-0">
+        <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-xs flex-shrink-0">
               <Clock className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
                 Total Working Hours
               </span>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                   144.5 hrs
                 </span>
               </div>
-              <span className="text-[11px] text-slate-400 block mt-0.5">This Month</span>
+              <span className="text-[10.5px] text-slate-400 block">This Month</span>
             </div>
           </div>
           <div className="self-end pb-0.5">
-            <span className="inline-flex items-center gap-0.5 rounded-lg bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-0.5 rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-bold text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
               <ArrowUpRight className="h-3 w-3 stroke-[2.5]" /> 8%
             </span>
           </div>
@@ -294,12 +380,12 @@ export const AttendancePage: React.FC = () => {
           LEFT: ATTENDANCE CALENDAR (WIDE)
           RIGHT: TODAY'S ATTENDANCE + SUMMARY DONUT + RECENT ACTIVITY
          ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         
         {/* =======================================================================
             LEFT COLUMN: ATTENDANCE CALENDAR
            ======================================================================= */}
-        <div className="lg:col-span-7 xl:col-span-8 rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs dark:border-dark-border dark:bg-dark-card flex flex-col justify-between">
+        <div className="lg:col-span-7 xl:col-span-8 rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-dark-border dark:bg-dark-card flex flex-col justify-between">
           
           {/* Card Header & Controls */}
           <div className="flex items-center justify-between pb-4">
@@ -457,10 +543,10 @@ export const AttendancePage: React.FC = () => {
             2. ATTENDANCE SUMMARY (DONUT)
             3. RECENT ACTIVITY
            ======================================================================= */}
-        <div className="lg:col-span-5 xl:col-span-4 space-y-5">
+        <div className="lg:col-span-5 xl:col-span-4 space-y-4">
           
           {/* 1. Today's Attendance Card */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card space-y-4">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card space-y-3.5">
             {/* Card Header */}
             <div className="flex items-center justify-between">
               <div>
@@ -529,7 +615,7 @@ export const AttendancePage: React.FC = () => {
           </div>
 
           {/* 2. Attendance Summary Card */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card space-y-4">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card space-y-3.5">
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
@@ -645,7 +731,7 @@ export const AttendancePage: React.FC = () => {
           </div>
 
           {/* 3. Recent Activity Card */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card space-y-3.5">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card space-y-3">
             {/* Header */}
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">
