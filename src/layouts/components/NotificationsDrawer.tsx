@@ -60,7 +60,7 @@ export const NotificationsDrawer: React.FC = () => {
 
       {/* Slide-over Container */}
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-white shadow-2xl dark:border-l dark:border-dark-border dark:bg-dark-card flex flex-col">
+        <div className="w-screen max-w-md bg-white shadow-2xl dark:border-l dark:border-dark-border dark:bg-dark-card flex flex-col animate-drawer-slide-right">
           {/* Drawer Header */}
           <div className="flex items-center justify-between border-b border-slate-100 p-5 dark:border-dark-border">
             <div className="flex items-center gap-2.5">

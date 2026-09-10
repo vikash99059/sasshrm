@@ -49,14 +49,14 @@ export const Modal: React.FC<ModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4 sm:p-6 animate-fade-in">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-200"
         onClick={onClose}
       />
 
       {/* Modal Dialog */}
       <div
         className={cn(
-          'relative w-full overflow-hidden rounded-2xl bg-white shadow-2xl transition-all dark:border dark:border-dark-border dark:bg-dark-card my-8',
+          'relative w-full overflow-hidden rounded-2xl bg-white shadow-2xl transition-all duration-200 dark:border dark:border-dark-border dark:bg-dark-card my-8 animate-modal-pop',
           sizes[size]
         )}
       >

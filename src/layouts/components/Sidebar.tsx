@@ -66,18 +66,18 @@ export const Sidebar: React.FC = () => {
           {/* Desktop Toggle Button */}
           <button
             onClick={toggleSidebar}
-            className="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900 dark:bg-slate-800/60 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white transition-colors"
+            className="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900 dark:bg-slate-800/60 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white transition-colors cursor-pointer"
           >
             {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
         </div>
 
         {/* Navigation Items List */}
-        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-5 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4 scrollbar-thin">
           {navSections.map((section, sIdx) => (
             <div key={sIdx} className="space-y-0.5">
               {section.sectionTitle && !sidebarCollapsed && (
-                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
+                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 pt-1">
                   {section.sectionTitle}
                 </p>
               )}
@@ -95,8 +95,9 @@ export const Sidebar: React.FC = () => {
                   item.href !== '/operations' &&
                   item.href !== '/reports' &&
                   item.href !== '/settings' &&
+                  item.href !== '/calendar' &&
                   location.pathname.startsWith(item.href + '/');
-                const isEmployeeProfile = item.href === '/employees' && location.pathname.startsWith('/employees/');
+                const isEmployeeProfile = item.href === '/profile' && (location.pathname === '/profile' || location.pathname === '/my-profile');
                 const isActive = isExact || isSubPath || isEmployeeProfile;
 
                 return (
@@ -105,14 +106,18 @@ export const Sidebar: React.FC = () => {
                     to={item.href}
                     onClick={() => setMobileMenuOpen(false)}
                     className={cn(
-                      'group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 relative',
+                      'group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 relative overflow-hidden',
                       isActive
-                        ? 'bg-blue-50 text-blue-600 shadow-xs dark:bg-blue-950/60 dark:text-blue-400'
-                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:translate-x-1 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100',
+                        ? 'bg-blue-50/90 text-blue-600 shadow-2xs dark:bg-blue-950/60 dark:text-blue-400 font-bold'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:translate-x-0.5 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100',
                       sidebarCollapsed && 'justify-center px-0 hover:translate-x-0'
                     )}
                     title={sidebarCollapsed ? item.title : undefined}
                   >
+                    {/* Active Menu Indicator from Animation Reference Image */}
+                    {isActive && (
+                      <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-blue-600 dark:bg-blue-400 transition-all duration-200" />
+                    )}
                     <Icon
                       className={cn(
                         'h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110',
@@ -141,24 +146,24 @@ export const Sidebar: React.FC = () => {
           ))}
         </div>
 
-        {/* Bottom Promo Card matching reference image */}
+        {/* Bottom Promo Card */}
         {!sidebarCollapsed && (
           <div className="mx-3 my-2 rounded-2xl bg-blue-50/70 p-3 border border-blue-100/80 dark:bg-blue-950/30 dark:border-blue-900/40 hover-shine-sweep transition-all hover:shadow-sm">
             <div className="flex items-center gap-2 mb-1">
               <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-600 text-white text-xs shadow-xs">
                 <Sparkles className="h-3.5 w-3.5" />
               </div>
-              <span className="text-xs font-bold text-slate-900 dark:text-white">Your Growth</span>
+              <span className="text-xs font-bold text-slate-900 dark:text-white">Career Growth</span>
             </div>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mb-2">
-              Our Priority. Build your career with opportunities & support.
+              Explore your learning roadmaps, skills, and internal achievements.
             </p>
-            <button
-              onClick={() => alert('Explore Career & Learning Opportunities')}
-              className="w-full rounded-xl bg-blue-600 py-1.5 text-[11px] font-semibold text-white hover:bg-blue-700 shadow-xs transition-all hover-magnetic-btn"
+            <Link
+              to="/operations/training"
+              className="block text-center w-full rounded-xl bg-blue-600 py-1.5 text-[11px] font-semibold text-white hover:bg-blue-700 shadow-xs transition-all hover-magnetic-btn"
             >
-              Explore More
-            </button>
+              Explore Training
+            </Link>
           </div>
         )}
 
@@ -167,7 +172,7 @@ export const Sidebar: React.FC = () => {
           <button
             onClick={toggleSidebar}
             className={cn(
-              'w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-white transition-colors',
+              'w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-white transition-colors cursor-pointer',
               sidebarCollapsed ? 'justify-center px-0' : ''
             )}
           >

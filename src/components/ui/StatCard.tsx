@@ -29,7 +29,7 @@ export const StatCard: React.FC<StatCardProps> = ({
     <div
       onClick={onClick}
       className={cn(
-        'group relative overflow-hidden rounded-xl border border-slate-200/80 bg-white p-5 shadow-card transition-all duration-200 hover:border-slate-300 hover:shadow-soft dark:border-dark-border dark:bg-dark-card',
+        'group relative overflow-hidden rounded-xl border border-slate-200/80 bg-white p-5 shadow-card transition-all duration-200 hover-card-lift hover:border-slate-300 dark:border-dark-border dark:bg-dark-card',
         onClick && 'cursor-pointer',
         className
       )}
@@ -38,7 +38,7 @@ export const StatCard: React.FC<StatCardProps> = ({
         <span className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
           {title}
         </span>
-        <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105', iconBgColor)}>
+        <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-110', iconBgColor)}>
           {icon}
         </div>
       </div>

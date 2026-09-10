@@ -322,7 +322,7 @@ export const EmployeeDashboardView: React.FC = () => {
           {/* ROW 1: 5 EMPLOYEE STAT CARDS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4">
             {/* 1. Leave Balance */}
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between hover-card-lift transition-all duration-200">
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
                   <Calendar className="h-4 w-4" />
@@ -337,7 +337,7 @@ export const EmployeeDashboardView: React.FC = () => {
                 </div>
                 <div className="mt-2.5 space-y-1">
                   <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                    <div className="h-full rounded-full bg-blue-600" style={{ width: '75%' }} />
+                    <div className="h-full rounded-full bg-blue-600 transition-all duration-500" style={{ width: '75%' }} />
                   </div>
                   <span className="text-[10px] text-slate-400 font-medium">Total: 24 days</span>
                 </div>
@@ -345,7 +345,7 @@ export const EmployeeDashboardView: React.FC = () => {
             </div>
 
             {/* 2. Today's Attendance */}
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between hover-card-lift transition-all duration-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
@@ -372,7 +372,7 @@ export const EmployeeDashboardView: React.FC = () => {
             {/* 3. Pending Approvals */}
             <div
               onClick={() => navigate('/leave')}
-              className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between cursor-pointer hover:border-purple-200 dark:hover:border-purple-800 transition-colors group"
+              className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between cursor-pointer hover:border-purple-200 dark:hover:border-purple-800 hover-card-lift transition-all duration-200 group"
             >
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400">
@@ -398,7 +398,7 @@ export const EmployeeDashboardView: React.FC = () => {
             {/* 4. My Tasks */}
             <div
               onClick={() => navigate('/performance/goals')}
-              className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between cursor-pointer hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors group"
+              className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between cursor-pointer hover:border-indigo-200 dark:hover:border-indigo-800 hover-card-lift transition-all duration-200 group"
             >
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
@@ -422,7 +422,7 @@ export const EmployeeDashboardView: React.FC = () => {
             </div>
 
             {/* 5. Next Holiday */}
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between hover-card-lift transition-all duration-200">
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400">
                   <Palmtree className="h-4 w-4" />

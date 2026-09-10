@@ -294,174 +294,163 @@
   animation: floatGentleAlt 4s ease-in-out 0.8s infinite;
 }
 
-@keyframes loginCardEntry {
+/* ==========================================================
+   HRM PROFESSIONAL ANIMATION SYSTEM
+   ========================================================== */
+
+/* 1. Page / Route Transition (240ms subtle fade + slide) */
+@keyframes pageEnter {
   0% {
     opacity: 0;
-    transform: translateY(28px) scale(0.97);
+    transform: translateY(6px);
   }
-
-  60% {
+  100% {
     opacity: 1;
-    transform: translateY(-4px) scale(1.005);
+    transform: translateY(0);
   }
+}
 
+.animate-page-enter {
+  animation: pageEnter 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* 2. Modal Scale & Fade In (220ms) */
+@keyframes modalPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-pop {
+  animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* 3. Drawer Slide In (260ms) */
+@keyframes drawerSlideRight {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-drawer-slide-right {
+  animation: drawerSlideRight 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform;
+}
+
+/* 4. Form Validation Error Shake (320ms subtle) */
+@keyframes errorShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-3px);
+  }
+  40%, 80% {
+    transform: translateX(3px);
+  }
+}
+
+.animate-shake {
+  animation: errorShake 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* 5. Bell Notification Ring (Subtle 450ms) */
+@keyframes bellRing {
+  0% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(10deg);
+  }
+  40% {
+    transform: rotate(-10deg);
+  }
+  60% {
+    transform: rotate(6deg);
+  }
+  80% {
+    transform: rotate(-6deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+
+.animate-bell-ring {
+  animation: bellRing 0.45s ease-in-out;
+  transform-origin: top center;
+}
+
+.hover-bell-ring:hover svg,
+.hover-bell-ring:hover {
+  animation: bellRing 0.45s ease-in-out;
+  transform-origin: top center;
+}
+
+/* 6. Notification Badge Subtle Pulse */
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+  }
+}
+
+.animate-badge-pulse {
+  animation: badgePulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 7. Toast / Dropdown Slide Down (180ms) */
+@keyframes toastSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
 
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.animate-toast-slide {
+  animation: toastSlideIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.animate-fade-in {
-  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+/* 8. Micro-Press Button Utility */
+.btn-tactile {
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease;
+}
+.btn-tactile:active {
+  transform: scale(0.97);
 }
 
-/* ══════════════════════════════════════════════
-   INNOVATIVE LOGIN PAGE ANIMATIONS
-   ══════════════════════════════════════════════ */
+/* 9. Smooth Stagger Transitions */
+.stagger-1 { animation-delay: 40ms; }
+.stagger-2 { animation-delay: 80ms; }
+.stagger-3 { animation-delay: 120ms; }
+.stagger-4 { animation-delay: 160ms; }
 
-/* Floating orb movements */
-@keyframes orbFloat1 {
-  0% {
-    transform: translate(0, 0) scale(1);
+/* 10. Prefers-Reduced-Motion Accessibility Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-
-  30% {
-    transform: translate(-30px, 25px) scale(1.08);
-  }
-
-  60% {
-    transform: translate(20px, -20px) scale(0.95);
-  }
-
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-}
-
-@keyframes orbFloat2 {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-
-  40% {
-    transform: translate(40px, -30px) scale(1.1);
-  }
-
-  70% {
-    transform: translate(-15px, 20px) scale(0.92);
-  }
-
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-}
-
-@keyframes orbFloat3 {
-  0% {
-    transform: translate(0, 0) scale(1) rotate(0deg);
-  }
-
-  50% {
-    transform: translate(25px, -40px) scale(1.15) rotate(180deg);
-  }
-
-  100% {
-    transform: translate(0, 0) scale(1) rotate(360deg);
-  }
-}
-
-/* Sparkling star dots */
-@keyframes sparkle {
-
-  0%,
-  100% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-
-  20% {
-    opacity: 0;
-  }
-
-  40% {
-    opacity: 0.9;
-    transform: scale(1.4);
-  }
-
-  60% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-
-  80% {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-}
-
-/* Staggered card field entries */
-@keyframes staggerUp {
-  0% {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.anim-stagger-1 {
-  animation: staggerUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.10s both;
-}
-
-.anim-stagger-2 {
-  animation: staggerUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.20s both;
-}
-
-.anim-stagger-3 {
-  animation: staggerUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.30s both;
-}
-
-.anim-stagger-4 {
-  animation: staggerUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.40s both;
-}
-
-.anim-stagger-5 {
-  animation: staggerUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.50s both;
-}
-
-.anim-stagger-6 {
-  animation: staggerUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.60s both;
-}
-
-/* Card border glow pulse */
-@keyframes cardGlowPulse {
-
-  0%,
-  100% {
-    box-shadow: 0 25px 60px -15px rgba(0, 35, 80, 0.12), 0 0 0 0 rgba(29, 104, 254, 0);
-  }
-
-  50% {
-    box-shadow: 0 25px 60px -15px rgba(0, 35, 80, 0.18), 0 0 32px 4px rgba(29, 104, 254, 0.10);
-  }
-}
-
-.anim-card-glow {
-  animation: loginCardEntry 0.6s cubic-bezier(0.22, 1, 0.36, 1) both,
-    cardGlowPulse 4s ease-in-out 0.8s infinite;
 }
