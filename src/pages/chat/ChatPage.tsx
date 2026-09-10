@@ -177,6 +177,23 @@ const PRAISE_BADGES = [
   { id: 'leadership', label: 'Leadership', icon: '👑', color: 'from-emerald-500 to-teal-600', desc: 'Inspiring, guiding, and mentoring teammates toward success.' },
 ];
 
+export interface ChannelMember {
+  id: string;
+  name: string;
+  role: string;
+  avatar: string;
+  status: 'Available' | 'Busy' | 'In a Call' | 'Away' | 'Offline';
+  online: boolean;
+}
+
+const CHANNEL_MEMBERS: ChannelMember[] = [
+  { id: 'u-amit', name: 'Amit Verma', role: 'Engineering Manager', status: 'Available', online: true, avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80' },
+  { id: 'u-elena', name: 'Elena Rostova', role: 'Lead Talent Acquisition', status: 'Available', online: true, avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80' },
+  { id: 'u-sneha', name: 'Sneha Gupta', role: 'HR People Ops Lead', status: 'Available', online: true, avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80' },
+  { id: 'u-david', name: 'David Chen', role: 'Site Reliability Lead', status: 'Busy', online: true, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80' },
+  { id: 'u-priya', name: 'Priya Sharma', role: 'UX Specialist', status: 'Offline', online: false, avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80' },
+];
+
 export const ChatPage: React.FC = () => {
   const { currentUser } = useAppStore();
 
@@ -190,6 +207,21 @@ export const ChatPage: React.FC = () => {
   const [isPinnedExpanded, setIsPinnedExpanded] = useState(true);
   const [isRecentExpanded, setIsRecentExpanded] = useState(true);
   const [showMemberDrawer, setShowMemberDrawer] = useState(false);
+
+  // Calling Dropdown & Recipient Selection State
+  const [callDropdownOpen, setCallDropdownOpen] = useState<'audio' | 'video' | null>(null);
+  const [callMemberFilter, setCallMemberFilter] = useState('');
+  const [activeCallTarget, setActiveCallTarget] = useState<{
+    name: string;
+    avatar: string;
+    role?: string;
+    isGroup?: boolean;
+  }>({
+    name: 'General Standup Team',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80',
+    role: '18 Participants',
+    isGroup: true,
+  });
 
   // Message Composer State
   const [newSubject, setNewSubject] = useState('');
@@ -1032,31 +1064,53 @@ export const ChatPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Calling & Teams Action Icons */}
-            <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-              {/* Audio Call */}
-              <button
-                onClick={() => setIsAudioCallOpen(true)}
-                title="Start Audio Call"
-                className="flex items-center gap-1.5 h-8.5 px-2.5 rounded-xl text-slate-700 hover:text-[#5B5FC7] hover:bg-[#5B5FC7]/10 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer text-xs font-semibold"
-              >
-                <Phone className="h-4 w-4 text-[#5B5FC7]" />
-                <span className="hidden md:inline">Call</span>
-              </button>
+            {/* Calling & Teams Action Icons with Dropdown */}
+            <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0 relative">
+              {/* Audio Call Button with Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setCallDropdownOpen(callDropdownOpen === 'audio' ? null : 'audio')}
+                  title="Start Audio Call (Select who to call)"
+                  className={cn(
+                    'flex items-center gap-1.5 h-8.5 px-2.5 rounded-xl transition-colors cursor-pointer text-xs font-semibold',
+                    callDropdownOpen === 'audio'
+                      ? 'bg-[#5B5FC7] text-white shadow-xs'
+                      : 'text-slate-700 hover:text-[#5B5FC7] hover:bg-[#5B5FC7]/10 dark:text-slate-200 dark:hover:bg-slate-800'
+                  )}
+                >
+                  <Phone className="h-4 w-4" />
+                  <span className="hidden md:inline">Call</span>
+                  <ChevronDown className="h-3 w-3 opacity-70" />
+                </button>
+              </div>
 
-              {/* Video Call (Meet) */}
-              <button
-                onClick={() => setIsVideoCallOpen(true)}
-                title="Start Teams Video Meeting"
-                className="flex items-center gap-1.5 h-8.5 px-3 rounded-xl bg-[#5B5FC7] text-white hover:bg-[#4F52B2] transition-colors cursor-pointer text-xs font-bold shadow-xs"
-              >
-                <Video className="h-4 w-4" />
-                <span>Meet</span>
-              </button>
+              {/* Video Call (Meet) Button with Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setCallDropdownOpen(callDropdownOpen === 'video' ? null : 'video')}
+                  title="Start Teams Video Meeting (Select who to call)"
+                  className={cn(
+                    'flex items-center gap-1.5 h-8.5 px-3 rounded-xl transition-colors cursor-pointer text-xs font-bold shadow-xs',
+                    callDropdownOpen === 'video'
+                      ? 'bg-[#4F52B2] text-white ring-2 ring-[#5B5FC7]/40'
+                      : 'bg-[#5B5FC7] text-white hover:bg-[#4F52B2]'
+                  )}
+                >
+                  <Video className="h-4 w-4" />
+                  <span>Meet</span>
+                  <ChevronDown className="h-3 w-3 opacity-80" />
+                </button>
+              </div>
 
               {/* Screen Share */}
               <button
                 onClick={() => {
+                  setActiveCallTarget({
+                    name: activeChannel.name,
+                    avatar: activeChannel.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80',
+                    role: 'Screen Sharing Conference',
+                    isGroup: true,
+                  });
                   setIsVideoCallOpen(true);
                   setIsScreenSharing(true);
                 }}
@@ -1079,10 +1133,133 @@ export const ChatPage: React.FC = () => {
               >
                 <Users className="h-4 w-4" />
               </button>
+
+              {/* =============================================================
+                  CALLING RECIPIENT DROPDOWN POPOVER (MICROSOFT TEAMS STYLE)
+                 ============================================================= */}
+              {callDropdownOpen && (
+                <div className="absolute top-11 right-0 w-80 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-2xl dark:border-slate-700 dark:bg-[#1A1A28] z-50 text-xs animate-toast-slide">
+                  {/* Dropdown Header */}
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 mb-2.5">
+                    <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                      {callDropdownOpen === 'audio' ? (
+                        <Phone className="w-3.5 h-3.5 text-[#5B5FC7]" />
+                      ) : (
+                        <Video className="w-3.5 h-3.5 text-[#5B5FC7]" />
+                      )}
+                      <span>Start {callDropdownOpen === 'audio' ? 'Audio Call' : 'Video Meeting'}</span>
+                    </span>
+                    <button onClick={() => setCallDropdownOpen(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+
+                  {/* Option 1: Group Call with all channel participants */}
+                  <button
+                    onClick={() => {
+                      setActiveCallTarget({
+                        name: activeChannel.name,
+                        avatar: activeChannel.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80',
+                        role: `${activeChannel.membersCount || 18} Channel Participants`,
+                        isGroup: true,
+                      });
+                      if (callDropdownOpen === 'audio') setIsAudioCallOpen(true);
+                      else setIsVideoCallOpen(true);
+                      setCallDropdownOpen(null);
+                    }}
+                    className="w-full p-2.5 rounded-xl bg-[#5B5FC7]/10 hover:bg-[#5B5FC7]/20 border border-[#5B5FC7]/30 flex items-center justify-between text-left transition-all cursor-pointer group mb-2.5"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-[#5B5FC7] text-white flex items-center justify-center font-bold">
+                        {callDropdownOpen === 'audio' ? <Phone className="w-4 h-4" /> : <Video className="w-4 h-4" />}
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-900 dark:text-white">Call entire team</p>
+                        <p className="text-[10px] text-slate-400">{activeChannel.name}</p>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-bold text-[#5B5FC7] group-hover:underline">Start</span>
+                  </button>
+
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 px-1">
+                    Or select who to call:
+                  </div>
+
+                  {/* Search member filter */}
+                  <div className="relative mb-2">
+                    <Search className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
+                    <input
+                      type="text"
+                      value={callMemberFilter}
+                      onChange={(e) => setCallMemberFilter(e.target.value)}
+                      placeholder="Search member by name..."
+                      className="w-full h-7.5 pl-7.5 pr-2.5 text-xs bg-slate-50 dark:bg-[#13131D] rounded-lg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-[#5B5FC7]"
+                    />
+                  </div>
+
+                  {/* List of members with direct call triggers */}
+                  <div className="space-y-1 max-h-48 overflow-y-auto pr-0.5 scrollbar-thin">
+                    {CHANNEL_MEMBERS
+                      .filter((m) => !callMemberFilter || m.name.toLowerCase().includes(callMemberFilter.toLowerCase()))
+                      .map((member) => (
+                        <div
+                          key={member.id}
+                          className="flex items-center justify-between p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="relative flex-shrink-0">
+                              <img src={member.avatar} alt={member.name} className="w-7 h-7 rounded-full object-cover" />
+                              <span className={cn('absolute bottom-0 right-0 w-2 h-2 rounded-full ring-1 ring-white dark:ring-slate-900', member.online ? 'bg-emerald-500' : 'bg-slate-300')} />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{member.name}</p>
+                              <p className="text-[9.5px] text-slate-400 truncate">{member.role} • {member.status}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                            <button
+                              onClick={() => {
+                                setActiveCallTarget({
+                                  name: member.name,
+                                  avatar: member.avatar,
+                                  role: member.role,
+                                  isGroup: false,
+                                });
+                                setIsAudioCallOpen(true);
+                                setCallDropdownOpen(null);
+                              }}
+                              title={`Audio call ${member.name}`}
+                              className="p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-[#5B5FC7] hover:bg-[#5B5FC7]/10 transition-colors cursor-pointer"
+                            >
+                              <Phone className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setActiveCallTarget({
+                                  name: member.name,
+                                  avatar: member.avatar,
+                                  role: member.role,
+                                  isGroup: false,
+                                });
+                                setIsVideoCallOpen(true);
+                                setCallDropdownOpen(null);
+                              }}
+                              title={`Video call ${member.name}`}
+                              className="p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-[#5B5FC7] hover:bg-[#5B5FC7]/10 transition-colors cursor-pointer"
+                            >
+                              <Video className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Teams Sub-Header Tabs (Posts, Files, Notes, +) */}
+          {/* Teams Sub-Header Tabs (Chat, Files, Notes) */}
           <div className="h-9 px-4 bg-white dark:bg-[#13131B] border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs">
             <div className="flex items-center gap-4 h-full">
               <button
@@ -1095,7 +1272,7 @@ export const ChatPage: React.FC = () => {
                 )}
               >
                 <MessageSquare className="h-3.5 w-3.5" />
-                <span>Posts</span>
+                <span>Chat</span>
               </button>
 
               <button
@@ -1129,299 +1306,233 @@ export const ChatPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2 text-[11px] text-slate-400">
-              <span className="hidden sm:inline">Encrypted Microsoft 365 Tenant</span>
+              <span className="hidden sm:inline">Protected by End-to-End Enterprise Encryption</span>
               <Shield className="h-3.5 w-3.5 text-emerald-500" />
             </div>
           </div>
 
           {/* ===================================================================
-              TAB VIEW 1: TEAMS POSTS & MESSAGES STREAM
+              TAB VIEW 1: CONVERSATIONAL PROJECT CHAT STREAM
              =================================================================== */}
           {channelViewTab === 'posts' && (
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 scrollbar-thin">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 scrollbar-thin">
               
               {/* Date Separator Pill */}
-              <div className="flex items-center justify-center my-2">
-                <span className="px-3 py-1 rounded-full bg-slate-200/70 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 text-[10.5px] font-bold shadow-2xs">
+              <div className="flex items-center justify-center my-1.5">
+                <span className="px-3 py-0.5 rounded-full bg-slate-200/70 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 text-[10.5px] font-bold shadow-2xs">
                   Today, September 10, 2026
                 </span>
               </div>
 
-              {/* Messages / Channel Post Cards */}
+              {/* Conversational Messages Stream */}
               {activeMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className="bg-white dark:bg-[#151520] rounded-xl border border-slate-200/90 dark:border-slate-800/90 shadow-2xs p-3.5 sm:p-4 relative group transition-all hover:border-slate-300 dark:hover:border-slate-700"
+                  className={cn(
+                    'flex gap-2.5 group relative animate-toast-slide',
+                    msg.isMe ? 'justify-end' : 'justify-start'
+                  )}
                 >
-                  {/* Urgent / Important Left Accent Border */}
-                  {msg.isUrgent && (
-                    <div className="absolute top-0 bottom-0 left-0 w-1.5 bg-rose-600 rounded-l-xl" />
-                  )}
-                  {msg.isImportant && !msg.isUrgent && (
-                    <div className="absolute top-0 bottom-0 left-0 w-1.5 bg-amber-500 rounded-l-xl" />
+                  {/* Teammate Avatar */}
+                  {!msg.isMe && (
+                    <img
+                      src={msg.senderAvatar}
+                      alt={msg.senderName}
+                      className="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-1 border border-slate-200 dark:border-slate-700 shadow-2xs"
+                    />
                   )}
 
-                  {/* Top Post Header: Avatar, Name, Role, Timestamp */}
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex items-center gap-2.5">
-                      <img
-                        src={msg.senderAvatar}
-                        alt={msg.senderName}
-                        className="w-8.5 h-8.5 rounded-full object-cover border border-slate-200 dark:border-slate-700 shadow-2xs"
-                      />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-xs text-slate-900 dark:text-white">
-                            {msg.senderName}
-                          </span>
-                          {msg.senderRole && (
-                            <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-medium">
-                              {msg.senderRole}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
-                      </div>
-                    </div>
-
-                    {/* Urgent / Important Tag */}
-                    {msg.isUrgent && (
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-950/50 dark:border-rose-800 dark:text-rose-300 text-[10px] font-black">
-                        <AlertCircle className="h-3 w-3 text-rose-600" />
-                        URGENT
+                  <div className={cn('max-w-[85%] sm:max-w-xl', msg.isMe && 'text-right')}>
+                    {/* Header with Name & Time */}
+                    <div className={cn('flex items-center gap-2 mb-1 text-[10.5px]', msg.isMe ? 'justify-end' : 'justify-start')}>
+                      <span className="font-bold text-slate-800 dark:text-slate-200">
+                        {msg.isMe ? 'You' : msg.senderName}
                       </span>
-                    )}
-                    {msg.isImportant && !msg.isUrgent && (
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-700 dark:bg-amber-950/50 dark:border-amber-800 dark:text-amber-300 text-[10px] font-black">
-                        <AlertCircle className="h-3 w-3 text-amber-600" />
-                        IMPORTANT
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Post Subject if available */}
-                  {msg.subject && (
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mb-1.5">
-                      {msg.subject}
-                    </h4>
-                  )}
-
-                  {/* Post Text Body */}
-                  <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
-                    {msg.text}
-                  </p>
-
-                  {/* =========================================================
-                      CARD TYPE 1: MICROSOFT 365 FILE ATTACHMENT CARD
-                     ========================================================= */}
-                  {msg.attachment && (
-                    <div className="mt-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-[#1C1C28] flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 overflow-hidden">
-                        {/* Distinct Microsoft File Icons */}
-                        {msg.attachment.type === 'excel' ? (
-                          <div className="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                            <FileSpreadsheet className="w-5 h-5" />
-                          </div>
-                        ) : msg.attachment.type === 'pdf' ? (
-                          <div className="w-9 h-9 rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                            <FileText className="w-5 h-5" />
-                          </div>
-                        ) : (
-                          <div className="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                            <FileCode className="w-5 h-5" />
-                          </div>
-                        )}
-
-                        <div className="truncate">
-                          <p className="truncate text-xs font-bold text-slate-900 dark:text-white leading-tight">
-                            {msg.attachment.name}
-                          </p>
-                          <p className="text-[10px] text-slate-400 mt-0.5">
-                            {msg.attachment.size} • Stored on SharePoint / OneDrive
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button
-                          onClick={() => alert(`Downloading ${msg.attachment?.name}...`)}
-                          title="Download document"
-                          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-200/60 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
-                        >
-                          <Download className="w-4 h-4" />
-                        </button>
-                      </div>
+                      {msg.senderRole && !msg.isMe && (
+                        <span className="text-[9.5px] text-slate-400">({msg.senderRole})</span>
+                      )}
+                      <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
                     </div>
-                  )}
 
-                  {/* =========================================================
-                      CARD TYPE 2: TEAMS MEETING INVITE CARD
-                     ========================================================= */}
-                  {msg.type === 'meeting' && msg.meeting && (
-                    <div className="mt-3 rounded-xl border border-[#5B5FC7]/30 bg-gradient-to-br from-[#EEF0FA] to-white dark:from-[#18182B] dark:to-[#12121E] overflow-hidden">
-                      <div className="px-3.5 py-2 bg-[#5B5FC7] text-white flex items-center justify-between text-xs font-bold">
-                        <span className="flex items-center gap-1.5">
-                          <Video className="h-4 w-4" /> Microsoft Teams Meeting
-                        </span>
-                        <span className="text-[10px] font-semibold bg-white/20 px-2 py-0.5 rounded-md">
-                          {msg.meeting.duration}
-                        </span>
-                      </div>
-                      <div className="p-3.5 space-y-2">
-                        <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
-                          {msg.meeting.title}
-                        </h4>
-                        <p className="text-[11px] text-slate-600 dark:text-slate-300 flex items-center gap-2">
-                          <Calendar className="h-3.5 w-3.5 text-[#5B5FC7]" /> {msg.meeting.date}
-                          <Clock className="h-3.5 w-3.5 text-[#5B5FC7] ml-2" /> {msg.meeting.time}
-                        </p>
-                        <div className="pt-1 flex items-center gap-2">
-                          <button
-                            onClick={() => setIsVideoCallOpen(true)}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#5B5FC7] hover:bg-[#4F52B2] text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
-                          >
-                            <Video className="h-3.5 w-3.5" />
-                            <span>Join Teams Meeting</span>
-                          </button>
-                          <button
-                            onClick={() => alert(`Meeting link copied: ${msg.meeting?.link}`)}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                          >
-                            <Copy className="h-3 w-3" />
-                            <span>Copy Link</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* =========================================================
-                      CARD TYPE 3: MICROSOFT FORMS LIVE POLL CARD
-                     ========================================================= */}
-                  {msg.type === 'poll' && msg.poll && (
-                    <div className="mt-3 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-[#1A1A26] overflow-hidden">
-                      <div className="px-3.5 py-1.5 bg-gradient-to-r from-[#5B5FC7] to-[#7B83EB] text-white flex items-center justify-between text-xs font-bold">
-                        <span className="flex items-center gap-1.5">
-                          <BarChart2 className="h-3.5 w-3.5" /> Microsoft Forms • Live Poll
-                        </span>
-                        <span className="text-[10.5px] font-medium opacity-90">{msg.poll.totalVotes} responses</span>
-                      </div>
-                      <div className="p-3.5 space-y-2.5">
-                        <p className="font-bold text-xs text-slate-900 dark:text-white">
-                          {msg.poll.question}
-                        </p>
-                        <div className="space-y-2">
-                          {msg.poll.options.map((opt) => {
-                            const pct = msg.poll?.totalVotes ? Math.round((opt.votes / msg.poll.totalVotes) * 100) : 0;
-                            const hasVoted = opt.votedUserIds.includes('u-me');
-                            return (
-                              <button
-                                key={opt.id}
-                                onClick={() => handleVotePoll(msg.id, opt.id)}
-                                className={cn(
-                                  'w-full text-left p-2.5 rounded-xl border text-xs transition-all relative overflow-hidden cursor-pointer group',
-                                  hasVoted
-                                    ? 'border-[#5B5FC7] bg-[#5B5FC7]/10 dark:bg-[#5B5FC7]/20 text-[#5B5FC7] dark:text-[#A6AFFA]'
-                                    : 'border-slate-200 dark:border-slate-700 hover:border-[#5B5FC7] bg-white dark:bg-[#14141E]'
-                                )}
-                              >
-                                <div
-                                  className="absolute inset-y-0 left-0 bg-[#5B5FC7]/20 dark:bg-[#5B5FC7]/30 transition-all duration-500 pointer-events-none"
-                                  style={{ width: `${pct}%` }}
-                                />
-                                <div className="relative flex items-center justify-between z-10">
-                                  <span className="font-medium text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                                    <span className={cn('w-3.5 h-3.5 rounded-full border flex items-center justify-center', hasVoted ? 'border-[#5B5FC7] bg-[#5B5FC7] text-white' : 'border-slate-300')}>
-                                      {hasVoted && <Check className="w-2.5 h-2.5" />}
-                                    </span>
-                                    {opt.text}
-                                  </span>
-                                  <span className="text-xs font-bold text-[#5B5FC7] dark:text-[#A6AFFA]">
-                                    {pct}% ({opt.votes})
-                                  </span>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* =========================================================
-                      CARD TYPE 4: TEAMS PRAISE & RECOGNITION CARD
-                     ========================================================= */}
-                  {msg.type === 'praise' && msg.praise && (
-                    <div className="mt-3 p-3.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-[#251D14] dark:to-[#1F1710] border border-amber-200 dark:border-amber-800/60">
-                      <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-xs">
-                        <Award className="h-4 w-4" />
-                        <span>Microsoft Teams Praise: {msg.praise.badge}</span>
-                      </div>
-                      <p className="text-xs font-bold text-slate-900 dark:text-white mt-1">
-                        To: <span className="text-[#5B5FC7] dark:text-[#A6AFFA]">{msg.praise.recipientName}</span>
-                      </p>
-                      <p className="text-[11.5px] text-slate-600 dark:text-slate-300 italic mt-0.5">
-                        "{msg.praise.message}"
-                      </p>
-                    </div>
-                  )}
-
-                  {/* GIF preview if present */}
-                  {msg.type === 'gif' && msg.gifUrl && (
-                    <div className="mt-3 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 max-w-xs shadow-xs">
-                      <img src={msg.gifUrl} alt="GIF" className="w-full h-36 object-cover" />
-                    </div>
-                  )}
-
-                  {/* Reactions Pill Display */}
-                  {msg.reactions && msg.reactions.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-3">
-                      {msg.reactions.map((r, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => handleAddReaction(msg.id, r.emoji)}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-[10.5px] text-slate-700 dark:text-slate-300 hover:border-[#5B5FC7] transition-all cursor-pointer shadow-2xs"
-                        >
-                          <span>{r.emoji}</span>
-                          <span className="font-bold">{r.count}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Channel Post Footer: Thread Replies Count */}
-                  {msg.repliesCount && (
-                    <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-[#5B5FC7] dark:text-[#A6AFFA]">
-                      <button
-                        onClick={() => alert(`Opening thread with ${msg.repliesCount} replies...`)}
-                        className="font-bold hover:underline cursor-pointer flex items-center gap-1.5"
-                      >
-                        <Reply className="h-3.5 w-3.5" />
-                        <span>{msg.repliesCount} replies</span>
-                      </button>
-                      <span className="text-[10px] text-slate-400">Last activity 5m ago</span>
-                    </div>
-                  )}
-
-                  {/* Authentic Teams Floating Hover Reaction Bar */}
-                  <div className="absolute -top-3.5 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-[#1E1E2C] rounded-full border border-slate-200 dark:border-slate-700 shadow-md px-1.5 py-0.5 flex items-center gap-1 z-10">
-                    {['👍', '❤️', '😆', '😮', '😢', '👏'].map((emoji) => (
-                      <button
-                        key={emoji}
-                        onClick={() => handleAddReaction(msg.id, emoji)}
-                        className="h-6 w-6 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center text-xs transition-transform hover:scale-125 cursor-pointer"
-                      >
-                        {emoji}
-                      </button>
-                    ))}
-                    <div className="h-3 w-px bg-slate-200 dark:bg-slate-700 mx-0.5" />
-                    <button
-                      onClick={() => alert('Reply directly to this post thread')}
-                      title="Reply"
-                      className="p-1 text-slate-400 hover:text-[#5B5FC7] rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+                    {/* Chat Bubble */}
+                    <div
+                      className={cn(
+                        'relative p-3 rounded-2xl text-xs leading-relaxed transition-all shadow-2xs text-left',
+                        msg.isUrgent && 'border-2 border-rose-500 bg-rose-50 dark:bg-rose-950/40 text-rose-950 dark:text-rose-100',
+                        msg.isImportant && !msg.isUrgent && 'border-l-4 border-l-amber-500 bg-amber-50/70 dark:bg-amber-950/30 text-slate-900 dark:text-white',
+                        !msg.isUrgent && !msg.isImportant && (
+                          msg.isMe
+                            ? 'bg-[#5B5FC7] text-white rounded-tr-xs'
+                            : 'bg-white dark:bg-[#1A1A28] border border-slate-200/90 dark:border-slate-800/90 text-slate-800 dark:text-slate-100 rounded-tl-xs'
+                        )
+                      )}
                     >
-                      <Reply className="h-3.5 w-3.5" />
-                    </button>
+                      {/* Urgent Tag Banner */}
+                      {msg.isUrgent && (
+                        <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold text-[10px] mb-1">
+                          <AlertCircle className="h-3 w-3" />
+                          <span>URGENT MESSAGE</span>
+                        </div>
+                      )}
+
+                      {/* Chat Text */}
+                      <p className="whitespace-pre-wrap">{msg.text}</p>
+
+                      {/* File Attachment Card */}
+                      {msg.attachment && (
+                        <div
+                          className={cn(
+                            'mt-2.5 p-2.5 rounded-xl border flex items-center justify-between gap-3 text-xs',
+                            msg.isMe
+                              ? 'bg-white/15 border-white/20 text-white'
+                              : 'bg-slate-50 dark:bg-[#14141E] border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100'
+                          )}
+                        >
+                          <div className="flex items-center gap-2.5 overflow-hidden">
+                            <FileText className="w-4 h-4 flex-shrink-0" />
+                            <div className="truncate">
+                              <p className="font-bold truncate text-[11.5px] leading-tight">{msg.attachment.name}</p>
+                              <p className="text-[9.5px] opacity-75">{msg.attachment.size} • {msg.attachment.type.toUpperCase()}</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => alert(`Downloading ${msg.attachment?.name}...`)}
+                            className="p-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Meeting Card */}
+                      {msg.type === 'meeting' && msg.meeting && (
+                        <div
+                          className={cn(
+                            'mt-2.5 p-3 rounded-xl border space-y-2',
+                            msg.isMe
+                              ? 'bg-white/15 border-white/25 text-white'
+                              : 'bg-[#EEF0FA] dark:bg-[#1C1C2E] border-[#5B5FC7]/30 text-slate-900 dark:text-white'
+                          )}
+                        >
+                          <div className="flex items-center gap-1.5 text-xs font-bold">
+                            <Video className="h-3.5 w-3.5 text-[#5B5FC7]" />
+                            <span>Microsoft Teams Meeting</span>
+                          </div>
+                          <p className="font-bold text-xs">{msg.meeting.title}</p>
+                          <p className="text-[10.5px] opacity-80">📅 {msg.meeting.date} • 🕒 {msg.meeting.time}</p>
+                          <button
+                            onClick={() => {
+                              setActiveCallTarget({
+                                name: msg.meeting?.title || activeChannel.name,
+                                avatar: activeChannel.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80',
+                                role: 'Teams Video Conference',
+                                isGroup: true,
+                              });
+                              setIsVideoCallOpen(true);
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#5B5FC7] text-white font-bold text-xs shadow-xs hover:bg-[#4F52B2] cursor-pointer"
+                          >
+                            <Video className="h-3 w-3" />
+                            <span>Join Meeting</span>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Poll Card */}
+                      {msg.type === 'poll' && msg.poll && (
+                        <div
+                          className={cn(
+                            'mt-2.5 p-3 rounded-xl border space-y-2 text-xs',
+                            msg.isMe
+                              ? 'bg-white/15 border-white/20 text-white'
+                              : 'bg-slate-50 dark:bg-[#14141E] border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white'
+                          )}
+                        >
+                          <div className="flex items-center justify-between font-bold">
+                            <span className="flex items-center gap-1 text-[#5B5FC7] dark:text-[#A6AFFA]">
+                              <BarChart2 className="h-3.5 w-3.5" /> Teams Poll
+                            </span>
+                            <span className="text-[10px] opacity-75">{msg.poll.totalVotes} votes</span>
+                          </div>
+                          <p className="font-semibold text-xs">{msg.poll.question}</p>
+                          <div className="space-y-1.5">
+                            {msg.poll.options.map((opt) => {
+                              const pct = msg.poll?.totalVotes ? Math.round((opt.votes / msg.poll.totalVotes) * 100) : 0;
+                              const hasVoted = opt.votedUserIds.includes('u-me');
+                              return (
+                                <button
+                                  key={opt.id}
+                                  onClick={() => handleVotePoll(msg.id, opt.id)}
+                                  className={cn(
+                                    'w-full text-left p-2 rounded-lg border text-xs relative overflow-hidden transition-all cursor-pointer',
+                                    hasVoted ? 'border-[#5B5FC7] bg-[#5B5FC7]/20' : 'border-slate-200 dark:border-slate-700 bg-white/40 dark:bg-black/20'
+                                  )}
+                                >
+                                  <div className="absolute inset-y-0 left-0 bg-[#5B5FC7]/25 pointer-events-none" style={{ width: `${pct}%` }} />
+                                  <div className="relative flex items-center justify-between z-10">
+                                    <span>{opt.text}</span>
+                                    <span className="font-bold text-[11px]">{pct}% ({opt.votes})</span>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Praise Card */}
+                      {msg.type === 'praise' && msg.praise && (
+                        <div className="mt-2.5 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-950 dark:text-amber-100 text-xs">
+                          <div className="flex items-center gap-1.5 font-bold text-amber-600 dark:text-amber-400">
+                            <Award className="h-3.5 w-3.5" />
+                            <span>Praise: {msg.praise.badge}</span>
+                          </div>
+                          <p className="text-[11px] mt-0.5 font-medium">To: {msg.praise.recipientName}</p>
+                          <p className="text-[10.5px] italic opacity-85">"{msg.praise.message}"</p>
+                        </div>
+                      )}
+
+                      {/* GIF Image Preview */}
+                      {msg.type === 'gif' && msg.gifUrl && (
+                        <div className="mt-2.5 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 max-w-xs shadow-xs">
+                          <img src={msg.gifUrl} alt="GIF" className="w-full h-36 object-cover" />
+                        </div>
+                      )}
+
+                      {/* Floating Hover Reaction Bar */}
+                      <div
+                        className={cn(
+                          'absolute -top-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-[#1E1E2C] rounded-full border border-slate-200 dark:border-slate-700 shadow-md px-1.5 py-0.5 flex items-center gap-1 z-10',
+                          msg.isMe ? 'left-2' : 'right-2'
+                        )}
+                      >
+                        {['👍', '❤️', '😆', '🎉', '👏'].map((emoji) => (
+                          <button
+                            key={emoji}
+                            onClick={() => handleAddReaction(msg.id, emoji)}
+                            className="h-5 w-5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center text-xs transition-transform hover:scale-125 cursor-pointer"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Reaction Pills below bubble */}
+                    {msg.reactions && msg.reactions.length > 0 && (
+                      <div className={cn('flex flex-wrap gap-1 mt-1', msg.isMe ? 'justify-end' : 'justify-start')}>
+                        {msg.reactions.map((r, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleAddReaction(msg.id, r.emoji)}
+                            className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] text-slate-700 dark:text-slate-300 shadow-2xs hover:border-[#5B5FC7] cursor-pointer"
+                          >
+                            <span>{r.emoji}</span>
+                            <span className="font-bold">{r.count}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -1589,7 +1700,7 @@ export const ChatPage: React.FC = () => {
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder={`Start a post or reply in ${activeChannel.name}...`}
+                  placeholder={`Type a message in ${activeChannel.name}...`}
                   className={cn(
                     'flex-1 h-10 px-3.5 text-xs bg-slate-50 dark:bg-[#1A1A26] rounded-xl border text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-[#5B5FC7] transition-all',
                     messageUrgency === 'urgent'
@@ -1775,7 +1886,7 @@ export const ChatPage: React.FC = () => {
                 </div>
 
                 <div className="text-[10.5px] text-slate-400">
-                  <span>Press <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono">Enter</kbd> to post</span>
+                  <span>Press <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono">Enter</kbd> to send</span>
                 </div>
               </div>
             </form>
@@ -1844,15 +1955,18 @@ export const ChatPage: React.FC = () => {
               <div className="absolute w-32 h-32 rounded-full bg-[#5B5FC7]/20 animate-ping" />
               <div className="absolute w-28 h-28 rounded-full bg-[#5B5FC7]/30 animate-pulse" />
               <img
-                src={activeChannel.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80'}
-                alt={activeChannel.name}
+                src={activeCallTarget?.avatar || activeChannel.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80'}
+                alt={activeCallTarget?.name || activeChannel.name}
                 className="relative w-20 h-20 rounded-full object-cover border-4 border-[#5B5FC7] shadow-xl"
               />
             </div>
 
             {/* Name & Call State */}
             <div>
-              <h3 className="text-lg font-bold text-white">{activeChannel.name}</h3>
+              <h3 className="text-lg font-bold text-white">{activeCallTarget?.name || activeChannel.name}</h3>
+              <p className="text-xs text-[#5B5FC7] font-semibold mt-0.5">
+                {activeCallTarget?.role || (activeCallTarget?.isGroup ? 'Channel Group Audio' : 'Direct Call')}
+              </p>
               <p className="text-xs text-slate-400 mt-1">
                 {isMicMuted ? 'Microphone Muted' : 'Speaking • High Audio Quality'}
               </p>
@@ -1910,14 +2024,16 @@ export const ChatPage: React.FC = () => {
               </span>
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  {activeChannel.name} • Teams Meeting
+                  {activeCallTarget?.name || activeChannel.name} • {activeCallTarget?.isGroup ? 'Teams Meeting' : 'Direct Call'}
                 </h3>
-                <p className="text-[11px] text-slate-400 font-mono">Duration: {formatTime(callDuration)}</p>
+                <p className="text-[11px] text-slate-400 font-mono">Duration: {formatTime(callDuration)} • {activeCallTarget?.role || 'Connected'}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-400 hidden sm:inline">4 Participants in Call</span>
+              <span className="text-xs text-slate-400 hidden sm:inline">
+                {activeCallTarget?.isGroup ? '4 Participants in Call' : '1-on-1 Direct Video'}
+              </span>
               <button
                 onClick={() => setIsVideoCallOpen(false)}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer"
@@ -1928,33 +2044,41 @@ export const ChatPage: React.FC = () => {
           </div>
 
           {/* Video Grid Canvas */}
-          <div className="flex-1 p-4 grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0 relative overflow-hidden">
+          <div className={cn(
+            "flex-1 p-4 gap-4 min-h-0 relative overflow-hidden",
+            activeCallTarget?.isGroup ? "grid grid-cols-1 md:grid-cols-2" : "flex items-center justify-center"
+          )}>
             
             {/* Tile 1: Remote Participant 1 */}
-            <div className="relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center">
+            <div className={cn(
+              "relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center",
+              !activeCallTarget?.isGroup ? "w-full max-w-4xl h-full" : ""
+            )}>
               <img
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=80"
-                alt="Sneha Gupta"
+                src={activeCallTarget?.avatar || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=80"}
+                alt={activeCallTarget?.name || "Participant"}
                 className="w-full h-full object-cover"
               />
               <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-slate-950/70 backdrop-blur-md text-xs font-semibold flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span>Sneha Gupta (HR Lead)</span>
+                <span>{activeCallTarget?.name || "Sneha Gupta"} {activeCallTarget?.role ? `(${activeCallTarget.role})` : ''}</span>
               </div>
             </div>
 
-            {/* Tile 2: Remote Participant 2 */}
-            <div className="relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center">
-              <img
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&auto=format&fit=crop&q=80"
-                alt="Amit Verma"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-slate-950/70 backdrop-blur-md text-xs font-semibold flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span>Amit Verma (Lead Architect)</span>
+            {/* Tile 2: Remote Participant 2 (Only for group channel meetings) */}
+            {activeCallTarget?.isGroup && (
+              <div className="relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center">
+                <img
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&auto=format&fit=crop&q=80"
+                  alt="Amit Verma"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-slate-950/70 backdrop-blur-md text-xs font-semibold flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span>Amit Verma (Lead Architect)</span>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Floating Self Camera View (PIP in bottom-right) */}
             <div className="absolute bottom-6 right-6 w-48 h-32 rounded-2xl overflow-hidden bg-slate-800 border-2 border-[#5B5FC7] shadow-2xl z-20">
