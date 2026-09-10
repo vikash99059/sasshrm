@@ -209,18 +209,18 @@ export const LeaveManagementPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-page-enter">
+    <div className="space-y-4 animate-page-enter">
       {/* =========================================================================
           HEADER AREA: TITLE + SUBTITLE & 3D CALENDAR / CLOCK ILLUSTRATION
          ========================================================================= */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         {/* Left: Icon, Title and Subtitle */}
-        <div className="flex items-center gap-3.5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-xs flex-shrink-0">
-            <CalendarDays className="h-6 w-6" />
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-xs flex-shrink-0">
+            <CalendarDays className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               Leave Management
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -230,13 +230,13 @@ export const LeaveManagementPage: React.FC = () => {
         </div>
 
         {/* Right: Soft 3D Calendar & Clock Illustration matching reference */}
-        <div className="hidden md:flex items-center justify-end relative pr-4">
+        <div className="hidden md:flex items-center justify-end relative pr-2">
           <div className="relative flex items-center justify-center">
             {/* Ambient Soft Glow Behind Graphic */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-blue-400/20 via-sky-300/20 to-blue-500/20 rounded-full blur-xl pointer-events-none" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400/20 via-sky-300/20 to-blue-500/20 rounded-full blur-lg pointer-events-none" />
 
             {/* SVG 3D Calendar & Clock Graphic */}
-            <svg width="135" height="80" viewBox="0 0 170 95" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="105" height="58" viewBox="0 0 170 95" fill="none" xmlns="http://www.w3.org/2000/svg">
               {/* Soft Leaves Decorative Background */}
               <path d="M12 55C24 42 38 48 44 64C31 70 20 66 12 55Z" fill="#BFDBFE" fillOpacity="0.6" />
               <path d="M152 28C142 16 128 22 122 38C134 44 146 40 152 28Z" fill="#BFDBFE" fillOpacity="0.5" />
@@ -299,104 +299,104 @@ export const LeaveManagementPage: React.FC = () => {
       </div>
 
       {/* =========================================================================
-          TOP 4 KPI METRIC CARDS (HORIZONTAL ROW, COMPACT BOX HEIGHT)
+          TOP 4 KPI METRIC CARDS (COMPACT HEIGHT, BALANCED PADDING, SHARP ALIGNMENT)
          ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {/* 1. Total Leave Balance */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 shadow-xs flex-shrink-0">
+        <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 shadow-xs flex-shrink-0">
               <CalendarCheck className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
                 Total Leave Balance
               </span>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                   18 Days
                 </span>
               </div>
-              <span className="text-[11px] text-slate-400 block mt-0.5">Available leaves</span>
+              <span className="text-[10.5px] text-slate-400 block">Available leaves</span>
             </div>
           </div>
           <div className="self-end pb-0.5">
-            <span className="inline-flex items-center gap-0.5 rounded-lg bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-0.5 rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-bold text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
               <ArrowUpRight className="h-3 w-3 stroke-[2.5]" /> 12%
             </span>
           </div>
         </div>
 
         {/* 2. Leaves Taken */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-50 text-rose-500 dark:bg-rose-950/60 dark:text-rose-400 shadow-xs flex-shrink-0">
+        <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-500 dark:bg-rose-950/60 dark:text-rose-400 shadow-xs flex-shrink-0">
               <CalendarX className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
                 Leaves Taken
               </span>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                   6 Days
                 </span>
               </div>
-              <span className="text-[11px] text-slate-400 block mt-0.5">This Year</span>
+              <span className="text-[10.5px] text-slate-400 block">This Year</span>
             </div>
           </div>
           <div className="self-end pb-0.5">
-            <span className="inline-flex items-center gap-0.5 rounded-lg bg-rose-50 px-2 py-0.5 text-xs font-bold text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
+            <span className="inline-flex items-center gap-0.5 rounded-md bg-rose-50 px-1.5 py-0.5 text-[11px] font-bold text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
               <ArrowDownRight className="h-3 w-3 stroke-[2.5]" /> 8%
             </span>
           </div>
         </div>
 
         {/* 3. Pending Requests */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400 shadow-xs flex-shrink-0">
+        <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400 shadow-xs flex-shrink-0">
               <Clock className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
                 Pending Requests
               </span>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                   2
                 </span>
               </div>
-              <span className="text-[11px] text-slate-400 block mt-0.5">Awaiting Approval</span>
+              <span className="text-[10.5px] text-slate-400 block">Awaiting Approval</span>
             </div>
           </div>
           <div className="self-end pb-0.5">
-            <span className="inline-flex items-center gap-0.5 rounded-lg bg-purple-50 px-2 py-0.5 text-xs font-bold text-purple-600 dark:bg-purple-950/40 dark:text-purple-400">
+            <span className="inline-flex items-center gap-0.5 rounded-md bg-purple-50 px-1.5 py-0.5 text-[11px] font-bold text-purple-600 dark:bg-purple-950/40 dark:text-purple-400">
               <ArrowUpRight className="h-3 w-3 stroke-[2.5]" /> 0%
             </span>
           </div>
         </div>
 
         {/* 4. Total Entitlement */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-xs flex-shrink-0">
+        <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-xs flex-shrink-0">
               <Calendar className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
                 Total Entitlement
               </span>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                   24 Days
                 </span>
               </div>
-              <span className="text-[11px] text-slate-400 block mt-0.5">Per Year</span>
+              <span className="text-[10.5px] text-slate-400 block">Per Year</span>
             </div>
           </div>
           <div className="self-end pb-0.5">
-            <span className="inline-flex items-center gap-0.5 rounded-lg bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+            <span className="inline-flex items-center gap-0.5 rounded-md bg-blue-50 px-1.5 py-0.5 text-[11px] font-bold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
               <ArrowUpRight className="h-3 w-3 stroke-[2.5]" /> 0%
             </span>
           </div>
@@ -408,14 +408,14 @@ export const LeaveManagementPage: React.FC = () => {
          ========================================================================= */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         {/* Left 3 Pill Tabs */}
-        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/60 text-xs font-semibold">
+        <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/70 text-xs font-semibold">
           <button
             onClick={() => setActiveTab('my')}
             className={cn(
-              'px-4 py-2 rounded-xl transition-all duration-150 cursor-pointer',
+              'px-3.5 py-1.5 rounded-lg transition-all duration-150 cursor-pointer text-xs',
               activeTab === 'my'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-blue-600 text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'
             )}
           >
             My Leaves
@@ -423,10 +423,10 @@ export const LeaveManagementPage: React.FC = () => {
           <button
             onClick={() => setActiveTab('team')}
             className={cn(
-              'px-4 py-2 rounded-xl transition-all duration-150 cursor-pointer',
+              'px-3.5 py-1.5 rounded-lg transition-all duration-150 cursor-pointer text-xs',
               activeTab === 'team'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-blue-600 text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'
             )}
           >
             Team Leaves
@@ -434,10 +434,10 @@ export const LeaveManagementPage: React.FC = () => {
           <button
             onClick={() => setActiveTab('calendar')}
             className={cn(
-              'px-4 py-2 rounded-xl transition-all duration-150 cursor-pointer',
+              'px-3.5 py-1.5 rounded-lg transition-all duration-150 cursor-pointer text-xs',
               activeTab === 'calendar'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-blue-600 text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'
             )}
           >
             Leave Calendar
@@ -445,15 +445,13 @@ export const LeaveManagementPage: React.FC = () => {
         </div>
 
         {/* Right CTA Button: + Apply Leave */}
-        <Button
-          size="md"
-          variant="primary"
+        <button
           onClick={() => setIsApplyModalOpen(true)}
-          leftIcon={<Plus className="h-4 w-4" />}
-          className="shadow-sm shadow-blue-500/25"
+          className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm shadow-blue-500/25 transition-all duration-150 hover:shadow-md cursor-pointer active:scale-95"
         >
-          Apply Leave
-        </Button>
+          <Plus className="h-4 w-4 stroke-[2.5]" />
+          <span>Apply Leave</span>
+        </button>
       </div>
 
       {/* =========================================================================
@@ -461,12 +459,12 @@ export const LeaveManagementPage: React.FC = () => {
           LEFT: LEAVE HISTORY TABLE WITH 3 FILTERS
           RIGHT: LEAVE CALENDAR & LEAVE CATEGORY PROGRESS BARS
          ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         
         {/* =======================================================================
             LEFT COLUMN: LEAVE HISTORY TABLE (7-8 COLS)
            ======================================================================= */}
-        <div className="lg:col-span-7 xl:col-span-8 rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs dark:border-dark-border dark:bg-dark-card space-y-4">
+        <div className="lg:col-span-7 xl:col-span-8 rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-dark-border dark:bg-dark-card space-y-3.5">
           
           {/* Filter Bar */}
           <div className="flex flex-wrap items-center gap-2.5 pb-2">
@@ -678,10 +676,10 @@ export const LeaveManagementPage: React.FC = () => {
         {/* =======================================================================
             RIGHT COLUMN: LEAVE CALENDAR & LEAVE BALANCE PROGRESS CARDS (4-5 COLS)
            ======================================================================= */}
-        <div className="lg:col-span-5 xl:col-span-4 space-y-5">
+        <div className="lg:col-span-5 xl:col-span-4 space-y-4">
           
           {/* Card 1: Leave Calendar */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card space-y-3.5">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card space-y-3.5">
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -778,7 +776,7 @@ export const LeaveManagementPage: React.FC = () => {
           </div>
 
           {/* Card 2: Leave Balance Progress Bars */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card space-y-4">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card space-y-3.5">
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
