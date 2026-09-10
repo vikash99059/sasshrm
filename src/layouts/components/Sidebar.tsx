@@ -1,0 +1,181 @@
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useAppStore } from '../../store/useAppStore';
+import { getNavigationForRole } from '../../config/navigation';
+import { cn } from '../../utils';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Sparkles,
+  LogOut,
+  Building,
+} from 'lucide-react';
+
+export const Sidebar: React.FC = () => {
+  const {
+    currentRole,
+    currentUser,
+    currentOrg,
+    sidebarCollapsed,
+    toggleSidebar,
+    mobileMenuOpen,
+    setMobileMenuOpen,
+    logout,
+  } = useAppStore();
+
+  const location = useLocation();
+  const navSections = getNavigationForRole(currentRole);
+
+  return (
+    <>
+      {/* Mobile Backdrop */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar Container */}
+      <aside
+        className={cn(
+          'fixed top-0 bottom-0 left-0 z-40 flex flex-col bg-white text-slate-700 transition-all duration-300 ease-in-out border-r border-slate-200/80 dark:bg-[#0F172A] dark:text-slate-300 dark:border-slate-800/80 select-none shadow-xs',
+          sidebarCollapsed ? 'w-20' : 'w-64',
+          // Mobile responsive class
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        )}
+      >
+        {/* Brand Header */}
+        <div className="flex h-16 items-center justify-between px-5 border-b border-slate-100 dark:border-slate-800/60">
+          <Link to="/" className="flex items-center gap-3 overflow-hidden group">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-blue-600 shadow-md shadow-blue-500/25 text-white font-black text-lg group-hover:scale-105 transition-transform">
+              <span className="text-white">◆</span>
+            </div>
+            {!sidebarCollapsed && (
+              <div className="flex flex-col">
+                <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
+                  HRM
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium truncate max-w-[130px]">
+                  {currentRole === 'saas_owner' ? 'Global Platform' : currentOrg?.name || 'Enterprise'}
+                </span>
+              </div>
+            )}
+          </Link>
+
+          {/* Desktop Toggle Button */}
+          <button
+            onClick={toggleSidebar}
+            className="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900 dark:bg-slate-800/60 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white transition-colors"
+          >
+            {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </button>
+        </div>
+
+        {/* Navigation Items List */}
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-5 scrollbar-thin">
+          {navSections.map((section, sIdx) => (
+            <div key={sIdx} className="space-y-0.5">
+              {section.sectionTitle && !sidebarCollapsed && (
+                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
+                  {section.sectionTitle}
+                </p>
+              )}
+              {section.items.map((item) => {
+                const Icon = item.icon;
+                const isExact = location.pathname === item.href;
+                const isSubPath = item.href !== '/' &&
+                  item.href !== '/dashboard' &&
+                  item.href !== '/saas' &&
+                  item.href !== '/employees' &&
+                  item.href !== '/leave' &&
+                  item.href !== '/payroll' &&
+                  item.href !== '/recruitment' &&
+                  item.href !== '/performance' &&
+                  item.href !== '/operations' &&
+                  item.href !== '/reports' &&
+                  item.href !== '/settings' &&
+                  location.pathname.startsWith(item.href + '/');
+                const isEmployeeProfile = item.href === '/employees' && location.pathname.startsWith('/employees/');
+                const isActive = isExact || isSubPath || isEmployeeProfile;
+
+                return (
+                  <Link
+                    key={item.href + item.title}
+                    to={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      'group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 relative',
+                      isActive
+                        ? 'bg-blue-50 text-blue-600 shadow-xs dark:bg-blue-950/60 dark:text-blue-400'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:translate-x-1 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100',
+                      sidebarCollapsed && 'justify-center px-0 hover:translate-x-0'
+                    )}
+                    title={sidebarCollapsed ? item.title : undefined}
+                  >
+                    <Icon
+                      className={cn(
+                        'h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110',
+                        isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 group-hover:text-slate-600 dark:text-slate-400 dark:group-hover:text-slate-200'
+                      )}
+                    />
+                    {!sidebarCollapsed && (
+                      <span className="truncate flex-1">{item.title}</span>
+                    )}
+                    {!sidebarCollapsed && item.badge && (
+                      <span
+                        className={cn(
+                          'rounded-full px-1.5 py-0.5 text-[9px] font-bold group-hover:scale-105 transition-transform',
+                          isActive
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-blue-50 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
+                        )}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom Promo Card matching reference image */}
+        {!sidebarCollapsed && (
+          <div className="mx-3 my-2 rounded-2xl bg-blue-50/70 p-3 border border-blue-100/80 dark:bg-blue-950/30 dark:border-blue-900/40 hover-shine-sweep transition-all hover:shadow-sm">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-600 text-white text-xs shadow-xs">
+                <Sparkles className="h-3.5 w-3.5" />
+              </div>
+              <span className="text-xs font-bold text-slate-900 dark:text-white">Your Growth</span>
+            </div>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mb-2">
+              Our Priority. Build your career with opportunities & support.
+            </p>
+            <button
+              onClick={() => alert('Explore Career & Learning Opportunities')}
+              className="w-full rounded-xl bg-blue-600 py-1.5 text-[11px] font-semibold text-white hover:bg-blue-700 shadow-xs transition-all hover-magnetic-btn"
+            >
+              Explore More
+            </button>
+          </div>
+        )}
+
+        {/* Bottom Collapse Sidebar Button */}
+        <div className="border-t border-slate-100 dark:border-slate-800/80 p-3">
+          <button
+            onClick={toggleSidebar}
+            className={cn(
+              'w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-white transition-colors',
+              sidebarCollapsed ? 'justify-center px-0' : ''
+            )}
+          >
+            <ChevronLeft className={cn('h-4 w-4 transition-transform', sidebarCollapsed && 'rotate-180')} />
+            {!sidebarCollapsed && <span>Collapse Sidebar</span>}
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+};

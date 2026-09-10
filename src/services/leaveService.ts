@@ -1,0 +1,73 @@
+import { LeaveRequest, LeaveBalance, Holiday } from '../types';
+import { INITIAL_LEAVE_REQUESTS, INITIAL_HOLIDAYS } from './mockDb';
+import { getFromStorage, saveToStorage } from './storage';
+
+export const leaveService = {
+  getRequests: async (_orgId: string = 'org-1'): Promise<LeaveRequest[]> => {
+    return getFromStorage<LeaveRequest[]>('leave_requests', INITIAL_LEAVE_REQUESTS);
+  },
+
+  getEmployeeBalances: async (_employeeId?: string): Promise<LeaveBalance> => {
+    return {
+      employeeId: _employeeId || 'emp-1',
+      annual: { total: 18, used: 6, remaining: 12 },
+      casual: { total: 10, used: 2, remaining: 8 },
+      sick: { total: 12, used: 3, remaining: 9 },
+      maternityPaternity: { total: 90, used: 0, remaining: 90 },
+    };
+  },
+
+  applyLeave: async (data: Partial<LeaveRequest>): Promise<LeaveRequest> => {
+    const list = getFromStorage<LeaveRequest[]>('leave_requests', INITIAL_LEAVE_REQUESTS);
+    const newRequest: LeaveRequest = {
+      id: `lev-${Date.now()}`,
+      organizationId: data.organizationId || 'org-1',
+      employeeId: data.employeeId || 'emp-1',
+      employeeCode: data.employeeCode || 'EMP001',
+      employeeName: data.employeeName || 'Rahul Sharma',
+      employeeAvatar: data.employeeAvatar || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
+      department: data.department || 'Engineering',
+      leaveType: data.leaveType || 'Casual',
+      startDate: data.startDate || new Date().toISOString().split('T')[0],
+      endDate: data.endDate || new Date().toISOString().split('T')[0],
+      days: data.days || 1,
+      reason: data.reason || 'Personal leave',
+      status: 'Pending',
+      appliedDate: new Date().toISOString().split('T')[0],
+      approverName: 'Amit Verma',
+    };
+    const updated = [newRequest, ...list];
+    saveToStorage('leave_requests', updated);
+    return newRequest;
+  },
+
+  updateStatus: async (requestId: string, status: 'Approved' | 'Rejected', approverName?: string, rejectionReason?: string): Promise<LeaveRequest> => {
+    const list = getFromStorage<LeaveRequest[]>('leave_requests', INITIAL_LEAVE_REQUESTS);
+    const index = list.findIndex(r => r.id === requestId);
+    if (index === -1) throw new Error('Request not found');
+    list[index] = {
+      ...list[index],
+      status,
+      approverName: approverName || list[index].approverName || 'HR Admin',
+      approvedOrRejectedDate: new Date().toISOString().split('T')[0],
+      rejectionReason: status === 'Rejected' ? rejectionReason : undefined,
+    };
+    saveToStorage('leave_requests', list);
+    return list[index];
+  },
+
+  getHolidays: async (): Promise<Holiday[]> => {
+    return getFromStorage<Holiday[]>('holidays', INITIAL_HOLIDAYS);
+  },
+
+  getLeaveOverviewStats: async () => {
+    const requests = await leaveService.getRequests();
+    return {
+      totalOnLeaveToday: 8,
+      annual: 4,
+      sick: 2,
+      casual: 2,
+      pendingRequests: requests.filter(r => r.status === 'Pending').length,
+    };
+  }
+};
