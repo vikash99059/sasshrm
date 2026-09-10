@@ -396,7 +396,6 @@ export const AssetsPage: React.FC = () => {
             <h3 className="text-xs font-bold text-slate-900 dark:text-white">
               Asset Summary
             </h3>
-            <span className="text-[10px] font-semibold text-slate-400">Total: {totalAssetsCount}</span>
           </div>
 
           <div className="flex items-center justify-between gap-3">
@@ -518,21 +517,21 @@ export const AssetsPage: React.FC = () => {
         <div className="lg:col-span-8 xl:col-span-8.5 rounded-xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-xs dark:border-dark-border dark:bg-dark-card space-y-3">
           
           {/* Header Row: Title + Search Input + Filter Button */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white flex-shrink-0">
               My Assigned Assets
             </h2>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex items-center gap-2.5 w-full sm:w-auto">
               {/* Search input with proper pl-9 to prevent icon overlap */}
-              <div className="relative flex-1 sm:w-56">
-                <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+              <div className="relative flex-1 sm:w-60">
+                <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Search assets, notebook, pen..."
+                  placeholder="Search assets..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-8.5 pl-9 pr-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/20 dark:border-dark-border dark:bg-slate-800/60 dark:text-white transition-all"
+                  className="w-full h-9 pl-9 pr-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/20 dark:border-dark-border dark:bg-slate-800/60 dark:text-white transition-all"
                 />
               </div>
 
@@ -541,13 +540,13 @@ export const AssetsPage: React.FC = () => {
                 <button
                   onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
                   className={cn(
-                    'inline-flex items-center justify-center gap-1.5 h-8.5 px-3 rounded-xl border text-xs font-semibold transition-all duration-150 cursor-pointer',
+                    'inline-flex items-center justify-center gap-1.5 h-9 px-3.5 rounded-xl border text-xs font-semibold transition-all duration-150 cursor-pointer',
                     categoryFilter !== 'All'
                       ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300'
                       : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-dark-border dark:bg-slate-800 dark:text-slate-200'
                   )}
                 >
-                  <Filter className="h-3.5 w-3.5 text-slate-500" />
+                  <Filter className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                   <span>{categoryFilter === 'All' ? 'Filter' : categoryFilter}</span>
                 </button>
 
