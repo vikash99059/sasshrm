@@ -723,47 +723,55 @@ export const ChatPage: React.FC = () => {
   const recentChannels = filteredChannels.filter((c) => !c.isPinned);
 
   return (
-    <div className="h-[calc(100vh-5.5rem)] flex flex-col space-y-1.5 animate-page-enter">
+    <div className="h-[calc(100vh-5.5rem)] flex flex-col space-y-2 animate-page-enter">
       
       {/* =======================================================================
           TOP TEAMS NAVIGATION & CALLING ACTIONS
          ======================================================================= */}
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between px-1 py-1">
         <div className="flex items-center gap-2.5">
           {/* Authentic Microsoft Teams Icon Badge */}
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#5B5FC7] text-white shadow-sm ring-1 ring-white/20">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#5B5FC7] to-[#4F52B2] text-white shadow-xs">
             <Users className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                Microsoft Teams Collaboration
+                Chat & Teams Collaboration
               </h1>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#5B5FC7]/10 text-[#5B5FC7] dark:bg-[#5B5FC7]/25 dark:text-[#A6AFFA]">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#5B5FC7]/10 text-[#5B5FC7] dark:bg-[#5B5FC7]/25 dark:text-[#A6AFFA] border border-[#5B5FC7]/20">
                 Enterprise
               </span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Meetings, Calling, Team Posts, Live Polls, Attachments & Praise
+              Meetings, Video Calls, Project Chat, Live Polls & Files
             </p>
           </div>
         </div>
 
         {/* Top Global Teams Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={() => setIsMeetingModalOpen(true)}
-            className="hidden sm:inline-flex items-center gap-1.5 h-8.5 px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 dark:border-dark-border dark:bg-dark-card dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors shadow-2xs cursor-pointer"
+            className="hidden sm:inline-flex items-center gap-2 h-9 px-3.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 dark:border-slate-700 dark:bg-[#1E1E2C] dark:hover:bg-[#28283C] text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all duration-150 shadow-xs hover:shadow-sm hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer"
           >
-            <CalendarPlus className="h-3.5 w-3.5 text-[#5B5FC7]" />
+            <CalendarPlus className="h-4 w-4 text-[#5B5FC7] dark:text-[#8B8FF0]" />
             <span>Schedule Meeting</span>
           </button>
 
           <button
-            onClick={() => setIsVideoCallOpen(true)}
-            className="inline-flex items-center gap-1.5 h-8.5 px-3.5 rounded-xl bg-[#5B5FC7] hover:bg-[#4F52B2] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+            onClick={() => {
+              setActiveCallTarget({
+                name: activeChannel.name,
+                avatar: activeChannel.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80',
+                role: `${activeChannel.membersCount || 18} Channel Participants`,
+                isGroup: true,
+              });
+              setIsVideoCallOpen(true);
+            }}
+            className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-gradient-to-r from-[#5B5FC7] to-[#4F52B2] hover:from-[#4F52B2] hover:to-[#43469C] text-white text-xs font-semibold shadow-sm shadow-[#5B5FC7]/30 hover:shadow-md hover:shadow-[#5B5FC7]/40 transition-all duration-150 hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer"
           >
-            <Video className="h-3.5 w-3.5" />
+            <Video className="h-4 w-4" />
             <span>Meet Now</span>
           </button>
         </div>
