@@ -189,7 +189,8 @@ export const Sidebar: React.FC = () => {
                         {item.children!.map((child) => {
                           const isChildActive =
                             location.pathname + location.search === child.href ||
-                            (!location.search && child.href === '/chat?tab=chat' && location.pathname === '/chat');
+                            (!location.search && child.href === '/chat?tab=chat' && location.pathname === '/chat') ||
+                            (!location.search && child.href === '/email?folder=inbox' && location.pathname === '/email');
 
                           return (
                             <Link
