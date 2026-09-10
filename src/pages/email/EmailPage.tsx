@@ -615,7 +615,7 @@ export const EmailPage: React.FC = () => {
 
   return (
     <div className="h-[calc(100vh-5.5rem)] flex flex-col space-y-2 animate-page-enter">
-      
+
       {/* =======================================================================
           OUTLOOK TOP HEADER & BRANDING
          ======================================================================= */}
@@ -628,7 +628,7 @@ export const EmailPage: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                Outlook Mail & Communications
+                Mail & Communications
               </h1>
               <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#0078D4]/10 text-[#0078D4] dark:bg-[#0078D4]/25 dark:text-[#60A5FA] border border-[#0078D4]/20">
                 Exchange Online
@@ -657,12 +657,12 @@ export const EmailPage: React.FC = () => {
           OUTLOOK 3-PANE WORKSPACE (FOLDER RAIL | EMAIL LIST | READING PANE)
          ======================================================================= */}
       <div className="flex-1 min-h-0 flex bg-white dark:bg-[#111118] rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs overflow-hidden">
-        
+
         {/* =====================================================================
             PANE 1: LEFT OUTLOOK FOLDERS & CATEGORIES RAIL (w-56)
            ===================================================================== */}
         <div className="w-56 border-r border-slate-200/80 dark:border-slate-800 flex flex-col bg-slate-50/70 dark:bg-[#13131B] flex-shrink-0 text-xs select-none">
-          
+
           {/* Mailbox Header */}
           <div className="p-3 border-b border-slate-200/70 dark:border-slate-800 flex items-center justify-between">
             <span className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
@@ -681,7 +681,7 @@ export const EmailPage: React.FC = () => {
           {/* Folder Links List */}
           <div className="flex-1 overflow-y-auto p-2 space-y-0.5 scrollbar-thin">
             <p className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Favorites</p>
-            
+
             {/* 1. Inbox */}
             <button
               onClick={() => handleSelectFolder('inbox')}
@@ -833,7 +833,7 @@ export const EmailPage: React.FC = () => {
             PANE 2: MIDDLE EMAIL LIST WITH FOCUSED / OTHER TABS (w-80 md:w-96)
            ===================================================================== */}
         <div className="w-80 sm:w-88 md:w-96 border-r border-slate-200/80 dark:border-slate-800 flex flex-col flex-shrink-0 bg-white dark:bg-[#111118]">
-          
+
           {/* Top Search & Filter Strip */}
           <div className="p-2.5 border-b border-slate-200/80 dark:border-slate-800 space-y-2">
             {/* Outlook Search Bar */}
@@ -1055,7 +1055,7 @@ export const EmailPage: React.FC = () => {
         <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-[#111118]">
           {selectedEmail ? (
             <div className="flex-1 flex flex-col min-h-0">
-              
+
               {/* Outlook Action Toolbar for Active Message */}
               <div className="h-12 px-4 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between bg-slate-50/40 dark:bg-[#14141E] flex-shrink-0 text-xs">
                 <div className="flex items-center gap-1">
@@ -1130,7 +1130,7 @@ export const EmailPage: React.FC = () => {
 
               {/* Message Details Canvas */}
               <div className="flex-1 overflow-y-auto p-5 space-y-4 scrollbar-thin">
-                
+
                 {/* Subject Line & Category */}
                 <div className="space-y-1.5 pb-3 border-b border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -1329,7 +1329,7 @@ export const EmailPage: React.FC = () => {
       {isComposeOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-fade-in">
           <div className="w-full max-w-2xl bg-white dark:bg-[#141420] text-slate-900 dark:text-white rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-[90vh]">
-            
+
             {/* Modal Outlook Title Bar */}
             <div className="h-12 px-4 bg-[#0078D4] text-white flex items-center justify-between flex-shrink-0">
               <span className="font-bold text-xs sm:text-sm flex items-center gap-2">
@@ -1346,7 +1346,7 @@ export const EmailPage: React.FC = () => {
 
             {/* Compose Form */}
             <form onSubmit={handleSendEmail} className="flex-1 flex flex-col p-4 space-y-3 overflow-y-auto">
-              
+
               {/* To: Recipients Row */}
               <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
                 <span className="text-xs font-bold text-slate-500 w-12 flex-shrink-0">To:</span>

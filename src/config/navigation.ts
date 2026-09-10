@@ -84,19 +84,7 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
                 { title: 'Files', href: '/chat?tab=files' },
               ]
             },
-            {
-              title: 'Email',
-              href: '/email',
-              icon: Mail,
-              badge: '4',
-              children: [
-                { title: 'Inbox', href: '/email?folder=inbox' },
-                { title: 'Sent Items', href: '/email?folder=sent' },
-                { title: 'Drafts', href: '/email?folder=drafts' },
-                { title: 'Archive', href: '/email?folder=archive' },
-                { title: 'Deleted Items', href: '/email?folder=trash' },
-              ]
-            },
+            { title: 'Email', href: '/email', icon: Mail, badge: '4' },
             { title: 'Team Members', href: '/employees', icon: Users, badge: '14' },
             { title: 'Team Attendance', href: '/attendance', icon: Clock },
             { title: 'Clock In / Out', href: '/clock-in', icon: UserCheck },
@@ -127,18 +115,7 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
                 { title: 'Files', href: '/chat?tab=files' },
               ]
             },
-            {
-              title: 'Email',
-              href: '/email',
-              icon: Mail,
-              children: [
-                { title: 'Inbox', href: '/email?folder=inbox' },
-                { title: 'Sent Items', href: '/email?folder=sent' },
-                { title: 'Drafts', href: '/email?folder=drafts' },
-                { title: 'Archive', href: '/email?folder=archive' },
-                { title: 'Deleted Items', href: '/email?folder=trash' },
-              ]
-            },
+            { title: 'Email', href: '/email', icon: Mail },
             { title: 'Job Openings', href: '/recruitment/jobs', icon: Briefcase, badge: '4' },
             { title: 'Candidates Kanban', href: '/recruitment/candidates', icon: Users },
             { title: 'Interviews Schedule', href: '/recruitment/interviews', icon: Calendar },
@@ -166,18 +143,7 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
                 { title: 'Files', href: '/chat?tab=files' },
               ]
             },
-            {
-              title: 'Email',
-              href: '/email',
-              icon: Mail,
-              children: [
-                { title: 'Inbox', href: '/email?folder=inbox' },
-                { title: 'Sent Items', href: '/email?folder=sent' },
-                { title: 'Drafts', href: '/email?folder=drafts' },
-                { title: 'Archive', href: '/email?folder=archive' },
-                { title: 'Deleted Items', href: '/email?folder=trash' },
-              ]
-            },
+            { title: 'Email', href: '/email', icon: Mail },
             { title: 'Process Payroll', href: '/payroll', icon: DollarSign },
             { title: 'Salary Structures', href: '/payroll/salary-structure', icon: CreditCard },
             { title: 'Employee Payslips', href: '/payroll/payslips', icon: FileSpreadsheet },
@@ -217,19 +183,7 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
                 { title: 'Files', href: '/chat?tab=files' },
               ]
             },
-            {
-              title: 'Email',
-              href: '/email',
-              icon: Mail,
-              badge: '4',
-              children: [
-                { title: 'Inbox', href: '/email?folder=inbox' },
-                { title: 'Sent Items', href: '/email?folder=sent' },
-                { title: 'Drafts', href: '/email?folder=drafts' },
-                { title: 'Archive', href: '/email?folder=archive' },
-                { title: 'Deleted Items', href: '/email?folder=trash' },
-              ]
-            },
+            { title: 'Email', href: '/email', icon: Mail, badge: '4' },
           ]
         },
         {
@@ -287,19 +241,7 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
                 { title: 'Files', href: '/chat?tab=files' },
               ]
             },
-            {
-              title: 'Email',
-              href: '/email',
-              icon: Mail,
-              badge: '4',
-              children: [
-                { title: 'Inbox', href: '/email?folder=inbox' },
-                { title: 'Sent Items', href: '/email?folder=sent' },
-                { title: 'Drafts', href: '/email?folder=drafts' },
-                { title: 'Archive', href: '/email?folder=archive' },
-                { title: 'Deleted Items', href: '/email?folder=trash' },
-              ]
-            },
+            { title: 'Email', href: '/email', icon: Mail, badge: '4' },
             { title: 'Analytics', href: '/reports', icon: BarChart3 },
           ]
         },
