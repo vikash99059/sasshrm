@@ -7,10 +7,11 @@ import { CORPORATE_MODULES } from '../../services/corporateModulesDb';
 
 interface ModuleGuardProps {
     moduleId: CorporateModuleId;
+    subModule?: string;
     children: React.ReactNode;
 }
 
-export const ModuleGuard: React.FC<ModuleGuardProps> = ({ moduleId, children }) => {
+export const ModuleGuard: React.FC<ModuleGuardProps> = ({ moduleId, subModule, children }) => {
     const { currentRole, currentOrg } = useAppStore();
     const navigate = useNavigate();
 
@@ -23,7 +24,11 @@ export const ModuleGuard: React.FC<ModuleGuardProps> = ({ moduleId, children }) 
     const subscribedModules = currentOrg?.subscribedModules;
     const isSubscribed = !subscribedModules || subscribedModules.includes(moduleId);
 
-    if (isSubscribed) {
+    // Check if this specific submodule is disabled
+    const disabledSubModules = currentOrg?.disabledSubModules?.[moduleId] || [];
+    const isSubModuleDisabled = subModule && disabledSubModules.includes(subModule);
+
+    if (isSubscribed && !isSubModuleDisabled) {
         return <>{children}</>;
     }
 

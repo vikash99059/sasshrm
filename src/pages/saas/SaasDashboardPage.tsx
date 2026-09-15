@@ -154,6 +154,7 @@ export const SaasDashboardPage: React.FC = () => {
           icon={<Users className="h-5 w-5 text-purple-600" />}
           iconBgColor="bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-400"
         />
+        {/*
         <StatCard
           title="Monthly Recurring Revenue"
           value={formatCurrency(stats.monthlyRevenue)}
@@ -162,11 +163,12 @@ export const SaasDashboardPage: React.FC = () => {
           icon={<DollarSign className="h-5 w-5 text-indigo-600" />}
           iconBgColor="bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400"
         />
+        */}
       </div>
 
-      {/* Charts Section: Revenue Growth + Subscription Distribution */}
+      {/* Charts Section: Revenue Growth + Subscription Distribution Commented Out (Preserved in code) */}
+      {/*
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Revenue Growth Area Chart */}
         <Card className="lg:col-span-2 space-y-4">
           <CardHeader>
             <div>
@@ -198,7 +200,6 @@ export const SaasDashboardPage: React.FC = () => {
           </div>
         </Card>
 
-        {/* Subscription Distribution Donut Chart */}
         <Card className="space-y-4">
           <CardHeader>
             <div>
@@ -243,10 +244,12 @@ export const SaasDashboardPage: React.FC = () => {
           </div>
         </Card>
       </div>
+      */}
 
       {/* Bottom Grid: Recent Organizations + System Health */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Recent Organizations Table */}
+        {/* Recent Organizations Table Commented Out (Preserved in code) */}
+        {/*
         <div className="lg:col-span-3 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-bold text-slate-900 dark:text-white">Recent Organizations</h3>
@@ -262,6 +265,7 @@ export const SaasDashboardPage: React.FC = () => {
             pageSize={4}
           />
         </div>
+        */}
 
         {/* System Health Status */}
         <Card className="space-y-4">

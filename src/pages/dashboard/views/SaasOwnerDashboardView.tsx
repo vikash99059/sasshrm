@@ -50,7 +50,7 @@ export const SaasOwnerDashboardView: React.FC = () => {
     { title: 'Active Platform Users', value: '12,840', change: '+8.6% growth', isPositive: true, subtext: 'Across 48 Tenants', icon: Users, iconBg: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400' },
     { title: 'Platform Churn Rate', value: '1.2%', change: '-0.4% improvement', isPositive: true, subtext: 'Industry benchmark: 3.5%', icon: TrendingUp, iconBg: 'bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400' },
     { title: 'Platform Uptime', value: '99.98%', change: 'All systems operational', isPositive: true, subtext: 'Avg latency: 42ms', icon: Server, iconBg: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400' },
-    { title: 'Pending Upgrades', value: '7', change: 'Pipeline potential: $14k', isNeutral: true, subtext: 'Trial to Enterprise', icon: CreditCard, iconBg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400' },
+    // { title: 'Pending Upgrades', value: '7', change: 'Pipeline potential: $14k', isNeutral: true, subtext: 'Trial to Enterprise', icon: CreditCard, iconBg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400' },
   ];
 
   // Revenue trend (6 months)
@@ -100,14 +100,14 @@ export const SaasOwnerDashboardView: React.FC = () => {
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">SaaS Platform Headquarters</h1>
           <p className="text-slate-300 text-sm mt-1 max-w-xl">
-            Global monitoring for 48 active tenant organizations, subscription tier analytics, recurring billing, and infrastructure telemetry.
+            Global monitoring for 48 active tenant organizations, operational status, and infrastructure telemetry.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3 relative z-10">
           <Button
             variant="outline"
             className="bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm"
-            onClick={() => navigate('/analytics')}
+            onClick={() => navigate('/saas/analytics')}
           >
             <BarChart3 className="w-4 h-4 mr-2" />
             Platform Analytics
@@ -123,7 +123,7 @@ export const SaasOwnerDashboardView: React.FC = () => {
       </div>
 
       {/* SaaS Platform KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {saasKpis.map((kpi, idx) => {
           const Icon = kpi.icon;
           return (
@@ -148,9 +148,9 @@ export const SaasOwnerDashboardView: React.FC = () => {
         })}
       </div>
 
-      {/* Main Row: Revenue Trend Chart & Plan Distribution */}
+      {/* Subscription Trend & Plan Breakdown Commented Out Per User Requirement (Preserved in code) */}
+      {/*
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Revenue Growth Trend Chart (2 Cols) */}
         <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -177,12 +177,12 @@ export const SaasOwnerDashboardView: React.FC = () => {
               <AreaChart data={revenueTrend}>
                 <defs>
                   <linearGradient id="entGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="busGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.15} />
@@ -200,7 +200,6 @@ export const SaasOwnerDashboardView: React.FC = () => {
           </div>
         </div>
 
-        {/* Subscription Tier Distribution */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">Tier Breakdown</h2>
@@ -243,8 +242,10 @@ export const SaasOwnerDashboardView: React.FC = () => {
           </div>
         </div>
       </div>
+      */}
 
-      {/* Multi-Tenant Organization Directory Table */}
+      {/* Tenant Organizations Table Commented Out Per User Requirement (Preserved in code) */}
+      {/*
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -353,6 +354,7 @@ export const SaasOwnerDashboardView: React.FC = () => {
           </table>
         </div>
       </div>
+      */}
 
       {/* Platform Health & Infrastructure Telemetry */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -447,7 +449,7 @@ export const SaasOwnerDashboardView: React.FC = () => {
           </div>
         </form>
       </Modal>
-    </div>
+    </div >
   );
 };
 export default SaasOwnerDashboardView;

@@ -152,12 +152,13 @@ export const saasService = {
 
     saveToStorage('saas_modular_subscriptions', list);
 
-    // Also sync with the organization record's subscribedModules & monthlyFee
+    // Also sync with the organization record's subscribedModules & monthlyFee & disabledSubModules
     const orgs = await saasService.getOrganizations();
     const orgIdx = orgs.findIndex((o) => o.id === config.organizationId);
     if (orgIdx !== -1) {
       orgs[orgIdx].subscribedModules = config.subscribedModuleIds;
       orgs[orgIdx].monthlyFee = config.monthlyTotalFee;
+      orgs[orgIdx].disabledSubModules = config.disabledSubModules;
       saveToStorage('organizations', orgs);
     }
 

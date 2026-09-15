@@ -42,6 +42,7 @@ export interface CorporateModule {
   isKeyDifferentiator?: boolean;
   basePriceMonthly: number;
   perSeatPriceMonthly: number;
+  subModules?: string[];
   featureGroups: CorporateModuleFeatureGroup[];
   subFeaturesCount: number;
   activeOrganizationsCount: number;
@@ -55,6 +56,7 @@ export interface ModularSubscriptionConfig {
   planTier: 'Custom' | 'Starter' | 'Business Pro' | 'Enterprise Suite';
   bundleName?: string;
   subscribedModuleIds: CorporateModuleId[];
+  disabledSubModules?: Record<string, string[]>;
   customModulePricing?: Partial<Record<CorporateModuleId, number>>;
   monthlyBaseFee: number;
   monthlyTotalFee: number;
