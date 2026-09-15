@@ -48,6 +48,7 @@ export interface Organization {
   billingCycle: 'monthly' | 'annual';
   monthlyFee: number;
   subscribedModules?: CorporateModuleId[];
+  disabledSubModules?: Record<string, string[]>;
 }
 
 export interface SubscriptionPlan {
@@ -679,12 +680,12 @@ export interface OnboardingHandover {
   offerStatus: 'Accepted';
   documentsStatus: 'Verified' | 'Pending' | 'Under Review' | 'Pending Upload';
   handoverStatus:
-    | 'Joining Pending'
-    | 'Joining Confirmed'
-    | 'Ready for Handover'
-    | 'Handover to HR'
-    | 'Onboarding in Progress'
-    | 'Completed';
+  | 'Joining Pending'
+  | 'Joining Confirmed'
+  | 'Ready for Handover'
+  | 'Handover to HR'
+  | 'Onboarding in Progress'
+  | 'Completed';
   checklist: {
     offerAccepted: boolean;
     personalInfoComplete: boolean;

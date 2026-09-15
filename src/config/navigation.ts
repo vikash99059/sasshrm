@@ -42,7 +42,8 @@ export interface NavItem {
   icon: any;
   badge?: string;
   moduleId?: CorporateModuleId;
-  children?: { title: string; href: string }[];
+  subModule?: string;
+  children?: { title: string; href: string; subModule?: string }[];
 }
 
 export interface NavSection {
@@ -60,7 +61,7 @@ function getRawNavigationForRole(role: UserRole): NavSection[] {
             { title: 'Super Admin Overview', href: '/saas', icon: LayoutDashboard },
             { title: 'Corporate Modules', href: '/saas/modules', icon: Boxes, badge: '17' },
             { title: 'Organizations', href: '/saas/organizations', icon: Building2, badge: 'Active' },
-            { title: 'Subscriptions', href: '/saas/subscriptions', icon: CreditCard },
+            // { title: 'Subscriptions', href: '/saas/subscriptions', icon: CreditCard },
             { title: 'Plans & Pricing', href: '/saas/plans', icon: Layers },
             { title: 'Billing & Invoices', href: '/saas/billing', icon: DollarSign },
             { title: 'Revenue Analytics', href: '/saas/revenue', icon: BarChart3 },
@@ -83,21 +84,22 @@ function getRawNavigationForRole(role: UserRole): NavSection[] {
               icon: MessageSquare,
               badge: '3',
               moduleId: 'chat_communication',
+              subModule: 'Internal employee chat',
               children: [
-                { title: 'Chat', href: '/chat?tab=chat' },
-                { title: 'Teams', href: '/chat?tab=teams' },
-                { title: 'Calendar', href: '/chat?tab=calendar' },
-                { title: 'Calls', href: '/chat?tab=calls' },
-                { title: 'Files', href: '/chat?tab=files' },
+                { title: 'Chat', href: '/chat?tab=chat', subModule: 'Internal employee chat' },
+                { title: 'Teams', href: '/chat?tab=teams', subModule: 'Project/team chat' },
+                { title: 'Calendar', href: '/chat?tab=calendar', subModule: 'Internal employee chat' },
+                { title: 'Calls', href: '/chat?tab=calls', subModule: 'Internal employee chat' },
+                { title: 'Files', href: '/chat?tab=files', subModule: 'File sharing' },
               ]
             },
-            { title: 'Email', href: '/email', icon: Mail, badge: '4', moduleId: 'email_management' },
-            { title: 'Team Members', href: '/employees', icon: Users, moduleId: 'organization_management' },
-            { title: 'Team Attendance', href: '/attendance', icon: Clock, moduleId: 'employee_hr_management' },
-            { title: 'Clock In / Out', href: '/clock-in', icon: UserCheck, moduleId: 'employee_hr_management' },
-            { title: 'Leave Approvals', href: '/leave/requests', icon: CalendarDays, badge: '3', moduleId: 'employee_hr_management' },
-            { title: 'Team Performance', href: '/performance/goals', icon: Target, moduleId: 'kpi_performance_management' },
-            { title: 'Expense Approvals', href: '/operations/expenses', icon: Receipt, moduleId: 'finance_management' },
+            { title: 'Email', href: '/email', icon: Mail, badge: '4', moduleId: 'email_management', subModule: 'Inbox / sent / drafts' },
+            { title: 'Team Members', href: '/employees', icon: Users, moduleId: 'organization_management', subModule: 'User management' },
+            { title: 'Team Attendance', href: '/attendance', icon: Clock, moduleId: 'employee_hr_management', subModule: 'Attendance & shifts' },
+            { title: 'Clock In / Out', href: '/clock-in', icon: UserCheck, moduleId: 'employee_hr_management', subModule: 'Attendance & shifts' },
+            { title: 'Leave Approvals', href: '/leave/requests', icon: CalendarDays, badge: '3', moduleId: 'employee_hr_management', subModule: 'Leave management' },
+            { title: 'Team Performance', href: '/performance/goals', icon: Target, moduleId: 'kpi_performance_management', subModule: 'Targets' },
+            { title: 'Expense Approvals', href: '/operations/expenses', icon: Receipt, moduleId: 'finance_management', subModule: 'Income & expenses' },
             { title: 'Company Calendar', href: '/calendar', icon: Calendar },
             { title: 'Settings', href: '/settings', icon: Settings },
           ]
@@ -397,83 +399,84 @@ function getRawNavigationForRole(role: UserRole): NavSection[] {
               icon: MessageSquare,
               badge: '3',
               moduleId: 'chat_communication',
+              subModule: 'Internal employee chat',
               children: [
-                { title: 'Chat', href: '/chat?tab=chat' },
-                { title: 'Teams', href: '/chat?tab=teams' },
-                { title: 'Calendar', href: '/chat?tab=calendar' },
-                { title: 'Calls', href: '/chat?tab=calls' },
-                { title: 'Files', href: '/chat?tab=files' },
+                { title: 'Chat', href: '/chat?tab=chat', subModule: 'Internal employee chat' },
+                { title: 'Teams', href: '/chat?tab=teams', subModule: 'Project/team chat' },
+                { title: 'Calendar', href: '/chat?tab=calendar', subModule: 'Internal employee chat' },
+                { title: 'Calls', href: '/chat?tab=calls', subModule: 'Internal employee chat' },
+                { title: 'Files', href: '/chat?tab=files', subModule: 'File sharing' },
               ]
             },
-            { title: 'Email', href: '/email', icon: Mail, badge: '4', moduleId: 'email_management' },
-            { title: 'Analytics', href: '/reports', icon: BarChart3, moduleId: 'mis_analytics_dashboard' },
+            { title: 'Email', href: '/email', icon: Mail, badge: '4', moduleId: 'email_management', subModule: 'Inbox / sent / drafts' },
+            { title: 'Analytics', href: '/reports', icon: BarChart3, moduleId: 'mis_analytics_dashboard', subModule: 'HR dashboard' },
           ]
         },
         {
           sectionTitle: 'PEOPLE',
           items: [
-            { title: 'Employees', href: '/employees', icon: Users, moduleId: 'organization_management' },
-            { title: 'Departments', href: '/departments', icon: Building2, moduleId: 'organization_management' },
-            { title: 'Designations', href: '/designations', icon: Award, moduleId: 'organization_management' },
-            { title: 'Teams', href: '/teams', icon: Users, moduleId: 'organization_management' },
-            { title: 'Organization Structure', href: '/org-structure', icon: Layers, moduleId: 'organization_management' },
+            { title: 'Employees', href: '/employees', icon: Users, moduleId: 'organization_management', subModule: 'User management' },
+            { title: 'Departments', href: '/departments', icon: Building2, moduleId: 'organization_management', subModule: 'Departments' },
+            { title: 'Designations', href: '/designations', icon: Award, moduleId: 'organization_management', subModule: 'Designations & roles' },
+            { title: 'Teams', href: '/teams', icon: Users, moduleId: 'organization_management', subModule: 'Company / Business Unit / Branch setup' },
+            { title: 'Organization Structure', href: '/org-structure', icon: Layers, moduleId: 'organization_management', subModule: 'Organization structure' },
           ]
         },
         {
           sectionTitle: 'ATTENDANCE',
           items: [
-            { title: 'Attendance', href: '/attendance', icon: Clock, moduleId: 'employee_hr_management' },
-            { title: 'Timesheets', href: '/timesheets', icon: UserCheck, moduleId: 'employee_hr_management' },
-            { title: 'Shifts', href: '/shifts', icon: Sparkles, moduleId: 'employee_hr_management' },
-            { title: 'Clock In / Out', href: '/clock-in', icon: Clock, badge: 'Live', moduleId: 'employee_hr_management' },
+            { title: 'Attendance', href: '/attendance', icon: Clock, moduleId: 'employee_hr_management', subModule: 'Attendance & shifts' },
+            { title: 'Timesheets', href: '/timesheets', icon: UserCheck, moduleId: 'employee_hr_management', subModule: 'Attendance & shifts' },
+            { title: 'Shifts', href: '/shifts', icon: Sparkles, moduleId: 'employee_hr_management', subModule: 'Attendance & shifts' },
+            { title: 'Clock In / Out', href: '/clock-in', icon: Clock, badge: 'Live', moduleId: 'employee_hr_management', subModule: 'Attendance & shifts' },
           ]
         },
         {
           sectionTitle: 'LEAVE',
           items: [
-            { title: 'Leave Management', href: '/leave', icon: CalendarDays, badge: '12', moduleId: 'employee_hr_management' },
-            { title: 'Leave Requests', href: '/leave/requests', icon: FileSpreadsheet, moduleId: 'employee_hr_management' },
-            { title: 'Leave Balance', href: '/leave/balance', icon: ShieldCheck, moduleId: 'employee_hr_management' },
-            { title: 'Holidays', href: '/leave/holidays', icon: Calendar, moduleId: 'employee_hr_management' },
+            { title: 'Leave Management', href: '/leave', icon: CalendarDays, badge: '12', moduleId: 'employee_hr_management', subModule: 'Leave management' },
+            { title: 'Leave Requests', href: '/leave/requests', icon: FileSpreadsheet, moduleId: 'employee_hr_management', subModule: 'Leave management' },
+            { title: 'Leave Balance', href: '/leave/balance', icon: ShieldCheck, moduleId: 'employee_hr_management', subModule: 'Leave management' },
+            { title: 'Holidays', href: '/leave/holidays', icon: Calendar, moduleId: 'employee_hr_management', subModule: 'Leave management' },
           ]
         },
         {
           sectionTitle: 'PAYROLL',
           items: [
-            { title: 'Payroll Dashboard', href: '/payroll', icon: DollarSign, moduleId: 'finance_management' },
-            { title: 'Salary Structure', href: '/payroll/salary-structure', icon: CreditCard, moduleId: 'finance_management' },
-            { title: 'Payslips', href: '/payroll/payslips', icon: FileSpreadsheet, moduleId: 'finance_management' },
-            { title: 'Adjustments & Claims', href: '/payroll/adjustments', icon: Receipt, moduleId: 'finance_management' },
+            { title: 'Payroll Dashboard', href: '/payroll', icon: DollarSign, moduleId: 'finance_management', subModule: 'Salary structure & payroll processing' },
+            { title: 'Salary Structure', href: '/payroll/salary-structure', icon: CreditCard, moduleId: 'finance_management', subModule: 'Salary structure & payroll processing' },
+            { title: 'Payslips', href: '/payroll/payslips', icon: FileSpreadsheet, moduleId: 'finance_management', subModule: 'Payslips, deductions & advances' },
+            { title: 'Adjustments & Claims', href: '/payroll/adjustments', icon: Receipt, moduleId: 'finance_management', subModule: 'Income & expenses' },
           ]
         },
         {
           sectionTitle: 'RECRUITMENT',
           items: [
-            { title: 'Job Openings', href: '/recruitment/jobs', icon: Briefcase, badge: '5', moduleId: 'recruitment_management' },
-            { title: 'Candidates', href: '/recruitment/candidates', icon: Users, moduleId: 'recruitment_management' },
-            { title: 'Interviews', href: '/recruitment/interviews', icon: Calendar, moduleId: 'recruitment_management' },
+            { title: 'Job Openings', href: '/recruitment/jobs', icon: Briefcase, badge: '5', moduleId: 'recruitment_management', subModule: 'Job creation & publishing' },
+            { title: 'Candidates', href: '/recruitment/candidates', icon: Users, moduleId: 'recruitment_management', subModule: 'Candidate database' },
+            { title: 'Interviews', href: '/recruitment/interviews', icon: Calendar, moduleId: 'recruitment_management', subModule: 'Interview scheduling' },
           ]
         },
         {
           sectionTitle: 'PERFORMANCE',
           items: [
-            { title: 'Goals & OKRs', href: '/performance/goals', icon: Target, moduleId: 'kpi_performance_management' },
-            { title: 'Performance Reviews', href: '/performance/reviews', icon: BarChart3, moduleId: 'kpi_performance_management' },
+            { title: 'Goals & OKRs', href: '/performance/goals', icon: Target, moduleId: 'kpi_performance_management', subModule: 'Targets' },
+            { title: 'Performance Reviews', href: '/performance/reviews', icon: BarChart3, moduleId: 'kpi_performance_management', subModule: 'Performance scorecards' },
           ]
         },
         {
           sectionTitle: 'OPERATIONS',
           items: [
-            { title: 'Expenses', href: '/operations/expenses', icon: Receipt, moduleId: 'finance_management' },
-            { title: 'Assets', href: '/operations/assets', icon: Package, moduleId: 'inventory_asset_management' },
-            { title: 'Documents', href: '/operations/documents', icon: FileText, moduleId: 'document_management' },
-            { title: 'Training', href: '/operations/training', icon: GraduationCap, moduleId: 'employee_hr_management' },
+            { title: 'Expenses', href: '/operations/expenses', icon: Receipt, moduleId: 'finance_management', subModule: 'Income & expenses' },
+            { title: 'Assets', href: '/operations/assets', icon: Package, moduleId: 'inventory_asset_management', subModule: 'Asset registration' },
+            { title: 'Documents', href: '/operations/documents', icon: FileText, moduleId: 'document_management', subModule: 'Company documents' },
+            { title: 'Training', href: '/operations/training', icon: GraduationCap, moduleId: 'employee_hr_management', subModule: 'Training' },
           ]
         },
         {
           sectionTitle: 'REPORTS',
           items: [
-            { title: 'Reports & Analytics', href: '/reports', icon: BarChart3, moduleId: 'mis_analytics_dashboard' },
+            { title: 'Reports & Analytics', href: '/reports', icon: BarChart3, moduleId: 'mis_analytics_dashboard', subModule: 'HR dashboard' },
           ]
         },
         {
@@ -488,7 +491,8 @@ function getRawNavigationForRole(role: UserRole): NavSection[] {
 
 export function getNavigationForRole(
   role: UserRole,
-  subscribedModules?: CorporateModuleId[]
+  subscribedModules?: CorporateModuleId[],
+  disabledSubModules?: Record<string, string[]>
 ): NavSection[] {
   const rawSections = getRawNavigationForRole(role);
   if (role === 'saas_owner' || !subscribedModules) {
@@ -498,9 +502,38 @@ export function getNavigationForRole(
   return rawSections
     .map((section) => ({
       ...section,
-      items: section.items.filter(
-        (item) => !item.moduleId || subscribedModules.includes(item.moduleId)
-      ),
+      items: section.items
+        .filter((item) => {
+          // 1. Check if parent module is subscribed
+          if (item.moduleId && !subscribedModules.includes(item.moduleId)) {
+            return false;
+          }
+          // 2. Check if specific submodule is disabled
+          if (item.moduleId && item.subModule && disabledSubModules?.[item.moduleId]) {
+            const disabledList = disabledSubModules[item.moduleId] || [];
+            if (disabledList.includes(item.subModule)) {
+              return false;
+            }
+          }
+          return true;
+        })
+        .map((item) => {
+          if (!item.children) return item;
+          // Filter children sub-items if any child has a subModule that is disabled
+          const filteredChildren = item.children.filter((child) => {
+            if (item.moduleId && child.subModule && disabledSubModules?.[item.moduleId]) {
+              const disabledList = disabledSubModules[item.moduleId] || [];
+              if (disabledList.includes(child.subModule)) {
+                return false;
+              }
+            }
+            return true;
+          });
+          return {
+            ...item,
+            children: filteredChildren,
+          };
+        }),
     }))
     .filter((section) => section.items.length > 0);
 }

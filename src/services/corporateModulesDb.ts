@@ -15,6 +15,16 @@ export const CORPORATE_MODULES: CorporateModule[] = [
     activeOrganizationsCount: 8,
     adoptionPercentage: 100,
     iconName: 'Building2',
+    subModules: [
+      'Company / Business Unit / Branch setup',
+      'Departments',
+      'Designations & roles',
+      'User management',
+      'Role-based access',
+      'Approval hierarchy',
+      'Policies & documents',
+      'Organization structure'
+    ],
     featureGroups: [
       {
         groupName: 'Enterprise Setup',
@@ -42,10 +52,25 @@ export const CORPORATE_MODULES: CorporateModule[] = [
     isSeparateModule: true,
     basePriceMonthly: 299,
     perSeatPriceMonthly: 3.5,
-    subFeaturesCount: 14,
+    subFeaturesCount: 13,
     activeOrganizationsCount: 7,
     adoptionPercentage: 88,
     iconName: 'Briefcase',
+    subModules: [
+      'Manpower requirements',
+      'Job requisitions',
+      'Job creation & publishing',
+      'Candidate database',
+      'Resume management',
+      'Application tracking',
+      'Screening & shortlisting',
+      'Interview scheduling',
+      'Interview evaluation',
+      'Selection & offer management',
+      'Recruitment pipeline',
+      'Recruitment analytics',
+      'Joining & onboarding handover'
+    ],
     featureGroups: [
       {
         groupName: 'Demand & Requisitions',
@@ -79,6 +104,19 @@ export const CORPORATE_MODULES: CorporateModule[] = [
     activeOrganizationsCount: 8,
     adoptionPercentage: 100,
     iconName: 'Users',
+    subModules: [
+      'Employee master',
+      'Employee onboarding',
+      'Employee profile',
+      'Attendance & shifts',
+      'Leave management',
+      'Employee documents',
+      'Training',
+      'Performance & appraisal',
+      'Employee lifecycle',
+      'Exit management',
+      'Employee self-service'
+    ],
     featureGroups: [
       {
         groupName: 'Employee Lifecycle',
@@ -104,10 +142,24 @@ export const CORPORATE_MODULES: CorporateModule[] = [
       'Robust corporate financial engine. Incorporates double-entry General Ledger accounting, accounts payable/receivable, automated invoicing, GST/tax filing, multi-structure payroll execution, and statutory compliance reporting.',
     basePriceMonthly: 399,
     perSeatPriceMonthly: 4.0,
-    subFeaturesCount: 22,
+    subFeaturesCount: 12,
     activeOrganizationsCount: 6,
     adoptionPercentage: 75,
     iconName: 'DollarSign',
+    subModules: [
+      'Chart of accounts',
+      'Income & expenses',
+      'Receivables & payables',
+      'Invoicing',
+      'Payments & receipts',
+      'GST & statutory reports',
+      'Bank reconciliation',
+      'Cash flow',
+      'P&L & Balance Sheet',
+      'Salary structure & payroll processing',
+      'Payslips, deductions & advances',
+      'Statutory compliance (PF, ESI, PT, TDS)'
+    ],
     featureGroups: [
       {
         groupName: 'Accounting & Finance',
@@ -135,10 +187,25 @@ export const CORPORATE_MODULES: CorporateModule[] = [
     isKeyDifferentiator: true,
     basePriceMonthly: 499,
     perSeatPriceMonthly: 5.0,
-    subFeaturesCount: 26,
+    subFeaturesCount: 13,
     activeOrganizationsCount: 5,
     adoptionPercentage: 63,
     iconName: 'TrendingUp',
+    subModules: [
+      'Business verticals & units',
+      'Services & products',
+      'Projects & cost centers',
+      'Revenue centers',
+      'Material & manpower costing',
+      'Machine, equipment & infrastructure costing',
+      'Administrative, marketing & technology costing',
+      'Total estimated cost & selling price',
+      'Gross & net margin analysis',
+      'Break-even & profitability analysis',
+      'Multi-Year Business Costing (1, 2 & 3-year estimates)',
+      'Revenue projections & cost escalation',
+      'Investment requirements & EBITDA projections'
+    ],
     featureGroups: [
       {
         groupName: 'Business Structure',
@@ -172,6 +239,19 @@ export const CORPORATE_MODULES: CorporateModule[] = [
     activeOrganizationsCount: 6,
     adoptionPercentage: 75,
     iconName: 'Target',
+    subModules: [
+      'Leads',
+      'Customers',
+      'Prospects',
+      'Opportunities',
+      'Sales pipeline',
+      'Follow-ups',
+      'Quotations',
+      'Sales orders',
+      'Customer history',
+      'Sales targets',
+      'Sales analytics'
+    ],
     featureGroups: [
       {
         groupName: 'Prospecting & Lead Gen',
@@ -201,6 +281,18 @@ export const CORPORATE_MODULES: CorporateModule[] = [
     activeOrganizationsCount: 7,
     adoptionPercentage: 88,
     iconName: 'Layers',
+    subModules: [
+      'Project creation',
+      'Work orders',
+      'Tasks & subtasks',
+      'Milestones',
+      'Resource allocation',
+      'Timesheets',
+      'Billable / non-billable hours',
+      'Project costing',
+      'Project profitability',
+      'Project performance'
+    ],
     featureGroups: [
       {
         groupName: 'Planning & Delivery',
@@ -230,6 +322,17 @@ export const CORPORATE_MODULES: CorporateModule[] = [
     activeOrganizationsCount: 5,
     adoptionPercentage: 63,
     iconName: 'CreditCard',
+    subModules: [
+      'Purchase requisition',
+      'Vendor management',
+      'RFQ',
+      'Vendor quotations',
+      'Quotation comparison',
+      'Purchase orders',
+      'GRN',
+      'Purchase invoices',
+      'Purchase approvals'
+    ],
     featureGroups: [
       {
         groupName: 'Sourcing & Vendor Relations',
@@ -255,6 +358,18 @@ export const CORPORATE_MODULES: CorporateModule[] = [
     activeOrganizationsCount: 6,
     adoptionPercentage: 75,
     iconName: 'Package',
+    subModules: [
+      'Item master',
+      'Stock',
+      'Warehouse',
+      'Stock movement',
+      'Stock transfer',
+      'Asset registration',
+      'Asset allocation',
+      'Asset maintenance',
+      'Asset lifecycle',
+      'Inventory valuation'
+    ],
     featureGroups: [
       {
         groupName: 'Stock & Warehousing',
@@ -276,10 +391,21 @@ export const CORPORATE_MODULES: CorporateModule[] = [
       'Comprehensive customer service and incident management. Handle support tickets, client complaints, service requests, SLA timers, priority escalations, agent assignments, and customer satisfaction metrics.',
     basePriceMonthly: 199,
     perSeatPriceMonthly: 2.0,
-    subFeaturesCount: 8,
+    subFeaturesCount: 9,
     activeOrganizationsCount: 5,
     adoptionPercentage: 63,
     iconName: 'HelpCircle',
+    subModules: [
+      'Customer tickets',
+      'Complaints',
+      'Service requests',
+      'SLA management',
+      'Escalations',
+      'Service assignment',
+      'Resolution tracking',
+      'Customer service history',
+      'Support analytics'
+    ],
     featureGroups: [
       {
         groupName: 'Ticket & Incident Operations',
@@ -307,6 +433,20 @@ export const CORPORATE_MODULES: CorporateModule[] = [
     activeOrganizationsCount: 8,
     adoptionPercentage: 100,
     iconName: 'Mail',
+    subModules: [
+      'Corporate email integration',
+      'Inbox / sent / drafts',
+      'Email communication history',
+      'Customer-wise and employee-wise email history',
+      'Email templates',
+      'Bulk emails',
+      'Automated emails',
+      'Follow-up reminders',
+      'Email-to-lead',
+      'Email-to-ticket',
+      'Email-to-task',
+      'Email attachments & document linking'
+    ],
     featureGroups: [
       {
         groupName: 'Corporate Mailbox',
@@ -334,10 +474,22 @@ export const CORPORATE_MODULES: CorporateModule[] = [
     isSeparateModule: true,
     basePriceMonthly: 199,
     perSeatPriceMonthly: 1.5,
-    subFeaturesCount: 9,
+    subFeaturesCount: 10,
     activeOrganizationsCount: 8,
     adoptionPercentage: 100,
     iconName: 'MessageSquare',
+    subModules: [
+      'Internal employee chat',
+      'Department chat',
+      'Project/team chat',
+      'Customer chat',
+      'Group conversations',
+      'File sharing',
+      'Notifications',
+      'Chat history',
+      'Task creation from chat',
+      'Customer communication history'
+    ],
     featureGroups: [
       {
         groupName: 'Team Collaboration',
@@ -363,10 +515,22 @@ export const CORPORATE_MODULES: CorporateModule[] = [
       'Enterprise-grade document vault. Store, categorize, and control versions for corporate documents, contracts, employee records, purchase orders, client proposals, with e-signature sign-offs and expiry notifications.',
     basePriceMonthly: 189,
     perSeatPriceMonthly: 1.5,
-    subFeaturesCount: 9,
+    subFeaturesCount: 10,
     activeOrganizationsCount: 7,
     adoptionPercentage: 88,
     iconName: 'FileText',
+    subModules: [
+      'Company documents',
+      'Employee documents',
+      'Customer documents',
+      'Contracts',
+      'Quotations',
+      'Purchase documents',
+      'Project documents',
+      'Version control',
+      'Document approvals',
+      'Expiry alerts'
+    ],
     featureGroups: [
       {
         groupName: 'Document Repositories',
@@ -388,10 +552,21 @@ export const CORPORATE_MODULES: CorporateModule[] = [
       'Strategic goal setting and quantitative performance governance. Cascade high-level corporate targets down to business units, departments, and individuals. Track target achievement real-time through balanced scorecards.',
     basePriceMonthly: 219,
     perSeatPriceMonthly: 2.0,
-    subFeaturesCount: 8,
+    subFeaturesCount: 9,
     activeOrganizationsCount: 6,
     adoptionPercentage: 75,
     iconName: 'Award',
+    subModules: [
+      'Employee KPIs',
+      'Department KPIs',
+      'Business-unit KPIs',
+      'Project KPIs',
+      'Sales KPIs',
+      'Financial KPIs',
+      'Targets',
+      'Achievement tracking',
+      'Performance scorecards'
+    ],
     featureGroups: [
       {
         groupName: 'Target Formulation',
@@ -417,6 +592,16 @@ export const CORPORATE_MODULES: CorporateModule[] = [
     activeOrganizationsCount: 7,
     adoptionPercentage: 88,
     iconName: 'Sparkles',
+    subModules: [
+      'Approval workflows',
+      'Automated notifications',
+      'Escalations',
+      'Task automation',
+      'Recurring activities',
+      'Rule-based actions',
+      'Alerts & reminders',
+      'Automated reports'
+    ],
     featureGroups: [
       {
         groupName: 'Process Automation',
@@ -438,10 +623,24 @@ export const CORPORATE_MODULES: CorporateModule[] = [
       'Real-time corporate business intelligence. Features role-tailored dashboards for CEO, Management, Finance, Sales, Projects, HR, Operations, and Cost Centers with custom MIS reporting and macro-trend forecasting.',
     basePriceMonthly: 349,
     perSeatPriceMonthly: 3.0,
-    subFeaturesCount: 13,
+    subFeaturesCount: 12,
     activeOrganizationsCount: 7,
     adoptionPercentage: 88,
     iconName: 'BarChart3',
+    subModules: [
+      'CEO dashboard',
+      'Management dashboard',
+      'HR dashboard',
+      'Recruitment dashboard',
+      'Finance dashboard',
+      'Sales dashboard',
+      'Project dashboard',
+      'Operations dashboard',
+      'Cost-center dashboard',
+      'Profitability dashboard',
+      'Custom MIS',
+      'Business forecasting'
+    ],
     featureGroups: [
       {
         groupName: 'Executive Command Centers',
@@ -472,6 +671,18 @@ export const CORPORATE_MODULES: CorporateModule[] = [
     activeOrganizationsCount: 5,
     adoptionPercentage: 63,
     iconName: 'Sparkles',
+    subModules: [
+      'AI business insights',
+      'Cost prediction',
+      'Revenue forecasting',
+      'Profitability analysis',
+      'Recruitment insights',
+      'Employee analytics',
+      'Sales forecasting',
+      'Project risk analysis',
+      'Automated MIS generation',
+      'Natural-language business reports'
+    ],
     featureGroups: [
       {
         groupName: 'Predictive Intelligence',

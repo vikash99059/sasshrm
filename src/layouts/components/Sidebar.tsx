@@ -29,7 +29,11 @@ export const Sidebar: React.FC = () => {
     : (currentOrg?.name || currentUser?.organizationName || 'Acme Corp');
 
   const location = useLocation();
-  const navSections = getNavigationForRole(currentRole, currentOrg?.subscribedModules);
+  const navSections = getNavigationForRole(
+    currentRole,
+    currentOrg?.subscribedModules,
+    currentOrg?.disabledSubModules
+  );
   const currentPersona = ROLE_PERSONAS[currentRole] || ROLE_PERSONAS.employee;
 
   const [openDropdowns, setOpenDropdowns] = React.useState<{ [key: string]: boolean }>({

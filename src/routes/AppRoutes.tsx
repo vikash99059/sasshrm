@@ -127,10 +127,11 @@ export const AppRoutes: React.FC = () => {
 
         {/* SaaS Specific Sub-pages */}
         <Route path="/saas" element={<DashboardPage forcedRole="saas_owner" />} />
+        <Route path="/saas/organizations" element={<SaasOrganizationsPage />} />
         <Route path="/saas/modules" element={<SaasModulesPage />} />
         <Route path="/saas/modular-subscriptions" element={<Navigate to="/saas/modules" replace />} />
-        <Route path="/saas/organizations" element={<SaasOrganizationsPage />} />
-        <Route path="/saas/subscriptions" element={<SaasSubscriptionsPage />} />
+        {/* <Route path="/saas/subscriptions" element={<SaasSubscriptionsPage />} /> */}
+        <Route path="/saas/subscriptions" element={<Navigate to="/saas" replace />} />
         <Route path="/saas/plans" element={<SaasPlansPage />} />
         <Route path="/saas/billing" element={<SaasBillingInvoicesPage />} />
         <Route path="/saas/revenue" element={<SaasRevenueAnalyticsPage />} />
