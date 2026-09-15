@@ -85,7 +85,7 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
               ]
             },
             { title: 'Email', href: '/email', icon: Mail, badge: '4' },
-            { title: 'Team Members', href: '/employees', icon: Users, badge: '14' },
+            { title: 'Team Members', href: '/employees', icon: Users },
             { title: 'Team Attendance', href: '/attendance', icon: Clock },
             { title: 'Clock In / Out', href: '/clock-in', icon: UserCheck },
             { title: 'Leave Approvals', href: '/leave/requests', icon: CalendarDays, badge: '3' },
@@ -158,18 +158,18 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
     case 'employee':
       return [
         {
-          sectionTitle: 'WORK',
           items: [
             { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
             { title: 'Tasks', href: '/tasks', icon: ListTodo, badge: '4' },
-            { title: 'Timesheet', href: '/timesheets', icon: Clock },
             { title: 'Calendar', href: '/calendar', icon: CalendarDays },
+            { title: 'Timesheet', href: '/timesheets', icon: Clock },
+            { title: 'Attendance', href: '/attendance', icon: UserCheck },
+            { title: 'Leave', href: '/leave', icon: CalendarDays },
           ]
         },
         {
-          sectionTitle: 'PEOPLE',
+          sectionTitle: 'Communication',
           items: [
-            { title: 'Profile', href: '/profile', icon: User },
             {
               title: 'Chat & Teams',
               href: '/chat',
@@ -187,32 +187,24 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
           ]
         },
         {
-          sectionTitle: 'HR',
+          sectionTitle: 'Employee',
           items: [
-            { title: 'Attendance', href: '/attendance', icon: UserCheck },
-            { title: 'Leave', href: '/leave', icon: CalendarDays },
-            // Payroll module commented out as requested by user
-            // { title: 'Payroll', href: '/payroll', icon: DollarSign },
-            // { title: 'Payslips', href: '/payroll/payslips', icon: FileSpreadsheet },
-            { title: 'Documents', href: '/operations/documents', icon: FileText },
-            // Performance module commented out as requested by user
-            // { title: 'Performance', href: '/performance', icon: BarChart3 },
-            // Expenses module commented out as requested by user
-            // { title: 'Expenses', href: '/operations/expenses', icon: Receipt },
+            { title: 'Profile', href: '/profile', icon: User },
+            { title: 'My Payslips', href: '/payroll/payslips', icon: FileSpreadsheet },
             { title: 'Assets', href: '/operations/assets', icon: Package },
           ]
         },
         {
-          sectionTitle: 'COMPANY',
+          sectionTitle: 'Company',
           items: [
             { title: 'Announcements', href: '/announcements', icon: Megaphone },
             { title: 'Holidays', href: '/leave/holidays', icon: Calendar },
-            { title: 'Requests', href: '/requests', icon: FileQuestion },
           ]
         },
         {
-          sectionTitle: 'SUPPORT',
+          sectionTitle: 'Support',
           items: [
+            { title: 'Requests', href: '/requests', icon: FileQuestion },
             { title: 'Help & Support', href: '/help', icon: HelpCircle },
           ]
         }
@@ -248,7 +240,7 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
         {
           sectionTitle: 'PEOPLE',
           items: [
-            { title: 'Employees', href: '/employees', icon: Users, badge: '248' },
+            { title: 'Employees', href: '/employees', icon: Users },
             { title: 'Departments', href: '/departments', icon: Building2 },
             { title: 'Designations', href: '/designations', icon: Award },
             { title: 'Teams', href: '/teams', icon: Users },

@@ -2,14 +2,14 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
 import { getNavigationForRole } from '../../config/navigation';
+import { ROLE_PERSONAS } from '../../config/roleDashboardConfig';
 import { cn } from '../../utils';
 import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  Sparkles,
   LogOut,
-  Building,
+  NotebookTabs,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -24,8 +24,13 @@ export const Sidebar: React.FC = () => {
     logout,
   } = useAppStore();
 
+  const companyName = currentRole === 'saas_owner'
+    ? 'Global Platform'
+    : (currentOrg?.name || currentUser?.organizationName || 'Acme Corp');
+
   const location = useLocation();
   const navSections = getNavigationForRole(currentRole);
+  const currentPersona = ROLE_PERSONAS[currentRole] || ROLE_PERSONAS.employee;
 
   const [openDropdowns, setOpenDropdowns] = React.useState<{ [key: string]: boolean }>({
     '/chat': true,
@@ -68,14 +73,9 @@ export const Sidebar: React.FC = () => {
               <span className="text-white">◆</span>
             </div>
             {!sidebarCollapsed && (
-              <div className="flex flex-col">
-                <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
-                  HRM
-                </span>
-                <span className="text-[10px] text-slate-400 font-medium truncate max-w-[130px]">
-                  {currentRole === 'saas_owner' ? 'Global Platform' : currentOrg?.name || 'Enterprise'}
-                </span>
-              </div>
+              <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                HRM
+              </span>
             )}
           </Link>
 
@@ -89,13 +89,37 @@ export const Sidebar: React.FC = () => {
         </div>
 
         {/* Navigation Items List */}
-        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2.5 scrollbar-thin">
           {navSections.map((section, sIdx) => (
-            <div key={sIdx} className="space-y-0.5">
-              {section.sectionTitle && !sidebarCollapsed && (
-                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 pt-1">
-                  {section.sectionTitle}
-                </p>
+            <div key={sIdx} className="space-y-1">
+              {/* Subtle Section Divider */}
+              {sIdx > 0 && section.sectionTitle && !sidebarCollapsed && (
+                <div className="pt-2 pb-1">
+                  <div className="border-t border-slate-100 dark:border-slate-800/80" />
+                </div>
+              )}
+              {/* Top Section Company Name Header */}
+              {sIdx === 0 ? (
+                <div
+                  className={cn(
+                    'flex items-center gap-2.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 select-none mb-2 transition-colors',
+                    sidebarCollapsed ? 'justify-center h-10 w-10 mx-auto px-0' : 'px-3 py-2.5'
+                  )}
+                  title={companyName}
+                >
+                  <NotebookTabs className="h-4.5 w-4.5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+                  {!sidebarCollapsed && (
+                    <span className="font-bold text-sm tracking-tight truncate text-blue-600 dark:text-blue-400">
+                      {companyName}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                section.sectionTitle && !sidebarCollapsed && (
+                  <p className="px-3 text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-1 pt-0.5">
+                    {section.sectionTitle}
+                  </p>
+                )
               )}
               {section.items.map((item) => {
                 const Icon = item.icon;
@@ -130,31 +154,31 @@ export const Sidebar: React.FC = () => {
                           setMobileMenuOpen(false);
                         }}
                         className={cn(
-                          'group flex-1 flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 relative overflow-hidden',
+                          'group flex-1 flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-colors duration-150 relative overflow-hidden',
                           isActive
-                            ? 'bg-blue-50/90 text-blue-600 shadow-2xs dark:bg-blue-950/60 dark:text-blue-400 font-bold'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:translate-x-0.5 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100',
-                          sidebarCollapsed && 'justify-center px-0 hover:translate-x-0'
+                            ? 'bg-blue-50/90 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 font-semibold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100',
+                          sidebarCollapsed && 'justify-center px-0'
                         )}
                         title={sidebarCollapsed ? item.title : undefined}
                       >
                         {/* Active Menu Indicator */}
                         {isActive && (
-                          <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-blue-600 dark:bg-blue-400 transition-all duration-200" />
+                          <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-blue-600 dark:bg-blue-400 transition-all duration-150" />
                         )}
                         <Icon
                           className={cn(
-                            'h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110',
+                            'h-4 w-4 flex-shrink-0 transition-colors duration-150',
                             isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 group-hover:text-slate-600 dark:text-slate-400 dark:group-hover:text-slate-200'
                           )}
                         />
                         {!sidebarCollapsed && (
-                          <span className="truncate flex-1">{item.title}</span>
+                          <span className="truncate flex-1 text-left">{item.title}</span>
                         )}
                         {!sidebarCollapsed && item.badge && (
                           <span
                             className={cn(
-                              'rounded-full px-1.5 py-0.5 text-[9px] font-bold group-hover:scale-105 transition-transform mr-1',
+                              'flex-shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold transition-colors mr-1',
                               isActive
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-blue-50 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
@@ -171,7 +195,7 @@ export const Sidebar: React.FC = () => {
                           type="button"
                           onClick={(e) => toggleDropdown(item.href, e)}
                           title="Toggle sub-menu"
-                          className="p-1.5 mr-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 mr-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer flex-shrink-0"
                         >
                           <ChevronDown
                             className={cn(
@@ -220,33 +244,70 @@ export const Sidebar: React.FC = () => {
           ))}
         </div>
 
-        {/* Bottom Promo Card */}
-        {!sidebarCollapsed && (
-          <div className="mx-3 my-2 rounded-2xl bg-blue-50/70 p-3 border border-blue-100/80 dark:bg-blue-950/30 dark:border-blue-900/40 hover-shine-sweep transition-all hover:shadow-sm">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-600 text-white text-xs shadow-xs">
-                <Sparkles className="h-3.5 w-3.5" />
-              </div>
-              <span className="text-xs font-bold text-slate-900 dark:text-white">Career Growth</span>
+        {/* Bottom User Profile & Logout Section */}
+        <div className="border-t border-slate-100 dark:border-slate-800/80 p-3 space-y-1.5">
+          {sidebarCollapsed ? (
+            <div className="flex flex-col items-center gap-2">
+              <Link
+                to="/profile"
+                className="group relative cursor-pointer"
+                title={`${currentPersona.name} (${currentPersona.title})`}
+              >
+                <img
+                  src={currentPersona.avatar}
+                  alt={currentPersona.name}
+                  className="h-9 w-9 rounded-full object-cover ring-2 ring-blue-500/20 group-hover:ring-blue-500 transition-all"
+                />
+                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
+              </Link>
+              <button
+                onClick={logout}
+                title="Log Out"
+                className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40 dark:hover:text-rose-400 transition-colors cursor-pointer"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
             </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mb-2">
-              Explore your learning roadmaps, skills, and internal achievements.
-            </p>
-            <Link
-              to="/operations/training"
-              className="block text-center w-full rounded-xl bg-blue-600 py-1.5 text-[11px] font-semibold text-white hover:bg-blue-700 shadow-xs transition-all hover-magnetic-btn"
-            >
-              Explore Training
-            </Link>
-          </div>
-        )}
+          ) : (
+            <div className="flex items-center justify-between gap-2 rounded-2xl bg-slate-50/90 p-2 border border-slate-200/70 dark:bg-slate-800/50 dark:border-slate-800/80">
+              <Link
+                to="/profile"
+                className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-90 transition-opacity cursor-pointer group"
+                title="View Profile"
+              >
+                <div className="relative flex-shrink-0">
+                  <img
+                    src={currentPersona.avatar}
+                    alt={currentPersona.name}
+                    className="h-8 w-8 rounded-full object-cover ring-2 ring-blue-500/20 group-hover:ring-blue-500 transition-all"
+                  />
+                  <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-1.5 ring-white dark:ring-slate-900" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 transition-colors">
+                    {currentPersona.name}
+                  </p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                    {currentPersona.title}
+                  </p>
+                </div>
+              </Link>
 
-        {/* Bottom Collapse Sidebar Button */}
-        <div className="border-t border-slate-100 dark:border-slate-800/80 p-3">
+              <button
+                onClick={logout}
+                title="Log Out"
+                className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40 dark:hover:text-rose-400 transition-colors cursor-pointer"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+
+          {/* Bottom Collapse Sidebar Button */}
           <button
             onClick={toggleSidebar}
             className={cn(
-              'w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-white transition-colors cursor-pointer',
+              'w-full flex items-center gap-2.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-white transition-colors cursor-pointer',
               sidebarCollapsed ? 'justify-center px-0' : ''
             )}
           >
