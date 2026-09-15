@@ -21,6 +21,8 @@ import { SaasRevenueAnalyticsPage } from '../pages/saas/SaasRevenueAnalyticsPage
 import { SaasSystemAnalyticsPage } from '../pages/saas/SaasSystemAnalyticsPage';
 import { SaasAuditLogsPage } from '../pages/saas/SaasAuditLogsPage';
 import { SaasSettingsPage } from '../pages/saas/SaasSettingsPage';
+import { SaasModulesPage } from '../pages/saas/SaasModulesPage';
+import { SaasModularSubscriptionsPage } from '../pages/saas/SaasModularSubscriptionsPage';
 
 // HR & Core Modules
 import { DashboardPage } from '../pages/dashboard/DashboardPage';
@@ -54,10 +56,23 @@ import { SalaryStructurePage } from '../pages/payroll/SalaryStructurePage';
 import { PayslipsPage } from '../pages/payroll/PayslipsPage';
 import { PayrollAdjustmentsPage } from '../pages/payroll/PayrollAdjustmentsPage';
 
-// Recruitment ATS
+// Recruitment ATS & Talent Acquisition
 import { JobOpeningsPage } from '../pages/recruitment/JobOpeningsPage';
+import { JobCreatePage } from '../pages/recruitment/JobCreatePage';
 import { CandidatesKanbanPage } from '../pages/recruitment/CandidatesKanbanPage';
+import { CandidateDatabasePage } from '../pages/recruitment/CandidateDatabasePage';
+import { ManpowerRequirementsPage } from '../pages/recruitment/ManpowerRequirementsPage';
+import { JobRequisitionsPage } from '../pages/recruitment/JobRequisitionsPage';
+import { ResumeManagementPage } from '../pages/recruitment/ResumeManagementPage';
+import { ApplicationsPage } from '../pages/recruitment/ApplicationsPage';
+import { ScreeningPage } from '../pages/recruitment/ScreeningPage';
 import { InterviewsPage } from '../pages/recruitment/InterviewsPage';
+import { InterviewEvaluationPage } from '../pages/recruitment/InterviewEvaluationPage';
+import { OfferManagementPage } from '../pages/recruitment/OfferManagementPage';
+import { RecruitmentPipelinePage } from '../pages/recruitment/RecruitmentPipelinePage';
+import { RecruitmentAnalyticsPage } from '../pages/recruitment/RecruitmentAnalyticsPage';
+import { OnboardingHandoverPage } from '../pages/recruitment/OnboardingHandoverPage';
+import { RecruiterNotificationsPage } from '../pages/recruitment/RecruiterNotificationsPage';
 
 // Performance & Operations
 import { GoalsPage } from '../pages/performance/GoalsPage';
@@ -110,6 +125,8 @@ export const AppRoutes: React.FC = () => {
 
         {/* SaaS Specific Sub-pages */}
         <Route path="/saas" element={<DashboardPage forcedRole="saas_owner" />} />
+        <Route path="/saas/modules" element={<SaasModulesPage />} />
+        <Route path="/saas/modular-subscriptions" element={<Navigate to="/saas/modules" replace />} />
         <Route path="/saas/organizations" element={<SaasOrganizationsPage />} />
         <Route path="/saas/subscriptions" element={<SaasSubscriptionsPage />} />
         <Route path="/saas/plans" element={<SaasPlansPage />} />
@@ -149,9 +166,32 @@ export const AppRoutes: React.FC = () => {
         <Route path="/payroll/adjustments" element={<PayrollAdjustmentsPage />} />
         <Route path="/my-payroll" element={<PayslipsPage />} />
 
-        {/* Recruitment / ATS */}
+        {/* Recruiter / Talent Acquisition Dedicated Workspace */}
+        <Route path="/recruiter/manpower-requirements" element={<ManpowerRequirementsPage />} />
+        <Route path="/recruiter/requisitions" element={<JobRequisitionsPage />} />
+        <Route path="/recruiter/requisitions/:id" element={<JobRequisitionsPage />} />
+        <Route path="/recruiter/jobs" element={<JobOpeningsPage />} />
+        <Route path="/recruiter/jobs/create" element={<JobCreatePage />} />
+        <Route path="/recruiter/jobs/:id" element={<JobOpeningsPage />} />
+        <Route path="/recruiter/candidates" element={<CandidateDatabasePage />} />
+        <Route path="/recruiter/candidates/:id" element={<CandidateDatabasePage />} />
+        <Route path="/recruiter/resumes" element={<ResumeManagementPage />} />
+        <Route path="/recruiter/applications" element={<ApplicationsPage />} />
+        <Route path="/recruiter/screening" element={<ScreeningPage />} />
+        <Route path="/recruiter/interviews" element={<InterviewsPage />} />
+        <Route path="/recruiter/interviews/calendar" element={<InterviewsPage />} />
+        <Route path="/recruiter/evaluations" element={<InterviewEvaluationPage />} />
+        <Route path="/recruiter/offers" element={<OfferManagementPage />} />
+        <Route path="/recruiter/pipeline" element={<RecruitmentPipelinePage />} />
+        <Route path="/recruiter/analytics" element={<RecruitmentAnalyticsPage />} />
+        <Route path="/recruiter/joining" element={<OnboardingHandoverPage />} />
+        <Route path="/recruiter/handover" element={<OnboardingHandoverPage />} />
+        <Route path="/recruiter/notifications" element={<RecruiterNotificationsPage />} />
+
+        {/* Recruitment / ATS Legacy & Inter-module Compatibility */}
         <Route path="/recruitment/jobs" element={<JobOpeningsPage />} />
-        <Route path="/recruitment/candidates" element={<CandidatesKanbanPage />} />
+        <Route path="/recruitment/candidates" element={<CandidateDatabasePage />} />
+        <Route path="/recruitment/pipeline" element={<RecruitmentPipelinePage />} />
         <Route path="/recruitment/interviews" element={<InterviewsPage />} />
 
         {/* Performance & OKRs */}

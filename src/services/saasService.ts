@@ -1,5 +1,7 @@
 import { Organization, SubscriptionPlan, AuditLog } from '../types';
+import { CorporateModule, ModuleBundlePreset, ModularSubscriptionConfig } from '../types/saasModules';
 import { INITIAL_ORGANIZATIONS, INITIAL_AUDIT_LOGS } from './mockDb';
+import { CORPORATE_MODULES, MODULE_BUNDLE_PRESETS, INITIAL_MODULAR_SUBSCRIPTIONS } from './corporateModulesDb';
 import { getFromStorage, saveToStorage } from './storage';
 
 export const saasService = {
@@ -104,5 +106,62 @@ export const saasService = {
 
   getAuditLogs: async (): Promise<AuditLog[]> => {
     return getFromStorage<AuditLog[]>('audit_logs', INITIAL_AUDIT_LOGS);
-  }
+  },
+
+  // =========================================================================
+  // CORPORATE SAAS 17 MODULES & MODULAR SUBSCRIPTIONS
+  // =========================================================================
+  getCorporateModules: async (): Promise<CorporateModule[]> => {
+    return CORPORATE_MODULES;
+  },
+
+  getModulePresets: async (): Promise<ModuleBundlePreset[]> => {
+    return MODULE_BUNDLE_PRESETS;
+  },
+
+  getModularSubscriptions: async (): Promise<ModularSubscriptionConfig[]> => {
+    return getFromStorage<ModularSubscriptionConfig[]>(
+      'saas_modular_subscriptions',
+      INITIAL_MODULAR_SUBSCRIPTIONS
+    );
+  },
+
+  getModularSubscriptionForOrg: async (
+    orgId: string
+  ): Promise<ModularSubscriptionConfig | undefined> => {
+    const list = await saasService.getModularSubscriptions();
+    return list.find((s) => s.organizationId === orgId);
+  },
+
+  saveModularSubscription: async (
+    config: ModularSubscriptionConfig
+  ): Promise<ModularSubscriptionConfig> => {
+    const list = await saasService.getModularSubscriptions();
+    const index = list.findIndex((s) => s.organizationId === config.organizationId);
+
+    const updatedConfig: ModularSubscriptionConfig = {
+      ...config,
+      lastUpdated: new Date().toISOString().split('T')[0],
+    };
+
+    if (index !== -1) {
+      list[index] = updatedConfig;
+    } else {
+      list.unshift(updatedConfig);
+    }
+
+    saveToStorage('saas_modular_subscriptions', list);
+
+    // Also sync with the organization record's subscribedModules & monthlyFee
+    const orgs = await saasService.getOrganizations();
+    const orgIdx = orgs.findIndex((o) => o.id === config.organizationId);
+    if (orgIdx !== -1) {
+      orgs[orgIdx].subscribedModules = config.subscribedModuleIds;
+      orgs[orgIdx].monthlyFee = config.monthlyTotalFee;
+      saveToStorage('organizations', orgs);
+    }
+
+    return updatedConfig;
+  },
 };
+

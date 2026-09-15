@@ -29,6 +29,9 @@ import {
   User,
   FileQuestion,
   Megaphone,
+  Bell,
+  Boxes,
+  Sliders,
 } from 'lucide-react';
 import { UserRole } from '../types';
 
@@ -53,6 +56,7 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
           sectionTitle: 'PLATFORM MANAGEMENT',
           items: [
             { title: 'Super Admin Overview', href: '/saas', icon: LayoutDashboard },
+            { title: 'Corporate Modules', href: '/saas/modules', icon: Boxes, badge: '17' },
             { title: 'Organizations', href: '/saas/organizations', icon: Building2, badge: 'Active' },
             { title: 'Subscriptions', href: '/saas/subscriptions', icon: CreditCard },
             { title: 'Plans & Pricing', href: '/saas/plans', icon: Layers },
@@ -100,29 +104,178 @@ export function getNavigationForRole(role: UserRole): NavSection[] {
     case 'recruiter':
       return [
         {
-          sectionTitle: 'TALENT ACQUISITION',
+          sectionTitle: 'RECRUITMENT',
           items: [
-            { title: 'ATS Dashboard', href: '/dashboard', icon: LayoutDashboard },
+            { title: 'Dashboard', href: '/recruiter/dashboard', icon: LayoutDashboard },
             {
-              title: 'Chat & Teams',
-              href: '/chat',
-              icon: MessageSquare,
+              title: 'Manpower Requirements',
+              href: '/recruiter/manpower-requirements',
+              icon: Users,
+              badge: '5',
               children: [
-                { title: 'Chat', href: '/chat?tab=chat' },
-                { title: 'Teams', href: '/chat?tab=teams' },
-                { title: 'Calendar', href: '/chat?tab=calendar' },
-                { title: 'Calls', href: '/chat?tab=calls' },
-                { title: 'Files', href: '/chat?tab=files' },
-              ]
+                { title: 'Workforce Requests', href: '/recruiter/manpower-requirements?tab=workforce' },
+                { title: 'Department Requirements', href: '/recruiter/manpower-requirements?tab=departments' },
+                { title: 'Position Requirements', href: '/recruiter/manpower-requirements?tab=positions' },
+                { title: 'Pending Approvals', href: '/recruiter/manpower-requirements?tab=pending' },
+              ],
             },
-            { title: 'Email', href: '/email', icon: Mail },
-            { title: 'Job Openings', href: '/recruitment/jobs', icon: Briefcase, badge: '4' },
-            { title: 'Candidates Kanban', href: '/recruitment/candidates', icon: Users },
-            { title: 'Interviews Schedule', href: '/recruitment/interviews', icon: Calendar },
-            { title: 'Talent Reports', href: '/reports', icon: BarChart3 },
-            { title: 'Clock In / Out', href: '/clock-in', icon: Clock },
-          ]
-        }
+            {
+              title: 'Job Requisitions',
+              href: '/recruiter/requisitions',
+              icon: FileText,
+              badge: '3',
+              children: [
+                { title: 'All Requisitions', href: '/recruiter/requisitions?tab=all' },
+                { title: 'My Requisitions', href: '/recruiter/requisitions?tab=my' },
+                { title: 'Pending Approval', href: '/recruiter/requisitions?tab=pending' },
+                { title: 'Approved', href: '/recruiter/requisitions?tab=approved' },
+                { title: 'Rejected', href: '/recruiter/requisitions?tab=rejected' },
+                { title: 'Closed', href: '/recruiter/requisitions?tab=closed' },
+              ],
+            },
+            {
+              title: 'Jobs',
+              href: '/recruiter/jobs',
+              icon: Briefcase,
+              badge: '4',
+              children: [
+                { title: 'All Jobs', href: '/recruiter/jobs?tab=all' },
+                { title: 'Create Job', href: '/recruiter/jobs/create' },
+                { title: 'Draft Jobs', href: '/recruiter/jobs?tab=draft' },
+                { title: 'Published Jobs', href: '/recruiter/jobs?tab=published' },
+                { title: 'Expired Jobs', href: '/recruiter/jobs?tab=expired' },
+                { title: 'Closed Jobs', href: '/recruiter/jobs?tab=closed' },
+              ],
+            },
+            {
+              title: 'Candidate Database',
+              href: '/recruiter/candidates',
+              icon: UserCheck,
+              children: [
+                { title: 'All Candidates', href: '/recruiter/candidates?tab=all' },
+                { title: 'Talent Pool', href: '/recruiter/candidates?tab=talent-pool' },
+                { title: 'New Candidates', href: '/recruiter/candidates?tab=new' },
+                { title: 'Shortlisted', href: '/recruiter/candidates?tab=shortlisted' },
+                { title: 'Rejected', href: '/recruiter/candidates?tab=rejected' },
+                { title: 'Hired', href: '/recruiter/candidates?tab=hired' },
+              ],
+            },
+            {
+              title: 'Resume Management',
+              href: '/recruiter/resumes',
+              icon: FileSpreadsheet,
+              children: [
+                { title: 'All Resumes', href: '/recruiter/resumes?tab=all' },
+                { title: 'Resume Screening', href: '/recruiter/resumes?tab=screening' },
+                { title: 'Resume Parsing', href: '/recruiter/resumes?tab=parsing' },
+                { title: 'Resume Downloads', href: '/recruiter/resumes?tab=downloads' },
+                { title: 'Candidate Documents', href: '/recruiter/resumes?tab=documents' },
+              ],
+            },
+            {
+              title: 'Applications',
+              href: '/recruiter/applications',
+              icon: Target,
+              badge: '7',
+              children: [
+                { title: 'All Applications', href: '/recruiter/applications?tab=all' },
+                { title: 'New Applications', href: '/recruiter/applications?tab=new' },
+                { title: 'Under Review', href: '/recruiter/applications?tab=review' },
+                { title: 'Shortlisted', href: '/recruiter/applications?tab=shortlisted' },
+                { title: 'Rejected', href: '/recruiter/applications?tab=rejected' },
+                { title: 'Withdrawn', href: '/recruiter/applications?tab=withdrawn' },
+              ],
+            },
+            {
+              title: 'Screening & Shortlisting',
+              href: '/recruiter/screening',
+              icon: Sparkles,
+              children: [
+                { title: 'Screening Queue', href: '/recruiter/screening?tab=queue' },
+                { title: 'Screening Results', href: '/recruiter/screening?tab=results' },
+                { title: 'Shortlisted Candidates', href: '/recruiter/screening?tab=shortlisted' },
+                { title: 'Rejected Candidates', href: '/recruiter/screening?tab=rejected' },
+              ],
+            },
+            {
+              title: 'Interviews',
+              href: '/recruiter/interviews',
+              icon: Calendar,
+              badge: '6',
+              children: [
+                { title: 'Interview Calendar', href: '/recruiter/interviews/calendar' },
+                { title: 'Schedule Interview', href: '/recruiter/interviews?action=schedule' },
+                { title: 'Upcoming Interviews', href: '/recruiter/interviews?tab=upcoming' },
+                { title: 'Completed Interviews', href: '/recruiter/interviews?tab=completed' },
+                { title: 'Cancelled Interviews', href: '/recruiter/interviews?tab=cancelled' },
+              ],
+            },
+            {
+              title: 'Interview Evaluation',
+              href: '/recruiter/evaluations',
+              icon: Award,
+              badge: '2',
+              children: [
+                { title: 'Pending Evaluation', href: '/recruiter/evaluations?tab=pending' },
+                { title: 'Completed Evaluations', href: '/recruiter/evaluations?tab=completed' },
+                { title: 'Interview Feedback', href: '/recruiter/evaluations?tab=feedback' },
+                { title: 'Evaluation History', href: '/recruiter/evaluations?tab=history' },
+              ],
+            },
+            {
+              title: 'Selection & Offers',
+              href: '/recruiter/offers',
+              icon: CreditCard,
+              badge: '3',
+              children: [
+                { title: 'Selected Candidates', href: '/recruiter/offers?tab=selected' },
+                { title: 'Offer Drafts', href: '/recruiter/offers?tab=drafts' },
+                { title: 'Offers Sent', href: '/recruiter/offers?tab=sent' },
+                { title: 'Offers Accepted', href: '/recruiter/offers?tab=accepted' },
+                { title: 'Offers Rejected', href: '/recruiter/offers?tab=rejected' },
+                { title: 'Offer Expired', href: '/recruiter/offers?tab=expired' },
+              ],
+            },
+            {
+              title: 'Recruitment Pipeline',
+              href: '/recruiter/pipeline',
+              icon: Layers,
+            },
+            {
+              title: 'Recruitment Analytics',
+              href: '/recruiter/analytics',
+              icon: BarChart3,
+              children: [
+                { title: 'Recruitment Overview', href: '/recruiter/analytics?tab=overview' },
+                { title: 'Source Analytics', href: '/recruiter/analytics?tab=sources' },
+                { title: 'Time to Hire', href: '/recruiter/analytics?tab=time-to-hire' },
+                { title: 'Cost per Hire', href: '/recruiter/analytics?tab=cost' },
+                { title: 'Hiring Funnel', href: '/recruiter/analytics?tab=funnel' },
+                { title: 'Recruiter Performance', href: '/recruiter/analytics?tab=performance' },
+              ],
+            },
+            {
+              title: 'Joining & Onboarding Handover',
+              href: '/recruiter/handover',
+              icon: User,
+              badge: '3',
+              children: [
+                { title: 'Joining Pending', href: '/recruiter/handover?tab=pending' },
+                { title: 'Joining Confirmed', href: '/recruiter/handover?tab=confirmed' },
+                { title: 'Documents Pending', href: '/recruiter/handover?tab=documents' },
+                { title: 'Ready for Onboarding', href: '/recruiter/handover?tab=ready' },
+                { title: 'Handover to HR', href: '/recruiter/handover?tab=handover' },
+              ],
+            },
+          ],
+        },
+        {
+          sectionTitle: 'SUPPORT',
+          items: [
+            { title: 'Notifications', href: '/recruiter/notifications', icon: Bell, badge: '5' },
+            { title: 'Help & Support', href: '/support', icon: HelpCircle },
+          ],
+        },
       ];
 
     case 'payroll_admin':

@@ -1,3 +1,6 @@
+import { CorporateModuleId } from './saasModules';
+export * from './saasModules';
+
 export type UserRole =
   | 'saas_owner'
   | 'org_owner'
@@ -31,11 +34,12 @@ export interface Organization {
   name: string;
   slug: string;
   logo: string;
-  plan: 'Basic' | 'Pro' | 'Business' | 'Enterprise';
+  plan?: string;
   status: 'active' | 'trial' | 'inactive' | 'suspended';
   industry: string;
   totalEmployees: number;
   maxEmployees: number;
+  contactPerson?: string;
   contactEmail: string;
   contactPhone: string;
   location: string;
@@ -43,6 +47,7 @@ export interface Organization {
   createdAt: string;
   billingCycle: 'monthly' | 'annual';
   monthlyFee: number;
+  subscribedModules?: CorporateModuleId[];
 }
 
 export interface SubscriptionPlan {
@@ -236,13 +241,20 @@ export interface PayrollRecord {
 
 export type CandidateStage =
   | 'Applied'
+  | 'Under Review'
   | 'Screening'
   | 'Shortlisted'
   | 'Interview'
   | 'Technical Round'
   | 'HR Round'
   | 'Selected'
+  | 'Offer'
+  | 'Offer Accepted'
+  | 'Joining'
+  | 'Hired'
   | 'Rejected'
+  | 'Withdrawn'
+  | 'Hold'
   | 'Joined';
 
 export interface JobOpening {
@@ -250,17 +262,30 @@ export interface JobOpening {
   organizationId: string;
   title: string;
   department: string;
+  designation?: string;
   location: string;
   type: 'Full-time' | 'Part-time' | 'Contract' | 'Remote';
+  workMode?: 'On-site' | 'Remote' | 'Hybrid';
   experienceRequired: string;
+  education?: string;
+  skills?: string[];
   positions: number;
   applicationsCount: number;
-  status: 'Active' | 'Draft' | 'Closed' | 'On Hold';
+  status: 'Active' | 'Draft' | 'Closed' | 'On Hold' | 'Expired';
   salaryRange: string;
   postedDate: string;
   deadline: string;
   description: string;
+  responsibilities?: string[];
   requirements: string[];
+  benefits?: string[];
+  hiringManager?: string;
+  recruiterName?: string;
+  viewsCount?: number;
+  shortlistedCount?: number;
+  interviewsCount?: number;
+  selectedCount?: number;
+  hiredCount?: number;
 }
 
 export interface Candidate {
@@ -283,6 +308,17 @@ export interface Candidate {
   resumeUrl: string;
   notes: string;
   interviews: Interview[];
+  location?: string;
+  source?: string;
+  skills?: string[];
+  education?: string;
+  recruiterId?: string;
+  recruiterName?: string;
+  priority?: 'High' | 'Medium' | 'Low';
+  talentPool?: boolean;
+  status?: 'Active' | 'Archived' | 'Hired' | 'Rejected';
+  screeningScore?: number; // 0-100%
+  screeningStatus?: 'Pending' | 'Passed' | 'Failed' | 'On Hold' | 'Hold' | 'Rejected';
 }
 
 export interface Interview {
@@ -452,3 +488,207 @@ export interface AuditLog {
   status: 'Success' | 'Warning' | 'Failed';
   details: string;
 }
+
+// =========================================================================
+// TALENT ACQUISITION & RECRUITMENT ATS TYPES
+// =========================================================================
+
+export interface ManpowerRequirement {
+  id: string;
+  organizationId: string;
+  department: string;
+  position: string;
+  requiredHeadcount: number;
+  existingHeadcount: number;
+  requiredDate: string;
+  priority: 'Urgent' | 'High' | 'Medium' | 'Low';
+  requestedBy: string;
+  requestedByRole: string;
+  approvalStatus: 'Pending Approval' | 'Approved' | 'Rejected' | 'In Review';
+  approvedBy?: string;
+  reason: string;
+  budgetAllocated: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface JobRequisition {
+  id: string;
+  organizationId: string;
+  manpowerRequirementId?: string;
+  jobTitle: string;
+  department: string;
+  location: string;
+  employmentType: 'Full-time' | 'Part-time' | 'Contract' | 'Remote';
+  positions: number;
+  priority: 'Urgent' | 'High' | 'Medium' | 'Low';
+  requestedBy: string;
+  hiringManager: string;
+  recruiterId?: string;
+  recruiterName?: string;
+  approvalStatus: 'Draft' | 'Pending Approval' | 'Approved' | 'Rejected' | 'Open' | 'Closed';
+  businessJustification: string;
+  requiredSkills: string[];
+  experienceRequired: string;
+  salaryRange: string;
+  targetJoiningDate: string;
+  createdDate: string;
+  deadline: string;
+  approvalHistory: {
+    approver: string;
+    role: string;
+    status: 'Approved' | 'Rejected' | 'Pending';
+    date?: string;
+    comment?: string;
+  }[];
+  recruitmentProgress?: {
+    applications: number;
+    screened: number;
+    interviewing: number;
+    offered: number;
+    hired: number;
+  };
+}
+
+export interface JobApplication {
+  id: string;
+  organizationId: string;
+  candidateId: string;
+  candidateName: string;
+  candidateEmail: string;
+  candidatePhone: string;
+  candidateAvatar: string;
+  jobId: string;
+  jobTitle: string;
+  department: string;
+  appliedDate: string;
+  source: 'Career Page' | 'LinkedIn' | 'Referral' | 'Job Portal' | 'Agency' | 'Direct';
+  currentStage: CandidateStage;
+  recruiterName: string;
+  experienceYears: number;
+  currentCompany?: string;
+  resumeUrl: string;
+  resumeFileName: string;
+  status: 'Active' | 'Rejected' | 'Withdrawn' | 'Hired';
+  rating: number;
+  notesCount: number;
+  notes?: string;
+  interviewsCount: number;
+  timeline: {
+    stage: string;
+    date: string;
+    updatedBy: string;
+    comment?: string;
+  }[];
+}
+
+export interface ResumeDocument {
+  id: string;
+  organizationId: string;
+  candidateId: string;
+  candidateName: string;
+  candidateEmail: string;
+  candidateAvatar: string;
+  jobApplied: string;
+  fileName: string;
+  fileSize: string;
+  uploadDate: string;
+  resumeStatus: 'Verified' | 'Pending' | 'Needs Update' | 'Parsed';
+  screeningStatus: 'Pending' | 'Screened' | 'Shortlisted' | 'Rejected';
+  extractedSkills: string[];
+  extractedExperience: string;
+  extractedEducation: string;
+  matchScore: number; // 0-100%
+  downloadUrl: string;
+}
+
+export interface InterviewEvaluation {
+  id: string;
+  organizationId: string;
+  candidateId: string;
+  candidateName: string;
+  candidateAvatar: string;
+  jobTitle: string;
+  interviewId: string;
+  interviewRound: string;
+  interviewerId: string;
+  interviewerName: string;
+  interviewerRole: string;
+  evaluationDate: string;
+  status: 'Pending' | 'Completed';
+  scores: {
+    technicalSkills: number; // 1-5
+    communication: number; // 1-5
+    problemSolving: number; // 1-5
+    experience: number; // 1-5
+    cultureFit: number; // 1-5
+  };
+  overallRating: number; // 1-5
+  strengths: string[];
+  weaknesses: string[];
+  comments: string;
+  recommendation: 'Strong Hire' | 'Hire' | 'Hold' | 'Reject';
+}
+
+export interface JobOffer {
+  id: string;
+  organizationId: string;
+  candidateId: string;
+  candidateName: string;
+  candidateEmail: string;
+  candidateAvatar: string;
+  jobId: string;
+  jobTitle: string;
+  department: string;
+  salaryAnnual: number;
+  salaryFormatted: string;
+  joiningDate: string;
+  employmentType: 'Full-time' | 'Contract' | 'Part-time';
+  offerStatus: 'Draft' | 'Pending Approval' | 'Approved' | 'Sent' | 'Accepted' | 'Rejected' | 'Expired';
+  approvalStatus: 'Pending' | 'Approved' | 'Rejected';
+  approvedBy?: string;
+  sentDate?: string;
+  responseDeadline: string;
+  benefitsSummary: string[];
+  notes?: string;
+  createdAt: string;
+}
+
+export interface OnboardingHandover {
+  id: string;
+  organizationId: string;
+  candidateId: string;
+  applicantId: string; // e.g. APP-2025-081
+  candidateName: string;
+  candidateEmail: string;
+  candidatePhone: string;
+  candidateAvatar: string;
+  jobTitle: string;
+  department: string;
+  designation: string;
+  joiningDate: string;
+  offerStatus: 'Accepted';
+  documentsStatus: 'Verified' | 'Pending' | 'Under Review' | 'Pending Upload';
+  handoverStatus:
+    | 'Joining Pending'
+    | 'Joining Confirmed'
+    | 'Ready for Handover'
+    | 'Handover to HR'
+    | 'Onboarding in Progress'
+    | 'Completed';
+  checklist: {
+    offerAccepted: boolean;
+    personalInfoComplete: boolean;
+    resumeAvailable: boolean;
+    documentsUploaded: boolean;
+    joiningDateConfirmed: boolean;
+    salaryDetailsApproved: boolean;
+    jobDepartmentConfirmed: boolean;
+    jobConfirmed?: boolean;
+    [key: string]: boolean | undefined;
+  };
+  assignedHrName?: string;
+  handoverDate?: string;
+  notes?: string;
+}
+
