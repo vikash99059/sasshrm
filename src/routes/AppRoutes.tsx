@@ -158,10 +158,16 @@ export const AppRoutes: React.FC = () => {
         <Route path="/performance/goals" element={<GoalsPage />} />
         <Route path="/performance/reviews" element={<PerformanceReviewsPage />} />
 
-        {/* Operations */}
+        {/* Operations & Documents */}
         <Route path="/operations/expenses" element={<ExpensesPage />} />
         <Route path="/operations/assets" element={<AssetsPage />} />
+        <Route path="/assets" element={<AssetsPage />} />
+        <Route path="/my-assets" element={<AssetsPage />} />
+        <Route path="/employee/assets" element={<AssetsPage />} />
         <Route path="/operations/documents" element={<DocumentsPage />} />
+        <Route path="/documents" element={<DocumentsPage />} />
+        <Route path="/my-documents" element={<DocumentsPage />} />
+        <Route path="/employee/documents" element={<DocumentsPage />} />
         <Route path="/operations/training" element={<TrainingPage />} />
 
         {/* Calendar, Reports, Settings & Support */}

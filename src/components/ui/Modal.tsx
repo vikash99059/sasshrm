@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '../../utils';
 import { X } from 'lucide-react';
 
@@ -45,25 +46,29 @@ export const Modal: React.FC<ModalProps> = ({
     '2xl': 'max-w-5xl',
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4 sm:p-6 animate-fade-in">
-      {/* Backdrop */}
+  const modalElement = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+      {/* Solid Dark Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-200"
+        className="fixed inset-0 bg-slate-950/75 backdrop-blur-[2px]"
         onClick={onClose}
+        aria-hidden="true"
       />
 
-      {/* Modal Dialog */}
+      {/* Modal Dialog: Strictly Centered, 100% Solid Opacity, No Bottom Offset */}
       <div
         className={cn(
-          'relative w-full overflow-hidden rounded-2xl bg-white shadow-2xl transition-all duration-200 dark:border dark:border-dark-border dark:bg-dark-card my-8 animate-modal-pop',
+          'relative z-10 w-full overflow-hidden rounded-2xl bg-white shadow-2xl border border-slate-200 dark:border-dark-border dark:bg-dark-card opacity-100 animate-modal-pop',
           sizes[size]
         )}
+        style={{ opacity: 1 }}
+        role="dialog"
+        aria-modal="true"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-dark-border">
+        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-dark-border bg-white dark:bg-dark-card">
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{title}</h3>
             {description && (
               <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{description}</p>
             )}
@@ -77,15 +82,19 @@ export const Modal: React.FC<ModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="max-h-[75vh] overflow-y-auto p-6">{children}</div>
+        <div className="max-h-[75vh] overflow-y-auto p-6 bg-white dark:bg-dark-card text-slate-800 dark:text-slate-100">
+          {children}
+        </div>
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/50 px-6 py-3.5 dark:border-dark-border dark:bg-slate-900/40">
+          <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50 px-6 py-3.5 dark:border-dark-border dark:bg-slate-900">
             {footer}
           </div>
         )}
       </div>
     </div>
   );
+
+  return createPortal(modalElement, document.body);
 };

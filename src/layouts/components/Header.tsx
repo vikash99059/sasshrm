@@ -11,7 +11,6 @@ import {
   ChevronDown,
   Building,
   Shield,
-  MessageSquare,
   HelpCircle,
   LogOut,
   Settings,
@@ -262,18 +261,6 @@ export const Header: React.FC = () => {
           <Bell className="h-4 w-4 text-slate-600 dark:text-slate-300 group-hover:rotate-12 transition-transform duration-200 origin-top" />
           <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm animate-badge-pulse">
             {unreadNotificationsCount}
-          </span>
-        </button>
-
-        {/* Messages with Badge 2 */}
-        <button
-          onClick={() => setNotificationsOpen(true)}
-          className="group relative hidden sm:flex rounded-xl border border-slate-200/80 p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all hover-magnetic-btn dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 cursor-pointer"
-          title="Messages"
-        >
-          <MessageSquare className="h-4 w-4 text-slate-600 dark:text-slate-300 group-hover:scale-110 transition-transform duration-200" />
-          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm">
-            2
           </span>
         </button>
 
