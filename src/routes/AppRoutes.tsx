@@ -4,6 +4,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 // Layouts
 import { AppLayout } from '../layouts/AppLayout';
 
+// Module Guard Component
+import { ModuleGuard } from '../components/common/ModuleGuard';
+
 // Public & Auth Pages
 import { LandingPage } from '../pages/LandingPage';
 import { LoginPage } from '../pages/auth/LoginPage';
@@ -102,7 +105,6 @@ export const AppRoutes: React.FC = () => {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/2fa" element={<TwoFactorPage />} />
 
-
       {/* Main SaaS & HRM Application Workspace (AppLayout) */}
       <Route element={<AppLayout />}>
         {/* Dashboards */}
@@ -111,16 +113,16 @@ export const AppRoutes: React.FC = () => {
         <Route path="/organization/dashboard" element={<DashboardPage forcedRole="org_admin" />} />
         <Route path="/hr/dashboard" element={<DashboardPage forcedRole="hr_admin" />} />
         <Route path="/hr-executive/dashboard" element={<DashboardPage forcedRole="hr_executive" />} />
-        <Route path="/recruiter/dashboard" element={<DashboardPage forcedRole="recruiter" />} />
-        <Route path="/payroll/dashboard" element={<DashboardPage forcedRole="payroll_admin" />} />
+        <Route path="/recruiter/dashboard" element={<ModuleGuard moduleId="recruitment_management"><DashboardPage forcedRole="recruiter" /></ModuleGuard>} />
+        <Route path="/payroll/dashboard" element={<ModuleGuard moduleId="finance_management"><DashboardPage forcedRole="payroll_admin" /></ModuleGuard>} />
         <Route path="/manager/dashboard" element={<DashboardPage forcedRole="manager" />} />
         <Route path="/employee/dashboard" element={<DashboardPage forcedRole="employee" />} />
 
         {/* Work, Communication & Collaboration */}
-        <Route path="/tasks" element={<TasksPage />} />
-        <Route path="/chat" element={<ChatPage />} />
-        <Route path="/email" element={<EmailPage />} />
-        <Route path="/requests" element={<RequestsPage />} />
+        <Route path="/tasks" element={<ModuleGuard moduleId="project_task_management"><TasksPage /></ModuleGuard>} />
+        <Route path="/chat" element={<ModuleGuard moduleId="chat_communication"><ChatPage /></ModuleGuard>} />
+        <Route path="/email" element={<ModuleGuard moduleId="email_management"><EmailPage /></ModuleGuard>} />
+        <Route path="/requests" element={<ModuleGuard moduleId="customer_service_support"><RequestsPage /></ModuleGuard>} />
         <Route path="/announcements" element={<AnnouncementsPage />} />
 
         {/* SaaS Specific Sub-pages */}
@@ -137,82 +139,82 @@ export const AppRoutes: React.FC = () => {
         <Route path="/saas/settings" element={<SaasSettingsPage />} />
 
         {/* Employee Management & Profiles */}
-        <Route path="/employees" element={<EmployeesListPage />} />
-        <Route path="/employees/:id" element={<EmployeeProfilePage />} />
+        <Route path="/employees" element={<ModuleGuard moduleId="organization_management"><EmployeesListPage /></ModuleGuard>} />
+        <Route path="/employees/:id" element={<ModuleGuard moduleId="organization_management"><EmployeeProfilePage /></ModuleGuard>} />
         <Route path="/profile" element={<EmployeeProfilePage />} />
         <Route path="/my-profile" element={<EmployeeProfilePage />} />
         <Route path="/employee/profile" element={<EmployeeProfilePage />} />
-        <Route path="/departments" element={<DepartmentsPage />} />
-        <Route path="/designations" element={<DesignationsPage />} />
-        <Route path="/teams" element={<TeamsPage />} />
-        <Route path="/org-structure" element={<OrgStructurePage />} />
+        <Route path="/departments" element={<ModuleGuard moduleId="organization_management"><DepartmentsPage /></ModuleGuard>} />
+        <Route path="/designations" element={<ModuleGuard moduleId="organization_management"><DesignationsPage /></ModuleGuard>} />
+        <Route path="/teams" element={<ModuleGuard moduleId="organization_management"><TeamsPage /></ModuleGuard>} />
+        <Route path="/org-structure" element={<ModuleGuard moduleId="organization_management"><OrgStructurePage /></ModuleGuard>} />
 
         {/* Time & Attendance */}
-        <Route path="/attendance" element={<AttendancePage />} />
-        <Route path="/clock-in" element={<ClockInPage />} />
-        <Route path="/shifts" element={<ShiftSchedulePage />} />
-        <Route path="/timesheets" element={<TimesheetsPage />} />
+        <Route path="/attendance" element={<ModuleGuard moduleId="employee_hr_management"><AttendancePage /></ModuleGuard>} />
+        <Route path="/clock-in" element={<ModuleGuard moduleId="employee_hr_management"><ClockInPage /></ModuleGuard>} />
+        <Route path="/shifts" element={<ModuleGuard moduleId="employee_hr_management"><ShiftSchedulePage /></ModuleGuard>} />
+        <Route path="/timesheets" element={<ModuleGuard moduleId="employee_hr_management"><TimesheetsPage /></ModuleGuard>} />
 
         {/* Leave */}
-        <Route path="/leave" element={<LeaveManagementPage />} />
-        <Route path="/leave/requests" element={<LeaveRequestsPage />} />
-        <Route path="/leave/balance" element={<LeaveBalancePage />} />
-        <Route path="/leave/holidays" element={<HolidaysPage />} />
+        <Route path="/leave" element={<ModuleGuard moduleId="employee_hr_management"><LeaveManagementPage /></ModuleGuard>} />
+        <Route path="/leave/requests" element={<ModuleGuard moduleId="employee_hr_management"><LeaveRequestsPage /></ModuleGuard>} />
+        <Route path="/leave/balance" element={<ModuleGuard moduleId="employee_hr_management"><LeaveBalancePage /></ModuleGuard>} />
+        <Route path="/leave/holidays" element={<ModuleGuard moduleId="employee_hr_management"><HolidaysPage /></ModuleGuard>} />
 
         {/* Payroll */}
-        <Route path="/payroll" element={<PayrollDashboardPage />} />
-        <Route path="/payroll/salary-structure" element={<SalaryStructurePage />} />
-        <Route path="/payroll/payslips" element={<PayslipsPage />} />
-        <Route path="/payroll/adjustments" element={<PayrollAdjustmentsPage />} />
-        <Route path="/my-payroll" element={<PayslipsPage />} />
+        <Route path="/payroll" element={<ModuleGuard moduleId="finance_management"><PayrollDashboardPage /></ModuleGuard>} />
+        <Route path="/payroll/salary-structure" element={<ModuleGuard moduleId="finance_management"><SalaryStructurePage /></ModuleGuard>} />
+        <Route path="/payroll/payslips" element={<ModuleGuard moduleId="finance_management"><PayslipsPage /></ModuleGuard>} />
+        <Route path="/payroll/adjustments" element={<ModuleGuard moduleId="finance_management"><PayrollAdjustmentsPage /></ModuleGuard>} />
+        <Route path="/my-payroll" element={<ModuleGuard moduleId="finance_management"><PayslipsPage /></ModuleGuard>} />
 
         {/* Recruiter / Talent Acquisition Dedicated Workspace */}
-        <Route path="/recruiter/manpower-requirements" element={<ManpowerRequirementsPage />} />
-        <Route path="/recruiter/requisitions" element={<JobRequisitionsPage />} />
-        <Route path="/recruiter/requisitions/:id" element={<JobRequisitionsPage />} />
-        <Route path="/recruiter/jobs" element={<JobOpeningsPage />} />
-        <Route path="/recruiter/jobs/create" element={<JobCreatePage />} />
-        <Route path="/recruiter/jobs/:id" element={<JobOpeningsPage />} />
-        <Route path="/recruiter/candidates" element={<CandidateDatabasePage />} />
-        <Route path="/recruiter/candidates/:id" element={<CandidateDatabasePage />} />
-        <Route path="/recruiter/resumes" element={<ResumeManagementPage />} />
-        <Route path="/recruiter/applications" element={<ApplicationsPage />} />
-        <Route path="/recruiter/screening" element={<ScreeningPage />} />
-        <Route path="/recruiter/interviews" element={<InterviewsPage />} />
-        <Route path="/recruiter/interviews/calendar" element={<InterviewsPage />} />
-        <Route path="/recruiter/evaluations" element={<InterviewEvaluationPage />} />
-        <Route path="/recruiter/offers" element={<OfferManagementPage />} />
-        <Route path="/recruiter/pipeline" element={<RecruitmentPipelinePage />} />
-        <Route path="/recruiter/analytics" element={<RecruitmentAnalyticsPage />} />
-        <Route path="/recruiter/joining" element={<OnboardingHandoverPage />} />
-        <Route path="/recruiter/handover" element={<OnboardingHandoverPage />} />
-        <Route path="/recruiter/notifications" element={<RecruiterNotificationsPage />} />
+        <Route path="/recruiter/manpower-requirements" element={<ModuleGuard moduleId="recruitment_management"><ManpowerRequirementsPage /></ModuleGuard>} />
+        <Route path="/recruiter/requisitions" element={<ModuleGuard moduleId="recruitment_management"><JobRequisitionsPage /></ModuleGuard>} />
+        <Route path="/recruiter/requisitions/:id" element={<ModuleGuard moduleId="recruitment_management"><JobRequisitionsPage /></ModuleGuard>} />
+        <Route path="/recruiter/jobs" element={<ModuleGuard moduleId="recruitment_management"><JobOpeningsPage /></ModuleGuard>} />
+        <Route path="/recruiter/jobs/create" element={<ModuleGuard moduleId="recruitment_management"><JobCreatePage /></ModuleGuard>} />
+        <Route path="/recruiter/jobs/:id" element={<ModuleGuard moduleId="recruitment_management"><JobOpeningsPage /></ModuleGuard>} />
+        <Route path="/recruiter/candidates" element={<ModuleGuard moduleId="recruitment_management"><CandidateDatabasePage /></ModuleGuard>} />
+        <Route path="/recruiter/candidates/:id" element={<ModuleGuard moduleId="recruitment_management"><CandidateDatabasePage /></ModuleGuard>} />
+        <Route path="/recruiter/resumes" element={<ModuleGuard moduleId="recruitment_management"><ResumeManagementPage /></ModuleGuard>} />
+        <Route path="/recruiter/applications" element={<ModuleGuard moduleId="recruitment_management"><ApplicationsPage /></ModuleGuard>} />
+        <Route path="/recruiter/screening" element={<ModuleGuard moduleId="recruitment_management"><ScreeningPage /></ModuleGuard>} />
+        <Route path="/recruiter/interviews" element={<ModuleGuard moduleId="recruitment_management"><InterviewsPage /></ModuleGuard>} />
+        <Route path="/recruiter/interviews/calendar" element={<ModuleGuard moduleId="recruitment_management"><InterviewsPage /></ModuleGuard>} />
+        <Route path="/recruiter/evaluations" element={<ModuleGuard moduleId="recruitment_management"><InterviewEvaluationPage /></ModuleGuard>} />
+        <Route path="/recruiter/offers" element={<ModuleGuard moduleId="recruitment_management"><OfferManagementPage /></ModuleGuard>} />
+        <Route path="/recruiter/pipeline" element={<ModuleGuard moduleId="recruitment_management"><RecruitmentPipelinePage /></ModuleGuard>} />
+        <Route path="/recruiter/analytics" element={<ModuleGuard moduleId="recruitment_management"><RecruitmentAnalyticsPage /></ModuleGuard>} />
+        <Route path="/recruiter/joining" element={<ModuleGuard moduleId="recruitment_management"><OnboardingHandoverPage /></ModuleGuard>} />
+        <Route path="/recruiter/handover" element={<ModuleGuard moduleId="recruitment_management"><OnboardingHandoverPage /></ModuleGuard>} />
+        <Route path="/recruiter/notifications" element={<ModuleGuard moduleId="recruitment_management"><RecruiterNotificationsPage /></ModuleGuard>} />
 
         {/* Recruitment / ATS Legacy & Inter-module Compatibility */}
-        <Route path="/recruitment/jobs" element={<JobOpeningsPage />} />
-        <Route path="/recruitment/candidates" element={<CandidateDatabasePage />} />
-        <Route path="/recruitment/pipeline" element={<RecruitmentPipelinePage />} />
-        <Route path="/recruitment/interviews" element={<InterviewsPage />} />
+        <Route path="/recruitment/jobs" element={<ModuleGuard moduleId="recruitment_management"><JobOpeningsPage /></ModuleGuard>} />
+        <Route path="/recruitment/candidates" element={<ModuleGuard moduleId="recruitment_management"><CandidateDatabasePage /></ModuleGuard>} />
+        <Route path="/recruitment/pipeline" element={<ModuleGuard moduleId="recruitment_management"><RecruitmentPipelinePage /></ModuleGuard>} />
+        <Route path="/recruitment/interviews" element={<ModuleGuard moduleId="recruitment_management"><InterviewsPage /></ModuleGuard>} />
 
         {/* Performance & OKRs */}
-        <Route path="/performance/goals" element={<GoalsPage />} />
-        <Route path="/performance/reviews" element={<PerformanceReviewsPage />} />
+        <Route path="/performance/goals" element={<ModuleGuard moduleId="kpi_performance_management"><GoalsPage /></ModuleGuard>} />
+        <Route path="/performance/reviews" element={<ModuleGuard moduleId="kpi_performance_management"><PerformanceReviewsPage /></ModuleGuard>} />
 
         {/* Operations & Documents */}
-        <Route path="/operations/expenses" element={<ExpensesPage />} />
-        <Route path="/operations/assets" element={<AssetsPage />} />
-        <Route path="/assets" element={<AssetsPage />} />
-        <Route path="/my-assets" element={<AssetsPage />} />
-        <Route path="/employee/assets" element={<AssetsPage />} />
-        <Route path="/operations/documents" element={<DocumentsPage />} />
-        <Route path="/documents" element={<DocumentsPage />} />
-        <Route path="/my-documents" element={<DocumentsPage />} />
-        <Route path="/employee/documents" element={<DocumentsPage />} />
-        <Route path="/operations/training" element={<TrainingPage />} />
+        <Route path="/operations/expenses" element={<ModuleGuard moduleId="finance_management"><ExpensesPage /></ModuleGuard>} />
+        <Route path="/operations/assets" element={<ModuleGuard moduleId="inventory_asset_management"><AssetsPage /></ModuleGuard>} />
+        <Route path="/assets" element={<ModuleGuard moduleId="inventory_asset_management"><AssetsPage /></ModuleGuard>} />
+        <Route path="/my-assets" element={<ModuleGuard moduleId="inventory_asset_management"><AssetsPage /></ModuleGuard>} />
+        <Route path="/employee/assets" element={<ModuleGuard moduleId="inventory_asset_management"><AssetsPage /></ModuleGuard>} />
+        <Route path="/operations/documents" element={<ModuleGuard moduleId="document_management"><DocumentsPage /></ModuleGuard>} />
+        <Route path="/documents" element={<ModuleGuard moduleId="document_management"><DocumentsPage /></ModuleGuard>} />
+        <Route path="/my-documents" element={<ModuleGuard moduleId="document_management"><DocumentsPage /></ModuleGuard>} />
+        <Route path="/employee/documents" element={<ModuleGuard moduleId="document_management"><DocumentsPage /></ModuleGuard>} />
+        <Route path="/operations/training" element={<ModuleGuard moduleId="employee_hr_management"><TrainingPage /></ModuleGuard>} />
 
         {/* Calendar, Reports, Settings & Support */}
         <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/reports" element={<ModuleGuard moduleId="mis_analytics_dashboard"><ReportsPage /></ModuleGuard>} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/help" element={<HelpSupportPage />} />
         <Route path="/support" element={<HelpSupportPage />} />
@@ -223,3 +225,4 @@ export const AppRoutes: React.FC = () => {
     </Routes>
   );
 };
+
