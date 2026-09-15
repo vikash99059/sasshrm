@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Briefcase,
@@ -6,22 +6,25 @@ import {
   UserCheck,
   Calendar,
   Clock,
-  Sparkles,
   Plus,
   ArrowRight,
-  Filter,
   CheckCircle2,
   Video,
-  ChevronDown,
-  Star,
-  Search,
+  Layers,
+  FileText,
+  CreditCard,
+  Target,
+  Send,
+  Sparkles,
+  ChevronRight,
+  TrendingUp,
+  MapPin,
+  ExternalLink,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  AreaChart,
-  Area,
   PieChart,
   Pie,
   Cell,
@@ -31,291 +34,952 @@ import {
   Tooltip,
 } from 'recharts';
 import { Modal, Input, Select, Button, Badge } from '../../../components/ui';
+import { recruitmentService } from '../../../services/recruitmentService';
+import {
+  JobOpening,
+  Candidate,
+  JobRequisition,
+  Interview,
+  JobOffer,
+  OnboardingHandover,
+} from '../../../types';
+import { useAppStore } from '../../../store/useAppStore';
 
 export const RecruiterDashboardView: React.FC = () => {
   const navigate = useNavigate();
+  const { currentUser } = useAppStore();
 
+  const recruiterName =
+    currentUser?.role === 'recruiter' && currentUser.name
+      ? currentUser.name
+      : 'Elena Rostova';
+
+  // Data states
+  const [jobs, setJobs] = useState<JobOpening[]>([]);
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [requisitions, setRequisitions] = useState<JobRequisition[]>([]);
+  const [offers, setOffers] = useState<JobOffer[]>([]);
+  const [handovers, setHandovers] = useState<OnboardingHandover[]>([]);
+
+  // Modals
   const [isPostJobOpen, setIsPostJobOpen] = useState(false);
+  const [isNewReqOpen, setIsNewReqOpen] = useState(false);
+  const [isAddCandOpen, setIsAddCandOpen] = useState(false);
+  const [isScheduleInterviewOpen, setIsScheduleInterviewOpen] = useState(false);
+  const [isCreateOfferOpen, setIsCreateOfferOpen] = useState(false);
 
-  // Recruiter KPIs
-  const recruiterKpis = [
-    { title: 'Open Positions', value: '12', change: '+3 new', isPositive: true, subtext: '5 Active Pipelines', icon: Briefcase, iconBg: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400' },
-    { title: 'Total Candidates', value: '148', change: '+24 this week', isPositive: true, subtext: 'Active in ATS', icon: Users, iconBg: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400' },
-    { title: 'Interviews Today', value: '6', change: '2 Completed', isNeutral: true, subtext: '4 Upcoming', icon: Calendar, iconBg: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400' },
-    { title: 'Offers Sent', value: '4', change: '3 Accepted', isPositive: true, subtext: '1 Pending Reply', icon: UserCheck, iconBg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' },
-    { title: 'Hired This Month', value: '8', change: 'Goal: 10', isPositive: true, subtext: '80% of Target', icon: CheckCircle2, iconBg: 'bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400' },
-    { title: 'Avg Time to Hire', value: '18 Days', change: '-4 Days', isPositive: true, subtext: 'Industry: 26d', icon: Clock, iconBg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400' },
+  // Form states
+  const [newJobTitle, setNewJobTitle] = useState('');
+  const [newJobDept, setNewJobDept] = useState('Engineering');
+  const [newJobLoc, setNewJobLoc] = useState('San Francisco HQ');
+  const [newJobPositions, setNewJobPositions] = useState(1);
+  const [newJobSalary, setNewJobSalary] = useState('$120,000 - $150,000');
+
+  const [reqTitle, setReqTitle] = useState('');
+  const [reqDept, setReqDept] = useState('Engineering');
+  const [reqJustification, setReqJustification] = useState('');
+
+  const [candName, setCandName] = useState('');
+  const [candEmail, setCandEmail] = useState('');
+  const [candJob, setCandJob] = useState('');
+
+  const [intCandidateId, setIntCandidateId] = useState('');
+  const [intDate, setIntDate] = useState('2025-05-25');
+  const [intTime, setIntTime] = useState('02:00 PM');
+  const [intRound, setIntRound] = useState('Technical Interview');
+
+  const [offerCandidateId, setOfferCandidateId] = useState('');
+  const [offerSalary, setOfferSalary] = useState('145000');
+  const [offerJoiningDate, setOfferJoiningDate] = useState('2025-07-01');
+
+  const loadData = async () => {
+    const [jList, cList, rList, oList, hList] = await Promise.all([
+      recruitmentService.getJobs(),
+      recruitmentService.getCandidates(),
+      recruitmentService.getJobRequisitions(),
+      recruitmentService.getOffers(),
+      recruitmentService.getHandovers(),
+    ]);
+    setJobs(jList);
+    setCandidates(cList);
+    setRequisitions(rList);
+    setOffers(oList);
+    setHandovers(hList);
+    if (jList.length > 0 && !candJob) setCandJob(jList[0].id);
+    if (cList.length > 0 && !intCandidateId) setIntCandidateId(cList[0].id);
+    if (cList.length > 0 && !offerCandidateId) setOfferCandidateId(cList[0].id);
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Compute 8 Compact KPI Cards
+  const openPositionsCount = jobs.reduce((acc, j) => acc + (j.status === 'Active' ? j.positions : 0), 0);
+  const activeRequisitionsCount = requisitions.filter(
+    (r) => r.approvalStatus === 'Approved' || r.approvalStatus === 'Open'
+  ).length;
+  const totalCandidatesCount = candidates.length;
+  const newApplicationsCount = candidates.filter((c) => c.stage === 'Applied' || c.stage === 'Under Review').length + 18;
+  const interviewsThisWeekCount = 12;
+  const offersPendingCount = offers.filter((o) => o.offerStatus === 'Sent' || o.offerStatus === 'Draft').length;
+  const joiningPendingCount = handovers.filter((h) => h.handoverStatus === 'Ready for Handover').length;
+  const positionsFilledCount = candidates.filter((c) => c.stage === 'Hired' || c.stage === 'Joined').length + 7;
+
+  const kpis = [
+    {
+      id: 'open-positions',
+      title: 'Open Positions',
+      value: openPositionsCount || 12,
+      trend: '+3 new',
+      isPositive: true,
+      comparison: 'vs last month',
+      icon: Briefcase,
+      color: 'text-blue-600 dark:text-blue-400',
+      bgColor: 'bg-blue-50 dark:bg-blue-950/60',
+      path: '/recruiter/jobs',
+    },
+    {
+      id: 'active-reqs',
+      title: 'Active Requisitions',
+      value: activeRequisitionsCount || 4,
+      trend: '2 pending',
+      isNeutral: true,
+      comparison: 'across 4 depts',
+      icon: FileText,
+      color: 'text-indigo-600 dark:text-indigo-400',
+      bgColor: 'bg-indigo-50 dark:bg-indigo-950/60',
+      path: '/recruiter/requisitions',
+    },
+    {
+      id: 'total-candidates',
+      title: 'Total Candidates',
+      value: totalCandidatesCount || 148,
+      trend: '+24 this week',
+      isPositive: true,
+      comparison: 'in active pipeline',
+      icon: Users,
+      color: 'text-purple-600 dark:text-purple-400',
+      bgColor: 'bg-purple-50 dark:bg-purple-950/60',
+      path: '/recruiter/candidates',
+    },
+    {
+      id: 'new-apps',
+      title: 'New Applications',
+      value: newApplicationsCount || 34,
+      trend: '+12 today',
+      isPositive: true,
+      comparison: '4 active job posts',
+      icon: Target,
+      color: 'text-pink-600 dark:text-pink-400',
+      bgColor: 'bg-pink-50 dark:bg-pink-950/60',
+      path: '/recruiter/applications',
+    },
+    {
+      id: 'interviews-week',
+      title: 'Interviews This Week',
+      value: interviewsThisWeekCount,
+      trend: '4 today',
+      isPositive: true,
+      comparison: '8 completed',
+      icon: Calendar,
+      color: 'text-amber-600 dark:text-amber-400',
+      bgColor: 'bg-amber-50 dark:bg-amber-950/60',
+      path: '/recruiter/interviews',
+    },
+    {
+      id: 'offers-pending',
+      title: 'Offers Pending',
+      value: offersPendingCount || 3,
+      trend: '1 ready to send',
+      isNeutral: true,
+      comparison: '2 sent to candidates',
+      icon: CreditCard,
+      color: 'text-cyan-600 dark:text-cyan-400',
+      bgColor: 'bg-cyan-50 dark:bg-cyan-950/60',
+      path: '/recruiter/offers',
+    },
+    {
+      id: 'joining-pending',
+      title: 'Joining Pending',
+      value: joiningPendingCount || 3,
+      trend: '2 confirmed',
+      isPositive: true,
+      comparison: 'next 14 days',
+      icon: UserCheck,
+      color: 'text-teal-600 dark:text-teal-400',
+      bgColor: 'bg-teal-50 dark:bg-teal-950/60',
+      path: '/recruiter/handover',
+    },
+    {
+      id: 'positions-filled',
+      title: 'Positions Filled',
+      value: positionsFilledCount,
+      trend: '90% of target',
+      isPositive: true,
+      comparison: 'Q2 hiring goal',
+      icon: CheckCircle2,
+      color: 'text-emerald-600 dark:text-emerald-400',
+      bgColor: 'bg-emerald-50 dark:bg-emerald-950/60',
+      path: '/recruiter/pipeline',
+    },
   ];
 
-  // Recruitment Funnel Data
-  const funnelData = [
-    { stage: 'Applied', count: 148, fill: '#3B82F6' },
-    { stage: 'Screening', count: 96, fill: '#6366F1' },
-    { stage: 'Shortlisted', count: 48, fill: '#8B5CF6' },
-    { stage: 'Interview', count: 28, fill: '#EC4899' },
-    { stage: 'Technical', count: 16, fill: '#F59E0B' },
-    { stage: 'Offer', count: 6, fill: '#10B981' },
-    { stage: 'Hired', count: 4, fill: '#059669' },
+  // 11-Stage Recruitment Funnel
+  const funnelStages = [
+    { name: 'Manpower Req', count: 5, path: '/recruiter/manpower-requirements', color: 'from-blue-600 to-blue-500' },
+    { name: 'Requisition', count: 4, path: '/recruiter/requisitions', color: 'from-blue-500 to-indigo-500' },
+    { name: 'Job Published', count: 4, path: '/recruiter/jobs', color: 'from-indigo-500 to-indigo-600' },
+    { name: 'Applications', count: 96, path: '/recruiter/applications', color: 'from-indigo-600 to-purple-500' },
+    { name: 'Screening', count: 42, path: '/recruiter/screening', color: 'from-purple-500 to-purple-600' },
+    { name: 'Shortlisted', count: 24, path: '/recruiter/candidates?tab=shortlisted', color: 'from-purple-600 to-pink-500' },
+    { name: 'Interview', count: 14, path: '/recruiter/interviews', color: 'from-pink-500 to-pink-600' },
+    { name: 'Selected', count: 6, path: '/recruiter/candidates?stage=Selected', color: 'from-pink-600 to-amber-500' },
+    { name: 'Offer', count: 4, path: '/recruiter/offers', color: 'from-amber-500 to-amber-600' },
+    { name: 'Joined', count: 3, path: '/recruiter/candidates?tab=hired', color: 'from-amber-600 to-teal-500' },
+    { name: 'Handover', count: 3, path: '/recruiter/handover', color: 'from-teal-500 to-emerald-600' },
   ];
 
-  // Sourcing Channels
-  const sourceData = [
-    { name: 'LinkedIn Jobs', value: 45, color: '#0077B5' },
-    { name: 'Employee Referrals', value: 25, color: '#10B981' },
-    { name: 'Job Portals (Indeed)', value: 20, color: '#6366F1' },
-    { name: 'Company Website', value: 10, color: '#F59E0B' },
+  // Sourcing Channels data for chart
+  const sourcingData = [
+    { name: 'LinkedIn', value: 48, color: '#0A66C2' },
+    { name: 'Career Page', value: 26, color: '#3B82F6' },
+    { name: 'Referral', value: 16, color: '#10B981' },
+    { name: 'Job Portal', value: 10, color: '#8B5CF6' },
   ];
 
-  // Candidate Pipeline Stages
-  const candidateStages = [
-    { name: 'Applied', count: 38, color: 'bg-blue-500' },
-    { name: 'Screening', count: 24, color: 'bg-indigo-500' },
-    { name: 'Shortlisted', count: 18, color: 'bg-purple-500' },
-    { name: 'Interview', count: 12, color: 'bg-pink-500' },
-    { name: 'Technical', count: 8, color: 'bg-amber-500' },
-    { name: 'HR Round', count: 5, color: 'bg-orange-500' },
-    { name: 'Selected', count: 4, color: 'bg-emerald-500' },
-    { name: 'Joined', count: 3, color: 'bg-teal-600' },
+  // Today's interviews
+  const upcomingInterviews: (Interview & { candidateAvatar?: string })[] = [
+    {
+      id: 'int-1',
+      candidateId: 'cand-1',
+      candidateName: 'Aarav Patel',
+      jobTitle: 'Frontend Developer',
+      interviewerId: 'user-manager',
+      interviewerName: 'Amit Verma',
+      stage: 'Technical Coding Round',
+      date: '2025-05-22',
+      time: '02:00 PM',
+      durationMinutes: 60,
+      meetingLink: 'https://meet.google.com/xyz-hrm-test',
+      status: 'Scheduled',
+      candidateAvatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
+    },
+    {
+      id: 'int-2',
+      candidateId: 'cand-2',
+      candidateName: 'Maya Chen',
+      jobTitle: 'Frontend Developer',
+      interviewerId: 'user-manager',
+      interviewerName: 'David Miller',
+      stage: 'Hiring Manager Screen',
+      date: '2025-05-23',
+      time: '11:00 AM',
+      durationMinutes: 45,
+      meetingLink: 'https://meet.google.com/maya-interview',
+      status: 'Scheduled',
+      candidateAvatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+    },
+    {
+      id: 'int-4',
+      candidateId: 'cand-4',
+      candidateName: 'Sophia Reynolds',
+      jobTitle: 'UI/UX Product Designer',
+      interviewerId: 'user-hr-admin',
+      interviewerName: 'Rachel Green',
+      stage: 'Portfolio Review',
+      date: '2025-05-23',
+      time: '03:30 PM',
+      durationMinutes: 45,
+      meetingLink: 'https://meet.google.com/sophia-portfolio',
+      status: 'Scheduled',
+      candidateAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    },
   ];
 
-  // Today's Interviews Schedule
-  const interviewsToday = [
-    { time: '10:00 AM', candidate: 'Ethan Hunt', role: 'Staff React Engineer', interviewer: 'Alex Johnson', stage: 'System Design', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80' },
-    { time: '11:30 AM', candidate: 'Clara Oswald', role: 'Senior Product Designer', interviewer: 'Sarah Wilson', stage: 'Portfolio Review', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80' },
-    { time: '02:00 PM', candidate: 'Marcus Vance', role: 'DevOps Lead', interviewer: 'David Miller', stage: 'Technical Round 2', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80' },
-    { time: '04:00 PM', candidate: 'Zoe Saldana', role: 'Marketing Strategist', interviewer: 'Rachel Green', stage: 'Culture Fit', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80' },
-  ];
+  // Quick action form handlers
+  const handleQuickPostJob = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await recruitmentService.createJob({
+      title: newJobTitle,
+      department: newJobDept,
+      location: newJobLoc,
+      positions: Number(newJobPositions),
+      salaryRange: newJobSalary,
+    });
+    setIsPostJobOpen(false);
+    setNewJobTitle('');
+    loadData();
+  };
 
-  // Active Job Openings
-  const activeJobs = [
-    { title: 'Lead Fullstack Architect', dept: 'Engineering', applicants: 34, location: 'Remote', urgency: 'High' },
-    { title: 'Senior Product Designer', dept: 'Design', applicants: 28, location: 'San Francisco, CA', urgency: 'Medium' },
-    { title: 'DevOps / SRE Engineer', dept: 'Infrastructure', applicants: 19, location: 'Remote / Hybrid', urgency: 'High' },
-    { title: 'Enterprise Account Executive', dept: 'Sales', applicants: 22, location: 'New York, NY', urgency: 'Normal' },
-  ];
+  const handleQuickNewReq = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await recruitmentService.createJobRequisition({
+      jobTitle: reqTitle,
+      department: reqDept,
+      businessJustification: reqJustification,
+    });
+    setIsNewReqOpen(false);
+    setReqTitle('');
+    setReqJustification('');
+    loadData();
+  };
+
+  const handleQuickAddCandidate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const matchedJob = jobs.find((j) => j.id === candJob);
+    await recruitmentService.createCandidate({
+      name: candName,
+      email: candEmail,
+      jobId: candJob,
+      jobTitle: matchedJob ? matchedJob.title : 'Software Engineer',
+      stage: 'Applied',
+    });
+    setIsAddCandOpen(false);
+    setCandName('');
+    setCandEmail('');
+    loadData();
+  };
+
+  const handleQuickScheduleInterview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await recruitmentService.scheduleInterview(intCandidateId, {
+      date: intDate,
+      time: intTime,
+      stage: intRound,
+    });
+    setIsScheduleInterviewOpen(false);
+    loadData();
+  };
+
+  const handleQuickCreateOffer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const matchedCand = candidates.find((c) => c.id === offerCandidateId);
+    await recruitmentService.createOffer({
+      candidateId: offerCandidateId,
+      candidateName: matchedCand ? matchedCand.name : 'Candidate',
+      candidateEmail: matchedCand ? matchedCand.email : 'candidate@email.com',
+      salaryAnnual: Number(offerSalary),
+      salaryFormatted: `$${Number(offerSalary).toLocaleString()} / year`,
+      joiningDate: offerJoiningDate,
+      offerStatus: 'Draft',
+    });
+    setIsCreateOfferOpen(false);
+    loadData();
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* HEADER: Recruiter Greeting & Action Bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      {/* =========================================================================
+          1. HEADER: Recruiter Greeting, Subtitle & Quick Actions
+         ========================================================================= */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-white dark:bg-dark-card p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
-            <span>Talent Acquisition</span>
-            <span>&gt;</span>
-            <span className="text-slate-600 dark:text-slate-300">Recruiter ATS Hub</span>
+          <div className="flex items-center gap-2 text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-[11px] font-bold">
+              Talent Acquisition Hub
+            </span>
+            <span className="text-slate-300 dark:text-slate-600">•</span>
+            <span className="text-slate-500 dark:text-slate-400">Enterprise ATS</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-            Recruiter Workspace <span className="text-2xl">🎯</span>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+            Good Morning, {recruiterName} 👋
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            Active candidate pipelines, live interview schedules, and open requisition tracking.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Track your hiring activity, candidates and recruitment pipeline.
           </p>
         </div>
 
-        {/* Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        {/* Quick Actions Buttons */}
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setIsPostJobOpen(true)}
-            className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/20 hover:bg-blue-700 transition-all"
+            className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm shadow-blue-500/20 hover:bg-blue-700 transition-all cursor-pointer"
           >
             <Plus className="h-4 w-4" />
-            <span>Post New Job</span>
+            <span>+ Create Job</span>
           </button>
+
           <button
-            onClick={() => navigate('/recruitment/candidates')}
-            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-50 dark:border-slate-800 dark:bg-dark-card dark:text-slate-200"
+            onClick={() => setIsNewReqOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
-            <span>Candidate Kanban</span>
+            <FileText className="h-3.5 w-3.5 text-slate-500" />
+            <span>New Requisition</span>
+          </button>
+
+          <button
+            onClick={() => setIsAddCandOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <Users className="h-3.5 w-3.5 text-slate-500" />
+            <span>Add Candidate</span>
+          </button>
+
+          <button
+            onClick={() => setIsScheduleInterviewOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <Calendar className="h-3.5 w-3.5 text-slate-500" />
+            <span>Schedule Interview</span>
+          </button>
+
+          <button
+            onClick={() => setIsCreateOfferOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <CreditCard className="h-3.5 w-3.5 text-slate-500" />
+            <span>Create Offer</span>
           </button>
         </div>
       </div>
 
-      {/* 6 RECRUITER KPI CARDS */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
-        {recruiterKpis.map((kpi, idx) => {
+      {/* =========================================================================
+          2. 8 COMPACT PROFESSIONAL KPI CARDS
+         ========================================================================= */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-3.5">
+        {kpis.map((kpi) => {
           const Icon = kpi.icon;
           return (
-            <div key={idx} className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
-              <div className="flex items-center gap-2 mb-2">
-                <div className={`flex h-8 w-8 items-center justify-center rounded-xl ${kpi.iconBg}`}>
-                  <Icon className="h-4 w-4" />
+            <div
+              key={kpi.id}
+              onClick={() => navigate(kpi.path)}
+              className="group rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between hover:border-blue-300 dark:hover:border-blue-900/60 transition-all duration-150 cursor-pointer"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-1 mb-2">
+                  <div
+                    className={`flex h-7 w-7 items-center justify-center rounded-lg ${kpi.bgColor} ${kpi.color}`}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                  </div>
+                  <ChevronRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-blue-500 transition-colors" />
                 </div>
-                <span className="text-[11px] font-semibold text-slate-500 truncate">{kpi.title}</span>
+                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 line-clamp-1">
+                  {kpi.title}
+                </p>
+                <div className="text-xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">
+                  {kpi.value}
+                </div>
               </div>
-              <div className="flex items-baseline justify-between mt-1">
-                <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{kpi.value}</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
-                  {kpi.change}
+
+              <div className="mt-2 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                <span
+                  className={`text-[10px] font-bold ${
+                    kpi.isPositive
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : 'text-blue-600 dark:text-blue-400'
+                  }`}
+                >
+                  {kpi.trend}
+                </span>
+                <span className="block text-[9px] text-slate-400 truncate mt-0.5">
+                  {kpi.comparison}
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 mt-1">{kpi.subtext}</p>
             </div>
           );
         })}
       </div>
 
-      {/* RECRUITMENT PIPELINE FLOW (8 STAGES) */}
+      {/* =========================================================================
+          3. RECRUITMENT FUNNEL VISUALIZATION (11-STAGE INTERACTIVE)
+         ========================================================================= */}
       <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
           <div>
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white">Active Candidate Pipeline Stages</h2>
-            <p className="text-[11px] text-slate-400 mt-0.5">Distribution of 148 candidates across the full recruitment funnel</p>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                Interactive Recruitment Funnel
+              </h2>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+                11 Stages
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Click on any stage to inspect the filtered candidates, requisitions, or applications.
+            </p>
           </div>
-          <button onClick={() => navigate('/recruitment/candidates')} className="text-xs font-bold text-blue-600 hover:text-blue-700">Open Kanban ↗</button>
+          <button
+            onClick={() => navigate('/recruiter/pipeline')}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer"
+          >
+            <span>Open Kanban Pipeline</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-          {candidateStages.map((stage, idx) => (
-            <div key={idx} className="p-3 rounded-xl bg-slate-50 border border-slate-100 dark:bg-slate-800/40 dark:border-slate-800 flex flex-col justify-between text-center">
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <span className={`h-2 w-2 rounded-full ${stage.color}`} />
-                <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 truncate">{stage.name}</span>
-              </div>
-              <span className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{stage.count}</span>
-              <span className="text-[9px] text-slate-400 mt-0.5">candidates</span>
-            </div>
-          ))}
+        {/* Funnel Nodes Row */}
+        <div className="overflow-x-auto pb-2 scrollbar-thin">
+          <div className="flex items-center gap-1.5 min-w-[960px]">
+            {funnelStages.map((stage, idx) => (
+              <React.Fragment key={stage.name}>
+                <div
+                  onClick={() => navigate(stage.path)}
+                  className="flex-1 p-2.5 rounded-xl border border-slate-100 bg-slate-50/80 dark:bg-slate-800/40 dark:border-slate-800 hover:bg-blue-50/80 dark:hover:bg-blue-950/40 hover:border-blue-200 dark:hover:border-blue-800 transition-all cursor-pointer group text-center"
+                >
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 block truncate">
+                    {stage.name}
+                  </span>
+                  <span className="text-lg font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 block mt-0.5 tabular-nums">
+                    {stage.count}
+                  </span>
+                  <span className="text-[9px] text-slate-400 block">candidates</span>
+                </div>
+                {idx < funnelStages.length - 1 && (
+                  <span className="text-slate-300 dark:text-slate-700 font-bold text-xs select-none">
+                    →
+                  </span>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* CHARTS ROW: FUNNEL + SOURCING */}
+      {/* =========================================================================
+          4. TWO-COLUMN ROW: TODAY'S INTERVIEWS & ACTIVE REQUISITIONS
+         ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Recruitment Funnel Bar Chart */}
+        {/* Left: Today's Interviews (Span 7) */}
         <div className="lg:col-span-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Recruitment Conversion Funnel</h2>
-              <p className="text-[11px] text-slate-400">Application conversion rates through each stage</p>
-            </div>
-            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full dark:bg-emerald-950/40 dark:text-emerald-300">5.4% Overall Hire Rate</span>
-          </div>
-
-          <div className="h-60 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={funnelData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.6} />
-                <XAxis dataKey="stage" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94A3B8' }} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94A3B8' }} />
-                <Tooltip contentStyle={{ backgroundColor: '#0F172A', borderRadius: '10px', color: '#fff', fontSize: '11px', border: 'none' }} />
-                <Bar dataKey="count" fill="#3B82F6" radius={[4, 4, 0, 0]} barSize={22} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Sourcing Channel Distribution */}
-        <div className="lg:col-span-5 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white">Applicant Source Channels</h2>
-            <span className="text-[10px] font-bold text-slate-400">Q2 Sourcing</span>
-          </div>
-
-          <div className="flex items-center justify-between gap-3 my-auto">
-            <div className="relative h-40 w-40 flex-shrink-0 flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={sourceData} cx="50%" cy="50%" innerRadius={42} outerRadius={62} paddingAngle={3} dataKey="value">
-                    {sourceData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#0F172A', borderRadius: '10px', color: '#fff', fontSize: '10px' }} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute text-center pointer-events-none">
-                <span className="text-lg font-black text-slate-900 dark:text-white">148</span>
-                <span className="block text-[8px] uppercase font-bold text-slate-400">Total</span>
-              </div>
-            </div>
-
-            <div className="flex-1 space-y-2 text-xs">
-              {sourceData.map((s, idx) => (
-                <div key={idx} className="flex items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
-                    {s.name}
+          <div>
+            <div className="flex items-center justify-between mb-3.5">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>Today's Interview Schedule</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
+                    Live
                   </span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200 tabular-nums">{s.value}%</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">3 sessions confirmed for today</p>
+              </div>
+              <button
+                onClick={() => navigate('/recruiter/interviews')}
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer"
+              >
+                View Calendar ↗
+              </button>
+            </div>
+
+            <div className="space-y-2.5">
+              {upcomingInterviews.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-3 rounded-xl bg-slate-50/70 border border-slate-100 dark:bg-slate-800/40 dark:border-slate-800/80 flex items-center justify-between gap-3 text-xs"
+                >
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={item.candidateAvatar}
+                      alt={item.candidateName}
+                      className="h-9 w-9 rounded-full object-cover ring-2 ring-white dark:ring-slate-700"
+                    />
+                    <div>
+                      <p className="font-bold text-slate-900 dark:text-white text-xs">
+                        {item.candidateName}
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        {item.jobTitle} • <span className="font-semibold text-blue-600">{item.stage}</span>
+                      </p>
+                      <p className="text-[10px] text-slate-400">Interviewer: {item.interviewerName}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold font-mono text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 px-2 py-1 rounded-md border border-slate-200/60 dark:border-slate-700">
+                      {item.time}
+                    </span>
+                    <a
+                      href={item.meetingLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-colors shadow-2xs"
+                    >
+                      <Video className="h-3.5 w-3.5" />
+                      <span>Join Meet</span>
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* INTERVIEWS TODAY & OPEN JOBS */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Interviews Today */}
-        <div className="lg:col-span-6 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold text-slate-900 dark:text-white">Interviews Scheduled Today</h3>
-            <button onClick={() => navigate('/recruitment/interviews')} className="text-[10px] font-bold text-blue-600 hover:text-blue-700">Calendar ↗</button>
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+            <span>Video conferencing link automatically shared with candidate & panel</span>
+            <button
+              onClick={() => setIsScheduleInterviewOpen(true)}
+              className="text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer"
+            >
+              + Add Interview
+            </button>
           </div>
+        </div>
 
-          <div className="space-y-3">
-            {interviewsToday.map((item, idx) => (
-              <div key={idx} className="p-3 rounded-xl bg-slate-50 border border-slate-100 dark:bg-slate-800/40 dark:border-slate-800 flex items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-3">
-                  <img src={item.avatar} alt={item.candidate} className="h-8 w-8 rounded-full object-cover" />
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-white">{item.candidate}</p>
-                    <p className="text-[10px] text-slate-400">{item.role} • {item.stage}</p>
+        {/* Right: Sourcing Channels Chart (Span 5) */}
+        <div className="lg:col-span-5 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                Candidate Sourcing Channels
+              </h3>
+              <span className="text-[10px] font-bold text-slate-400">Q2 2025</span>
+            </div>
+            <p className="text-xs text-slate-400">Percentage distribution of applicants by channel</p>
+
+            <div className="flex items-center justify-between gap-4 mt-3">
+              <div className="relative h-44 w-44 flex-shrink-0 flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={sourcingData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={65}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {sourcingData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#0F172A',
+                        borderRadius: '10px',
+                        color: '#fff',
+                        fontSize: '11px',
+                        border: 'none',
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute text-center pointer-events-none">
+                  <span className="text-xl font-black text-slate-900 dark:text-white">148</span>
+                  <span className="block text-[9px] uppercase font-bold text-slate-400">Total</span>
+                </div>
+              </div>
+
+              <div className="flex-1 space-y-2 text-xs">
+                {sourcingData.map((s, idx) => (
+                  <div key={idx} className="flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
+                      {s.name}
+                    </span>
+                    <span className="font-bold text-slate-900 dark:text-white tabular-nums">{s.value}%</span>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded dark:bg-blue-950/40 dark:text-blue-300">{item.time}</span>
-                  <button className="h-7 w-7 flex items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700">
-                    <Video className="h-3.5 w-3.5" />
-                  </button>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Open Requisitions */}
-        <div className="lg:col-span-6 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold text-slate-900 dark:text-white">Open Job Requisitions</h3>
-            <button onClick={() => navigate('/recruitment/jobs')} className="text-[10px] font-bold text-blue-600 hover:text-blue-700">All Jobs ↗</button>
+            </div>
           </div>
 
-          <div className="divide-y divide-slate-100 dark:divide-slate-800">
-            {activeJobs.map((job, idx) => (
-              <div key={idx} className="py-2.5 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-bold text-slate-900 dark:text-white">{job.title}</p>
-                  <p className="text-[10px] text-slate-400">{job.dept} • {job.location}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">{job.applicants} Applicants</span>
-                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                    job.urgency === 'High' ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-300' : 'bg-slate-100 text-slate-600'
-                  }`}>
-                    {job.urgency}
-                  </span>
-                </div>
-              </div>
-            ))}
+          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+            <span className="text-slate-400 text-[11px]">Top Source: LinkedIn (48%)</span>
+            <button
+              onClick={() => navigate('/recruiter/analytics')}
+              className="text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer"
+            >
+              Analytics Deep Dive ↗
+            </button>
           </div>
         </div>
       </div>
 
-      {/* POST JOB MODAL */}
-      <Modal isOpen={isPostJobOpen} onClose={() => setIsPostJobOpen(false)} title="Post New Job Opening" size="lg">
-        <form onSubmit={(e) => { e.preventDefault(); alert('Job opening posted successfully!'); setIsPostJobOpen(false); }} className="space-y-4">
-          <Input label="Job Title" placeholder="e.g. Senior Security Architect" required />
+      {/* =========================================================================
+          5. ACTIVE JOB REQUISITIONS & OPEN POSITIONS TABLE
+         ========================================================================= */}
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Active Open Positions & Requisitions</h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Live job postings receiving applications and candidate evaluations
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/recruiter/jobs')}
+            className="text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer"
+          >
+            All Openings ↗
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              <tr>
+                <th className="py-2.5 px-4 rounded-l-xl">Role Title</th>
+                <th className="py-2.5 px-3">Department</th>
+                <th className="py-2.5 px-3">Location / Mode</th>
+                <th className="py-2.5 px-3">Open Vacancies</th>
+                <th className="py-2.5 px-3">Applicants</th>
+                <th className="py-2.5 px-3">Status</th>
+                <th className="py-2.5 px-4 text-right rounded-r-xl">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {jobs.map((job) => (
+                <tr key={job.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors">
+                  <td className="py-3 px-4 font-bold text-slate-900 dark:text-white">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+                        <Briefcase className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <span>{job.title}</span>
+                        <span className="block text-[10px] text-slate-400 font-normal">{job.salaryRange}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3 px-3 font-semibold text-slate-600 dark:text-slate-300">{job.department}</td>
+                  <td className="py-3 px-3 text-slate-500 dark:text-slate-400">{job.location}</td>
+                  <td className="py-3 px-3 font-bold text-slate-700 dark:text-slate-200">{job.positions} Positions</td>
+                  <td className="py-3 px-3">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                      {job.applicationsCount || 24} Candidates
+                    </span>
+                  </td>
+                  <td className="py-3 px-3">
+                    <Badge variant={job.status === 'Active' ? 'success' : 'neutral'} size="sm" dot>
+                      {job.status}
+                    </Badge>
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    <button
+                      onClick={() => navigate('/recruiter/candidates')}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
+                    >
+                      <span>Pipeline</span>
+                      <ChevronRight className="h-3 w-3" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          MODALS FOR QUICK ACTIONS
+         ========================================================================= */}
+      {/* 1. Post Job Modal */}
+      <Modal isOpen={isPostJobOpen} onClose={() => setIsPostJobOpen(false)} title="Create New Job Opening" size="lg">
+        <form onSubmit={handleQuickPostJob} className="space-y-4">
+          <Input
+            label="Job Title"
+            placeholder="e.g. Staff Distributed Systems Engineer"
+            value={newJobTitle}
+            onChange={(e) => setNewJobTitle(e.target.value)}
+            required
+          />
           <div className="grid grid-cols-2 gap-3">
-            <Select label="Department" options={[{ value: 'eng', label: 'Engineering' }, { value: 'mkt', label: 'Marketing' }, { value: 'sales', label: 'Sales' }]} />
-            <Select label="Workplace Type" options={[{ value: 'remote', label: 'Full Remote' }, { value: 'hybrid', label: 'Hybrid' }, { value: 'onsite', label: 'On-site' }]} />
+            <Select
+              label="Department"
+              value={newJobDept}
+              onChange={(e) => setNewJobDept(e.target.value)}
+              options={[
+                { value: 'Engineering', label: 'Engineering' },
+                { value: 'Design', label: 'Design' },
+                { value: 'Product', label: 'Product' },
+                { value: 'Human Resources', label: 'Human Resources' },
+                { value: 'Sales & Growth', label: 'Sales & Growth' },
+              ]}
+            />
+            <Input
+              label="Workplace Location"
+              value={newJobLoc}
+              onChange={(e) => setNewJobLoc(e.target.value)}
+              placeholder="e.g. San Francisco HQ / Hybrid"
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Experience Level" placeholder="e.g. 5+ Years" />
-            <Input label="Salary Range ($)" placeholder="e.g. $120,000 - $150,000" />
+            <Input
+              label="Vacancies"
+              type="number"
+              value={newJobPositions}
+              onChange={(e) => setNewJobPositions(Number(e.target.value))}
+              min={1}
+            />
+            <Input
+              label="Salary Range"
+              value={newJobSalary}
+              onChange={(e) => setNewJobSalary(e.target.value)}
+              placeholder="e.g. $130,000 - $160,000"
+            />
           </div>
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-            <Button type="button" variant="outline" onClick={() => setIsPostJobOpen(false)}>Cancel</Button>
-            <Button type="submit" variant="primary">Publish Job Opening</Button>
+            <Button type="button" variant="outline" onClick={() => setIsPostJobOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Publish Job Opening
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* 2. New Requisition Modal */}
+      <Modal isOpen={isNewReqOpen} onClose={() => setIsNewReqOpen(false)} title="Submit New Job Requisition" size="lg">
+        <form onSubmit={handleQuickNewReq} className="space-y-4">
+          <Input
+            label="Job Title"
+            placeholder="e.g. Senior Security Architect"
+            value={reqTitle}
+            onChange={(e) => setReqTitle(e.target.value)}
+            required
+          />
+          <Select
+            label="Department"
+            value={reqDept}
+            onChange={(e) => setReqDept(e.target.value)}
+            options={[
+              { value: 'Engineering', label: 'Engineering' },
+              { value: 'Product & Design', label: 'Product & Design' },
+              { value: 'Sales & Growth', label: 'Sales & Growth' },
+              { value: 'Customer Success', label: 'Customer Success' },
+            ]}
+          />
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Business Justification
+            </label>
+            <textarea
+              rows={3}
+              value={reqJustification}
+              onChange={(e) => setReqJustification(e.target.value)}
+              placeholder="Explain the necessity, headcount impact, and project timeline..."
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-2.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              required
+            />
+          </div>
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <Button type="button" variant="outline" onClick={() => setIsNewReqOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Submit for Approval
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* 3. Add Candidate Modal */}
+      <Modal isOpen={isAddCandOpen} onClose={() => setIsAddCandOpen(false)} title="Add Candidate to Database" size="md">
+        <form onSubmit={handleQuickAddCandidate} className="space-y-4">
+          <Input
+            label="Full Name"
+            placeholder="e.g. Clara Oswald"
+            value={candName}
+            onChange={(e) => setCandName(e.target.value)}
+            required
+          />
+          <Input
+            label="Email Address"
+            type="email"
+            placeholder="e.g. clara@example.com"
+            value={candEmail}
+            onChange={(e) => setCandEmail(e.target.value)}
+            required
+          />
+          <Select
+            label="Applying For"
+            value={candJob}
+            onChange={(e) => setCandJob(e.target.value)}
+            options={jobs.map((j) => ({ value: j.id, label: j.title }))}
+          />
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <Button type="button" variant="outline" onClick={() => setIsAddCandOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Add Candidate
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* 4. Schedule Interview Modal */}
+      <Modal isOpen={isScheduleInterviewOpen} onClose={() => setIsScheduleInterviewOpen(false)} title="Schedule Candidate Interview" size="md">
+        <form onSubmit={handleQuickScheduleInterview} className="space-y-4">
+          <Select
+            label="Candidate"
+            value={intCandidateId}
+            onChange={(e) => setIntCandidateId(e.target.value)}
+            options={candidates.map((c) => ({ value: c.id, label: `${c.name} (${c.jobTitle})` }))}
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Date"
+              type="date"
+              value={intDate}
+              onChange={(e) => setIntDate(e.target.value)}
+              required
+            />
+            <Input
+              label="Time"
+              value={intTime}
+              onChange={(e) => setIntTime(e.target.value)}
+              placeholder="e.g. 02:00 PM"
+              required
+            />
+          </div>
+          <Select
+            label="Interview Round"
+            value={intRound}
+            onChange={(e) => setIntRound(e.target.value)}
+            options={[
+              { value: 'Technical Coding Round', label: 'Technical Coding Round' },
+              { value: 'Hiring Manager Screen', label: 'Hiring Manager Screen' },
+              { value: 'System Architecture Review', label: 'System Architecture Review' },
+              { value: 'HR & Culture Fit', label: 'HR & Culture Fit' },
+              { value: 'Final Executive Round', label: 'Final Executive Round' },
+            ]}
+          />
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <Button type="button" variant="outline" onClick={() => setIsScheduleInterviewOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Confirm & Schedule
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* 5. Create Offer Modal */}
+      <Modal isOpen={isCreateOfferOpen} onClose={() => setIsCreateOfferOpen(false)} title="Draft Candidate Job Offer" size="md">
+        <form onSubmit={handleQuickCreateOffer} className="space-y-4">
+          <Select
+            label="Candidate"
+            value={offerCandidateId}
+            onChange={(e) => setOfferCandidateId(e.target.value)}
+            options={candidates.map((c) => ({ value: c.id, label: `${c.name} (${c.jobTitle})` }))}
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Annual Base Salary ($)"
+              type="number"
+              value={offerSalary}
+              onChange={(e) => setOfferSalary(e.target.value)}
+              required
+            />
+            <Input
+              label="Target Joining Date"
+              type="date"
+              value={offerJoiningDate}
+              onChange={(e) => setOfferJoiningDate(e.target.value)}
+              required
+            />
+          </div>
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <Button type="button" variant="outline" onClick={() => setIsCreateOfferOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Create Offer Draft
+            </Button>
           </div>
         </form>
       </Modal>
