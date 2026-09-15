@@ -69,6 +69,10 @@ export interface Department {
   headName?: string;
   employeeCount: number;
   color: string;
+  budget?: number;
+  description?: string;
+  location?: string;
+  createdAt?: string;
 }
 
 export interface Designation {
@@ -79,6 +83,11 @@ export interface Designation {
   departmentName: string;
   level: string;
   employeeCount: number;
+  salaryBandMin?: number;
+  salaryBandMax?: number;
+  bandTrack?: 'IC' | 'Management' | 'Executive';
+  description?: string;
+  createdAt?: string;
 }
 
 export interface Employee {
