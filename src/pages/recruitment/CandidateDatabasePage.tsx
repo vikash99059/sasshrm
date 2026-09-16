@@ -226,19 +226,17 @@ export const CandidateDatabasePage: React.FC = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-              activeTab === tab.id
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${activeTab === tab.id
                 ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-2xs'
                 : 'text-slate-600 hover:bg-slate-100/70 dark:text-slate-400 dark:hover:bg-slate-800/60'
-            }`}
+              }`}
           >
             <span>{tab.label}</span>
             <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                activeTab === tab.id
+              className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${activeTab === tab.id
                   ? 'bg-blue-600 text-white dark:bg-blue-500'
                   : 'bg-slate-200/70 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-              }`}
+                }`}
             >
               {tab.count}
             </span>
@@ -395,10 +393,10 @@ export const CandidateDatabasePage: React.FC = () => {
                         item.stage === 'Selected' || item.stage === 'Offer Accepted' || item.stage === 'Hired'
                           ? 'success'
                           : item.stage === 'Rejected'
-                          ? 'danger'
-                          : item.stage === 'Interview' || item.stage === 'Technical Round'
-                          ? 'warning'
-                          : 'neutral'
+                            ? 'danger'
+                            : item.stage === 'Interview' || item.stage === 'Technical Round'
+                              ? 'warning'
+                              : 'neutral'
                       }
                       size="sm"
                       dot
@@ -458,11 +456,10 @@ export const CandidateDatabasePage: React.FC = () => {
                   <button
                     onClick={() => handleToggleTalentPool(selectedCandidate)}
                     title="Toggle Talent Pool"
-                    className={`p-1 rounded-md text-xs cursor-pointer ${
-                      selectedCandidate.talentPool
+                    className={`p-1 rounded-md text-xs cursor-pointer ${selectedCandidate.talentPool
                         ? 'text-amber-500 bg-amber-50 dark:bg-amber-950/60'
                         : 'text-slate-400 hover:text-amber-500'
-                    }`}
+                      }`}
                   >
                     ★
                   </button>
@@ -500,11 +497,10 @@ export const CandidateDatabasePage: React.FC = () => {
               <button
                 key={t.id}
                 onClick={() => setProfileTab(t.id as any)}
-                className={`py-3 px-2.5 font-bold transition-colors border-b-2 whitespace-nowrap cursor-pointer ${
-                  profileTab === t.id
+                className={`py-3 px-2.5 font-bold transition-colors border-b-2 whitespace-nowrap cursor-pointer ${profileTab === t.id
                     ? 'border-blue-600 text-blue-600 dark:text-blue-400'
                     : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-                }`}
+                  }`}
               >
                 {t.label}
               </button>

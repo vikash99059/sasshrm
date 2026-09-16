@@ -33,6 +33,9 @@ export const PerformanceReviewsPage: React.FC = () => {
   const [cycleFilter, setCycleFilter] = useState('H1 2024');
   const [isNewCycleOpen, setIsNewCycleOpen] = useState(false);
 
+  const [selectedReview, setSelectedReview] = useState<ReviewCycleItem | null>(null);
+  const [isReviewDetailModalOpen, setIsReviewDetailModalOpen] = useState(false);
+
   const reviews: ReviewCycleItem[] = [
     { id: 'REV-01', employeeName: 'Sarah Wilson', employeeAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80', designation: 'Senior Product Designer', department: 'Marketing', reviewerName: 'David Miller', cycle: 'H1 2024', rating: 4.8, status: 'Completed', submissionDate: 'May 15, 2024', feedbackSummary: 'Exceptional UX execution on SaaS redesign, strong cross-functional leadership.' },
     { id: 'REV-02', employeeName: 'Elena Rostova', employeeAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80', designation: 'Design Director', department: 'Product', reviewerName: 'Alex Johnson', cycle: 'H1 2024', rating: 4.6, status: 'Completed', submissionDate: 'May 12, 2024', feedbackSummary: 'Solid product strategy, excellent mentorship of junior design team.' },
@@ -169,11 +172,10 @@ export const PerformanceReviewsPage: React.FC = () => {
                     )}
                   </td>
                   <td className="py-4 px-4">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                      rev.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400' :
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${rev.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400' :
                       rev.status === 'In Review' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400' :
-                      'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400'
-                    }`}>
+                        'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400'
+                      }`}>
                       {rev.status}
                     </span>
                   </td>
@@ -181,7 +183,15 @@ export const PerformanceReviewsPage: React.FC = () => {
                     {rev.feedbackSummary}
                   </td>
                   <td className="py-4 px-6 text-right">
-                    <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+                      onClick={() => {
+                        setSelectedReview(rev);
+                        setIsReviewDetailModalOpen(true);
+                      }}
+                    >
                       View Review <ArrowRight className="w-3.5 h-3.5 ml-1" />
                     </Button>
                   </td>
@@ -191,6 +201,92 @@ export const PerformanceReviewsPage: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Review Detail Modal */}
+      {selectedReview && (
+        <Modal
+          isOpen={isReviewDetailModalOpen}
+          onClose={() => setIsReviewDetailModalOpen(false)}
+          title={`Performance Review Assessment: ${selectedReview.employeeName}`}
+          size="md"
+        >
+          <div className="space-y-4 text-xs">
+            {/* Header info */}
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <img src={selectedReview.employeeAvatar} alt={selectedReview.employeeName} className="w-12 h-12 rounded-full object-cover ring-2 ring-blue-500/30" />
+                <div>
+                  <h3 className="font-bold text-sm text-slate-900 dark:text-white">{selectedReview.employeeName}</h3>
+                  <p className="text-slate-500 text-[11px]">{selectedReview.designation} • {selectedReview.department}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${selectedReview.status === 'Completed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300' :
+                  selectedReview.status === 'In Review' ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300' :
+                    'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300'
+                  }`}>
+                  {selectedReview.status}
+                </span>
+                <p className="text-[10px] text-slate-400 mt-1">Cycle: {selectedReview.cycle}</p>
+              </div>
+            </div>
+
+            {/* Score & Reviewer */}
+            <div className="grid grid-cols-2 gap-3 p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+              <div>
+                <span className="text-slate-400 text-[10px] uppercase font-semibold block">Evaluated By</span>
+                <span className="font-bold text-slate-900 dark:text-white">{selectedReview.reviewerName}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 text-[10px] uppercase font-semibold block">Overall Rating</span>
+                {selectedReview.rating > 0 ? (
+                  <div className="flex items-center gap-1.5 font-black text-slate-900 dark:text-white">
+                    <span className="text-base text-amber-500">★ {selectedReview.rating.toFixed(1)}</span>
+                    <span className="text-slate-400 text-[10px] font-normal">/ 5.0</span>
+                  </div>
+                ) : (
+                  <span className="text-amber-500 font-semibold">Self Appraisal Pending</span>
+                )}
+              </div>
+            </div>
+
+            {/* Competency Ratings breakdown */}
+            <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+              <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block mb-1">Competency Scorecard</span>
+              {[
+                { label: 'Technical Execution & Quality', score: selectedReview.rating ? selectedReview.rating : 4.0 },
+                { label: 'Cross-Functional Collaboration', score: selectedReview.rating ? Math.min(5.0, selectedReview.rating + 0.1) : 4.0 },
+                { label: 'Leadership & Initiative', score: selectedReview.rating ? Math.max(3.5, selectedReview.rating - 0.2) : 3.8 },
+                { label: 'Delivery & Deadline Reliability', score: selectedReview.rating ? selectedReview.rating : 4.2 },
+              ].map((comp, idx) => (
+                <div key={idx} className="flex items-center justify-between text-xs py-1 border-b border-slate-100 dark:border-slate-800/60 last:border-0">
+                  <span className="text-slate-700 dark:text-slate-300 font-medium">{comp.label}</span>
+                  <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                    {comp.score.toFixed(1)} <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Manager Comments */}
+            <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1">
+              <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Manager Feedback & Appraisal Summary</span>
+              <p className="text-slate-800 dark:text-slate-200 text-xs leading-relaxed italic font-serif">
+                "{selectedReview.feedbackSummary}"
+              </p>
+              <div className="text-right text-[10px] text-slate-400 pt-1">
+                Submitted on {selectedReview.submissionDate}
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2 border-t border-slate-100 dark:border-slate-800">
+              <Button variant="secondary" size="sm" onClick={() => setIsReviewDetailModalOpen(false)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {/* Launch Cycle Modal */}
       <Modal

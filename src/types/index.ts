@@ -686,6 +686,8 @@ export interface OnboardingHandover {
   | 'Handover to HR'
   | 'Onboarding in Progress'
   | 'Completed';
+  bgvStatus?: 'Not Started' | 'Initiated' | 'In Progress' | 'Cleared' | 'Failed';
+  employeeId?: string;
   checklist: {
     offerAccepted: boolean;
     personalInfoComplete: boolean;
