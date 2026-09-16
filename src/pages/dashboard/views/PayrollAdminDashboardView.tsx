@@ -30,6 +30,7 @@ import {
   Tooltip,
 } from 'recharts';
 import { Modal, Input, Select, Button, Badge } from '../../../components/ui';
+import { DashboardHeroBanner } from '../../../components/common/DashboardHeroBanner';
 
 export const PayrollAdminDashboardView: React.FC = () => {
   const navigate = useNavigate();
@@ -81,6 +82,9 @@ export const PayrollAdminDashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* TOP HERO BANNER + WORK TIMER */}
+      <DashboardHeroBanner />
+
       {/* HEADER: Payroll Admin Greeting & Controls */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -129,9 +133,8 @@ export const PayrollAdminDashboardView: React.FC = () => {
               </div>
               <div className="flex items-baseline justify-between mt-1">
                 <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{kpi.value}</span>
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
-                  kpi.isPositive ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' : 'bg-amber-50 text-amber-600'
-                }`}>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${kpi.isPositive ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' : 'bg-amber-50 text-amber-600'
+                  }`}>
                   {kpi.change}
                 </span>
               </div>

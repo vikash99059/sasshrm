@@ -15,6 +15,7 @@ import {
   Package,
 } from 'lucide-react';
 import { Modal, Input, Select, Button, Badge } from '../../../components/ui';
+import { DashboardHeroBanner } from '../../../components/common/DashboardHeroBanner';
 
 export const HrExecutiveDashboardView: React.FC = () => {
   const navigate = useNavigate();
@@ -50,6 +51,9 @@ export const HrExecutiveDashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* TOP HERO BANNER + WORK TIMER */}
+      <DashboardHeroBanner />
+
       {/* HEADER: HR Executive Operations */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -98,9 +102,8 @@ export const HrExecutiveDashboardView: React.FC = () => {
               </div>
               <div className="flex items-baseline justify-between mt-1">
                 <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{kpi.value}</span>
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
-                  kpi.isPositive ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' : 'bg-amber-50 text-amber-600'
-                }`}>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${kpi.isPositive ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' : 'bg-amber-50 text-amber-600'
+                  }`}>
                   {kpi.change}
                 </span>
               </div>
@@ -123,9 +126,8 @@ export const HrExecutiveDashboardView: React.FC = () => {
             {operationalTasks.map((t) => (
               <div key={t.id} className="p-3 rounded-xl bg-slate-50 border border-slate-100 dark:bg-slate-800/40 dark:border-slate-800 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-3">
-                  <span className={`h-2.5 w-2.5 rounded-full ${
-                    t.status === 'Completed' ? 'bg-emerald-500' : t.priority === 'High' ? 'bg-rose-500' : 'bg-amber-500'
-                  }`} />
+                  <span className={`h-2.5 w-2.5 rounded-full ${t.status === 'Completed' ? 'bg-emerald-500' : t.priority === 'High' ? 'bg-rose-500' : 'bg-amber-500'
+                    }`} />
                   <div>
                     <p className={`font-semibold text-xs ${t.status === 'Completed' ? 'line-through text-slate-400' : 'text-slate-900 dark:text-white'}`}>{t.title}</p>
                     <p className="text-[10px] text-slate-400">{t.category} • Priority: {t.priority}</p>

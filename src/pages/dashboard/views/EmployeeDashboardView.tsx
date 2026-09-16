@@ -37,6 +37,7 @@ import {
   Tooltip,
 } from 'recharts';
 import { Modal, Input, Select, Button } from '../../../components/ui';
+import { DashboardHeroBanner } from '../../../components/common/DashboardHeroBanner';
 
 export const EmployeeDashboardView: React.FC = () => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ export const EmployeeDashboardView: React.FC = () => {
   const employeeId = isGenericMock
     ? 'EMP-0412'
     : currentUser?.employeeId ||
-      (currentUser?.id ? `EMP-${currentUser.id.replace(/\D/g, '').padStart(4, '0')}` : 'EMP-0412');
+    (currentUser?.id ? `EMP-${currentUser.id.replace(/\D/g, '').padStart(4, '0')}` : 'EMP-0412');
 
   // Periods & Dropdowns
   const [attendancePeriod, setAttendancePeriod] = useState<'Last 7 Days' | 'This Month'>('Last 7 Days');
@@ -223,204 +224,8 @@ export const EmployeeDashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in pb-8">
-      {/* =========================================================================
-          TOP SECTION: EMPLOYEE WELCOME BANNER (LEFT) + WORK TIMER CARD (RIGHT)
-         ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-        {/* LEFT: Employee Welcome Hero Card (Col 8/9 on desktop) */}
-        <div className="lg:col-span-8 xl:col-span-9 relative overflow-hidden rounded-2xl border border-blue-200/80 bg-gradient-to-r from-[#EFF6FF] via-[#E2EFFF] to-[#D5E8FE] px-4 py-3 sm:px-6 sm:py-3.5 shadow-sm dark:border-slate-800 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/50 flex flex-col justify-center">
-          {/* =========================================================================
-              WAVY & CLOUDY FLOWING BACKGROUND (ORGANIC MULTI-LAYER SVG + BLUR GLOBS)
-             ========================================================================= */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 select-none">
-            {/* Soft Ambient Cloud Blur Orbs */}
-            <div className="absolute -right-8 -top-12 h-80 w-80 rounded-full bg-gradient-to-br from-blue-300/45 via-sky-200/40 to-white/70 blur-3xl dark:from-blue-900/30 dark:via-sky-950/20 dark:to-indigo-950/30" />
-            <div className="absolute right-1/4 top-1/2 -translate-y-1/2 h-64 w-72 rounded-full bg-gradient-to-tr from-sky-200/40 via-blue-100/50 to-white/60 blur-2xl dark:from-slate-800/40 dark:via-blue-950/30 dark:to-slate-900/40" />
-            <div className="absolute left-1/3 -bottom-10 h-52 w-96 rounded-full bg-blue-100/50 blur-2xl dark:bg-blue-950/25" />
-
-            {/* Layered Translucent SVG Waves */}
-            <svg
-              className="absolute inset-0 h-full w-full object-cover"
-              viewBox="0 0 1200 240"
-              preserveAspectRatio="none"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <linearGradient id="cloudWave1" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#DBEAFE" stopOpacity="0.7" />
-                  <stop offset="50%" stopColor="#BFDBFE" stopOpacity="0.45" />
-                  <stop offset="100%" stopColor="#93C5FD" stopOpacity="0.3" />
-                </linearGradient>
-                <linearGradient id="cloudWave2" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#EFF6FF" stopOpacity="0.85" />
-                  <stop offset="50%" stopColor="#DBEAFE" stopOpacity="0.55" />
-                  <stop offset="100%" stopColor="#BFDBFE" stopOpacity="0.4" />
-                </linearGradient>
-                <linearGradient id="cloudWave3" x1="100%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#93C5FD" stopOpacity="0.5" />
-                  <stop offset="60%" stopColor="#60A5FA" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.15" />
-                </linearGradient>
-                <linearGradient id="cloudWave4" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.75" />
-                  <stop offset="100%" stopColor="#E0F2FE" stopOpacity="0.35" />
-                </linearGradient>
-              </defs>
-
-              {/* Layer 1: Rolling deep background wave */}
-              <path
-                d="M0,70 C240,125 480,25 740,75 C940,115 1100,45 1200,70 L1200,240 L0,240 Z"
-                fill="url(#cloudWave1)"
-              />
-
-              {/* Layer 2: Cloudy cresting middle undulating wave */}
-              <path
-                d="M0,130 C190,80 430,145 690,90 C930,40 1090,110 1200,75 L1200,240 L0,240 Z"
-                fill="url(#cloudWave2)"
-              />
-
-              {/* Layer 3: Smooth foreground translucent wave */}
-              <path
-                d="M120,155 C360,100 600,170 850,110 C1010,70 1110,100 1200,85 L1200,240 L120,240 Z"
-                fill="url(#cloudWave3)"
-              />
-
-              {/* Layer 4: Top-right airy cloud curl */}
-              <path
-                d="M720,0 C860,60 1020,40 1150,0 L1200,0 L1200,130 C1070,110 900,70 720,0 Z"
-                fill="url(#cloudWave4)"
-              />
-            </svg>
-          </div>
-
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
-            {/* Left Info: Avatar + Details */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-              {/* Employee Avatar with Online Indicator */}
-              <div className="relative flex-shrink-0">
-                <img
-                  src={employeeAvatar}
-                  alt={employeeName}
-                  className="h-12 w-12 sm:h-14 sm:w-14 rounded-xl object-cover ring-2 ring-white shadow-xs dark:ring-slate-800"
-                />
-                <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
-              </div>
-
-              {/* Text Info */}
-              <div className="space-y-0.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-lg sm:text-xl font-black tracking-tight text-slate-900 dark:text-white">
-                    Good morning, {employeeName} 👋
-                  </h1>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-700 dark:bg-blue-950/70 dark:text-blue-300 shadow-2xs">
-                    {employeeId}
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
-                  <span className="text-blue-600 dark:text-blue-400 font-bold">{employeeDesignation}</span>
-                  <span className="text-slate-300 dark:text-slate-600">•</span>
-                  <span>{employeeDepartment}</span>
-                  <span className="text-slate-300 dark:text-slate-600">•</span>
-                  <span className="text-slate-500 dark:text-slate-400">Full-Time</span>
-                </div>
-
-                {/* Date, Shift, and Status Chips */}
-                <div className="flex flex-wrap items-center gap-2 pt-0.5 text-xs text-slate-600 dark:text-slate-400">
-                  <div className="flex items-center gap-1.5 bg-white/75 dark:bg-slate-800/75 backdrop-blur-sm px-2 py-0.5 rounded-md border border-blue-100/70 dark:border-slate-700/60 shadow-2xs">
-                    <Calendar className="h-3 w-3 text-blue-500" />
-                    <span className="font-medium text-slate-700 dark:text-slate-300 text-[11px]">
-                      Thu, May 22, 2025
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 bg-white/75 dark:bg-slate-800/75 backdrop-blur-sm px-2 py-0.5 rounded-md border border-blue-100/70 dark:border-slate-700/60 shadow-2xs">
-                    <Clock className="h-3 w-3 text-blue-500" />
-                    <span className="font-medium text-slate-700 dark:text-slate-300 text-[11px]">
-                      Shift: 09:00 AM - 06:00 PM
-                    </span>
-                  </div>
-
-                  {isClockedIn ? (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] border border-emerald-200/80 dark:border-emerald-800/80 shadow-2xs">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Punched In at {formattedPunchInTime}
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/75 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-medium text-[11px] border border-slate-200/60 dark:border-slate-700/60 shadow-2xs">
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                      Shift Not Started
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Clean typography without circles */}
-            <div className="hidden lg:flex flex-col items-end justify-center text-right pr-2 select-none">
-              <span className="text-xl sm:text-2xl font-serif italic font-black text-blue-900/90 dark:text-blue-100 tracking-tight drop-shadow-2xs">
-                Great Things Ahead
-              </span>
-              <span className="text-[11px] font-semibold text-blue-700/80 dark:text-blue-300/80">
-                Let's make today count ✨
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT: Work Timer Card (Col 4/3 on desktop) */}
-        <div className="lg:col-span-4 xl:col-span-3 rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                WORK TIMER
-              </span>
-            </div>
-            {isClockedIn ? (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 font-bold text-[9px] tracking-wider uppercase">
-                LIVE
-              </span>
-            ) : (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/60 font-bold text-[9px] tracking-wider uppercase">
-                READY
-              </span>
-            )}
-          </div>
-
-          <div className="my-1.5">
-            <div className="font-mono text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-wider">
-              {formatTimerHMS(secondsElapsed)}
-            </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-              {isClockedIn ? `Working • Started at ${formattedPunchInTime}` : "Ready to start today's shift"}
-            </p>
-          </div>
-
-          <button
-            onClick={handlePunchToggle}
-            className={cn(
-              'w-full flex items-center justify-center gap-1.5 rounded-xl py-2 px-3 text-xs font-bold text-white shadow-xs transition-all cursor-pointer',
-              isClockedIn
-                ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/20'
-                : 'bg-[#00B074] hover:bg-[#009668] shadow-emerald-500/20'
-            )}
-          >
-            {isClockedIn ? (
-              <>
-                <Square className="h-3 w-3 fill-current" />
-                <span>PUNCH OUT</span>
-              </>
-            ) : (
-              <>
-                <Play className="h-3 w-3 fill-current" />
-                <span>PUNCH IN</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+      {/* TOP HERO BANNER + WORK TIMER */}
+      <DashboardHeroBanner />
 
       {/* =========================================================================
           MAIN 12-COLUMN DASHBOARD GRID
@@ -902,8 +707,8 @@ export const EmployeeDashboardView: React.FC = () => {
                         t.priority === 'High'
                           ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400'
                           : t.priority === 'Medium'
-                          ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400'
-                          : 'bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400'
+                            ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400'
+                            : 'bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400'
                       )}
                     >
                       {t.priority}

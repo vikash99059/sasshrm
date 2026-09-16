@@ -51,27 +51,44 @@ export interface NavSection {
   items: NavItem[];
 }
 
-function getRawNavigationForRole(role: UserRole): NavSection[] {
-  switch (role) {
-    case 'saas_owner':
-      return [
-        {
-          sectionTitle: 'PLATFORM MANAGEMENT',
-          items: [
-            { title: 'Super Admin Overview', href: '/saas', icon: LayoutDashboard },
-            { title: 'Corporate Modules', href: '/saas/modules', icon: Boxes, badge: '17' },
-            { title: 'Organizations', href: '/saas/organizations', icon: Building2, badge: 'Active' },
-            // { title: 'Subscriptions', href: '/saas/subscriptions', icon: CreditCard },
-            { title: 'Plans & Pricing', href: '/saas/plans', icon: Layers },
-            { title: 'Billing & Invoices', href: '/saas/billing', icon: DollarSign },
-            { title: 'Revenue Analytics', href: '/saas/revenue', icon: BarChart3 },
-            { title: 'System Analytics', href: '/saas/analytics', icon: Compass },
-            { title: 'Audit Logs', href: '/saas/audit-logs', icon: ShieldCheck },
-            { title: 'System Settings', href: '/saas/settings', icon: Settings },
-          ]
-        }
-      ];
+function getRawNavigationForRole(role: UserRole, activeContext: 'organisation' | 'superadmin' = 'superadmin'): NavSection[] {
+  if (role === 'saas_owner') {
+    if (activeContext === 'organisation') {
+      return getRawNavigationForRole('org_admin', 'organisation');
+    }
 
+    return [
+      {
+        sectionTitle: 'PLATFORM MANAGEMENT',
+        items: [
+          { title: 'Super Admin Overview', href: '/saas', icon: LayoutDashboard },
+          { title: 'Corporate Modules', href: '/saas/modules', icon: Boxes, badge: '17' },
+          { title: 'Organizations', href: '/saas/organizations', icon: Building2, badge: 'Active' },
+          { title: 'Plans & Pricing', href: '/saas/plans', icon: Layers },
+          { title: 'Billing & Invoices', href: '/saas/billing', icon: DollarSign },
+        ]
+      },
+      {
+        sectionTitle: 'PLATFORM OPERATIONS',
+        items: [
+          { title: 'Platform Sales & Deals', href: '/saas/sales', icon: Briefcase },
+          { title: 'Platform Finance & Revenue', href: '/saas/revenue', icon: BarChart3 },
+          { title: 'Platform Hiring & Team', href: '/saas/hiring', icon: Users },
+          { title: 'Platform Support & Tickets', href: '/saas/tickets', icon: FileQuestion, badge: 'SLA' },
+        ]
+      },
+      {
+        sectionTitle: 'SYSTEM & GOVERNANCE',
+        items: [
+          { title: 'System Analytics', href: '/saas/analytics', icon: Compass },
+          { title: 'Audit Logs', href: '/saas/audit-logs', icon: ShieldCheck },
+          { title: 'System Settings', href: '/saas/settings', icon: Settings },
+        ]
+      }
+    ];
+  }
+
+  switch (role) {
     case 'manager':
       return [
         {
@@ -290,6 +307,7 @@ function getRawNavigationForRole(role: UserRole): NavSection[] {
         {
           sectionTitle: 'SUPPORT',
           items: [
+            { title: 'Clock In / Out', href: '/clock-in', icon: Clock, badge: 'Live', moduleId: 'employee_hr_management' },
             { title: 'Notifications', href: '/recruiter/notifications', icon: Bell, badge: '5', moduleId: 'recruitment_management' },
             { title: 'Help & Support', href: '/support', icon: HelpCircle },
           ],
@@ -332,6 +350,7 @@ function getRawNavigationForRole(role: UserRole): NavSection[] {
         {
           items: [
             { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+            { title: 'Clock In / Out', href: '/clock-in', icon: Clock, badge: 'Live', moduleId: 'employee_hr_management' },
             { title: 'Tasks', href: '/tasks', icon: ListTodo, badge: '4', moduleId: 'project_task_management' },
             { title: 'Calendar', href: '/calendar', icon: CalendarDays },
             { title: 'Timesheet', href: '/timesheets', icon: Clock, moduleId: 'employee_hr_management' },
@@ -492,9 +511,10 @@ function getRawNavigationForRole(role: UserRole): NavSection[] {
 export function getNavigationForRole(
   role: UserRole,
   subscribedModules?: CorporateModuleId[],
-  disabledSubModules?: Record<string, string[]>
+  disabledSubModules?: Record<string, string[]>,
+  activeContext: 'organisation' | 'superadmin' = 'superadmin'
 ): NavSection[] {
-  const rawSections = getRawNavigationForRole(role);
+  const rawSections = getRawNavigationForRole(role, activeContext);
   if (role === 'saas_owner' || !subscribedModules) {
     return rawSections;
   }

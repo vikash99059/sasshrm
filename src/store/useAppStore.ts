@@ -10,7 +10,8 @@ interface AppState {
   currentOrg: Organization;
   allOrgs: Organization[];
   allDemoUsers: User[];
-  
+  activeContext: 'organisation' | 'superadmin';
+
   // App Shell State
   sidebarCollapsed: boolean;
   mobileMenuOpen: boolean;
@@ -18,15 +19,16 @@ interface AppState {
   commandPaletteOpen: boolean;
   notificationsOpen: boolean;
   notifications: NotificationItem[];
-  
+
   // Live Clock In State
   isClockedIn: boolean;
   clockInTime: string | null;
   secondsElapsed: number;
-  
+
   // Actions
   switchRole: (role: UserRole) => Promise<void>;
   switchOrg: (orgId: string) => Promise<void>;
+  setActiveContext: (context: 'organisation' | 'superadmin') => void;
   toggleSidebar: () => void;
   setMobileMenuOpen: (open: boolean) => void;
   toggleDarkMode: () => void;
@@ -50,6 +52,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   currentOrg: currentOrg,
   allOrgs: allOrgs,
   allDemoUsers: authService.getAllDemoUsers(),
+  activeContext: initialUser.role === 'saas_owner' ? 'superadmin' : 'organisation',
 
   sidebarCollapsed: false,
   mobileMenuOpen: false,
@@ -67,7 +70,12 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({
       currentUser: updatedUser,
       currentRole: role,
+      activeContext: role === 'saas_owner' ? 'superadmin' : 'organisation',
     });
+  },
+
+  setActiveContext: (context: 'organisation' | 'superadmin') => {
+    set({ activeContext: context });
   },
 
   switchOrg: async (orgId: string) => {
@@ -80,7 +88,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   toggleSidebar: () => set(state => ({ sidebarCollapsed: !state.sidebarCollapsed })),
   setMobileMenuOpen: (open) => set({ mobileMenuOpen: open }),
-  
+
   toggleDarkMode: () => set(state => {
     const nextDark = !state.isDarkMode;
     if (nextDark) {

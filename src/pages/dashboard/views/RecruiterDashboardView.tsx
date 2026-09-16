@@ -34,6 +34,7 @@ import {
   Tooltip,
 } from 'recharts';
 import { Modal, Input, Select, Button, Badge } from '../../../components/ui';
+import { DashboardHeroBanner } from '../../../components/common/DashboardHeroBanner';
 import { recruitmentService } from '../../../services/recruitmentService';
 import {
   JobOpening,
@@ -370,6 +371,9 @@ export const RecruiterDashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* TOP HERO BANNER + WORK TIMER */}
+      <DashboardHeroBanner />
+
       {/* =========================================================================
           1. HEADER: Recruiter Greeting, Subtitle & Quick Actions
          ========================================================================= */}
@@ -465,11 +469,10 @@ export const RecruiterDashboardView: React.FC = () => {
 
               <div className="mt-2 pt-1 border-t border-slate-100 dark:border-slate-800/80">
                 <span
-                  className={`text-[10px] font-bold ${
-                    kpi.isPositive
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-blue-600 dark:text-blue-400'
-                  }`}
+                  className={`text-[10px] font-bold ${kpi.isPositive
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-blue-600 dark:text-blue-400'
+                    }`}
                 >
                   {kpi.trend}
                 </span>

@@ -17,6 +17,7 @@ export const Sidebar: React.FC = () => {
     currentRole,
     currentUser,
     currentOrg,
+    activeContext,
     sidebarCollapsed,
     toggleSidebar,
     mobileMenuOpen,
@@ -25,14 +26,15 @@ export const Sidebar: React.FC = () => {
   } = useAppStore();
 
   const companyName = currentRole === 'saas_owner'
-    ? 'Global Platform'
+    ? (activeContext === 'superadmin' ? 'Global SaaS Platform' : (currentOrg?.name || currentUser?.organizationName || 'Acme Corp'))
     : (currentOrg?.name || currentUser?.organizationName || 'Acme Corp');
 
   const location = useLocation();
   const navSections = getNavigationForRole(
     currentRole,
     currentOrg?.subscribedModules,
-    currentOrg?.disabledSubModules
+    currentOrg?.disabledSubModules,
+    activeContext
   );
   const currentPersona = ROLE_PERSONAS[currentRole] || ROLE_PERSONAS.employee;
 
