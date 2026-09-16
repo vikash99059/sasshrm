@@ -371,72 +371,52 @@ export const RecruiterDashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* TOP HERO BANNER + WORK TIMER */}
-      <DashboardHeroBanner />
+      {/* TOP HERO BANNER + WORK TIMER WITH COMPACT QUICK ACTIONS */}
+      <DashboardHeroBanner
+        actions={
+          <>
+            <button
+              onClick={() => setIsPostJobOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-xs font-bold text-white px-3 py-1.5 shadow-sm shadow-blue-500/20 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Create Job</span>
+            </button>
 
-      {/* =========================================================================
-          1. HEADER: Recruiter Greeting, Subtitle & Quick Actions
-         ========================================================================= */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-white dark:bg-dark-card p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-[11px] font-bold">
-              Talent Acquisition Hub
-            </span>
-            <span className="text-slate-300 dark:text-slate-600">•</span>
-            <span className="text-slate-500 dark:text-slate-400">Enterprise ATS</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-            Good Morning, {recruiterName} 👋
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Track your hiring activity, candidates and recruitment pipeline.
-          </p>
-        </div>
+            <button
+              onClick={() => setIsNewReqOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white/85 dark:bg-slate-800/85 backdrop-blur-md px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700/60 shadow-2xs hover:shadow-xs active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <FileText className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+              <span>New Requisition</span>
+            </button>
 
-        {/* Quick Actions Buttons */}
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => setIsPostJobOpen(true)}
-            className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm shadow-blue-500/20 hover:bg-blue-700 transition-all cursor-pointer"
-          >
-            <Plus className="h-4 w-4" />
-            <span>+ Create Job</span>
-          </button>
+            <button
+              onClick={() => setIsAddCandOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white/85 dark:bg-slate-800/85 backdrop-blur-md px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700/60 shadow-2xs hover:shadow-xs active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <Users className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Add Candidate</span>
+            </button>
 
-          <button
-            onClick={() => setIsNewReqOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-          >
-            <FileText className="h-3.5 w-3.5 text-slate-500" />
-            <span>New Requisition</span>
-          </button>
+            <button
+              onClick={() => setIsScheduleInterviewOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white/85 dark:bg-slate-800/85 backdrop-blur-md px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700/60 shadow-2xs hover:shadow-xs active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <Calendar className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+              <span>Schedule Interview</span>
+            </button>
 
-          <button
-            onClick={() => setIsAddCandOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-          >
-            <Users className="h-3.5 w-3.5 text-slate-500" />
-            <span>Add Candidate</span>
-          </button>
-
-          <button
-            onClick={() => setIsScheduleInterviewOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-          >
-            <Calendar className="h-3.5 w-3.5 text-slate-500" />
-            <span>Schedule Interview</span>
-          </button>
-
-          <button
-            onClick={() => setIsCreateOfferOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-          >
-            <CreditCard className="h-3.5 w-3.5 text-slate-500" />
-            <span>Create Offer</span>
-          </button>
-        </div>
-      </div>
+            <button
+              onClick={() => setIsCreateOfferOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white/85 dark:bg-slate-800/85 backdrop-blur-md px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700/60 shadow-2xs hover:shadow-xs active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <CreditCard className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+              <span>Create Offer</span>
+            </button>
+          </>
+        }
+      />
 
       {/* =========================================================================
           2. 8 COMPACT PROFESSIONAL KPI CARDS

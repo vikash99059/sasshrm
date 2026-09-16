@@ -112,42 +112,27 @@ export const HrAdminDashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* TOP HERO BANNER + WORK TIMER */}
-      <DashboardHeroBanner />
-
-      {/* HEADER: HR Admin Greeting & Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
-            <span>Human Resources</span>
-            <span>&gt;</span>
-            <span className="text-slate-600 dark:text-slate-300">HR Admin Control Hub</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-            HR Admin Workspace <span className="text-2xl">👥</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            Organization-wide employee management, leave governance, onboarding, and compliance records.
-          </p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            onClick={() => setIsAddEmployeeOpen(true)}
-            className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/20 hover:bg-blue-700 transition-all"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Employee</span>
-          </button>
-          <button
-            onClick={() => navigate('/leave/requests')}
-            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-50 dark:border-slate-800 dark:bg-dark-card dark:text-slate-200"
-          >
-            <span>HR Approvals</span>
-          </button>
-        </div>
-      </div>
+      {/* TOP HERO BANNER + WORK TIMER WITH COMPACT QUICK ACTIONS */}
+      <DashboardHeroBanner
+        actions={
+          <>
+            <button
+              onClick={() => setIsAddEmployeeOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-xs font-bold text-white px-3 py-1.5 shadow-sm shadow-blue-500/20 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Add Employee</span>
+            </button>
+            <button
+              onClick={() => navigate('/leave/requests')}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white/85 dark:bg-slate-800/85 backdrop-blur-md px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700/60 shadow-2xs hover:shadow-xs active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <FileCheck className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+              <span>HR Approvals</span>
+            </button>
+          </>
+        }
+      />
 
       {/* 6 HR ADMIN KPI CARDS */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
