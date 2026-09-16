@@ -33,6 +33,7 @@ import {
   Tooltip,
 } from 'recharts';
 import { Modal, Input, Select, Button, Badge } from '../../../components/ui';
+import { DashboardHeroBanner } from '../../../components/common/DashboardHeroBanner';
 
 export const ManagerDashboardView: React.FC = () => {
   const navigate = useNavigate();
@@ -96,6 +97,9 @@ export const ManagerDashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* TOP HERO BANNER + WORK TIMER */}
+      <DashboardHeroBanner />
+
       {/* HEADER: Manager Greeting & Controls */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -149,11 +153,10 @@ export const ManagerDashboardView: React.FC = () => {
               </div>
               <div className="flex items-baseline justify-between mt-1">
                 <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{kpi.value}</span>
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
-                  kpi.isPositive ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' :
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${kpi.isPositive ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' :
                   kpi.isNeutral ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400' :
-                  'bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400'
-                }`}>
+                    'bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400'
+                  }`}>
                   {kpi.change}
                 </span>
               </div>
@@ -241,11 +244,10 @@ export const ManagerDashboardView: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                    tm.status === 'Online' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300' :
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${tm.status === 'Online' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300' :
                     tm.status === 'On Leave' ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-300' :
-                    'bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300'
-                  }`}>
+                      'bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300'
+                    }`}>
                     {tm.status}
                   </span>
                   <span className="text-[11px] font-semibold text-slate-500 tabular-nums hidden sm:inline">{tm.hoursThisWeek}</span>

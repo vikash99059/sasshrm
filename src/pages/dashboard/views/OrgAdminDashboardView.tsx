@@ -39,6 +39,7 @@ import {
   Tooltip,
 } from 'recharts';
 import { Modal, Input, Select, Button } from '../../../components/ui';
+import { DashboardHeroBanner } from '../../../components/common/DashboardHeroBanner';
 
 export const OrgAdminDashboardView: React.FC = () => {
   const navigate = useNavigate();
@@ -178,6 +179,9 @@ export const OrgAdminDashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* TOP HERO BANNER + WORK TIMER */}
+      <DashboardHeroBanner />
+
       {/* PAGE HEADER */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -244,10 +248,9 @@ export const OrgAdminDashboardView: React.FC = () => {
                       {kpi.value}
                     </span>
                     <span
-                      className={`inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold ${
-                        kpi.isNeutral ? 'bg-amber-50 text-amber-600' :
+                      className={`inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold ${kpi.isNeutral ? 'bg-amber-50 text-amber-600' :
                         kpi.isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
-                      }`}
+                        }`}
                     >
                       {kpi.change}
                     </span>

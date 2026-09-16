@@ -35,6 +35,7 @@ import {
   Tooltip
 } from 'recharts';
 import { Modal, Input, Select, Button, Badge } from '../../../components/ui';
+import { DashboardHeroBanner } from '../../../components/common/DashboardHeroBanner';
 
 export const SaasOwnerDashboardView: React.FC = () => {
   const navigate = useNavigate();
@@ -91,6 +92,9 @@ export const SaasOwnerDashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
+      {/* TOP HERO BANNER + WORK TIMER */}
+      <DashboardHeroBanner />
+
       {/* Top Banner Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 p-6 rounded-2xl text-white shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />

@@ -10,7 +10,9 @@ import {
   Moon,
   ChevronDown,
   Building,
+  Building2,
   Shield,
+  Clock,
   HelpCircle,
   LogOut,
   Settings,
@@ -27,6 +29,8 @@ export const Header: React.FC = () => {
     currentUser,
     currentOrg,
     allOrgs,
+    activeContext,
+    setActiveContext,
     switchRole,
     switchOrg,
     isDarkMode,
@@ -148,26 +152,52 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Live Clock-In Duration Tracker */}
-        {isClockedIn && (
-          <div
-            onClick={() => navigate('/clock-in')}
-            className="hidden 2xl:flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 cursor-pointer hover:bg-emerald-100 transition-all dark:bg-emerald-950/40 dark:border-emerald-800"
-            title="Click to view attendance screen"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
-              Working: {formatTimer(secondsElapsed)}
-            </span>
-          </div>
-        )}
       </div>
 
-      {/* Right Section: Org Selector + Language + Theme + Notifications + Messages + Help + User Profile */}
+      {/* Right Section: Context Switcher + Org Selector + Language + Theme + Notifications + Messages + Help + User Profile */}
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* Dual Context Switcher for Platform Owner / Super Admin */}
+        {currentRole === 'saas_owner' && (
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold">
+            <button
+              onClick={() => {
+                setActiveContext('organisation');
+                if (location.pathname.startsWith('/saas')) {
+                  navigate('/dashboard');
+                }
+              }}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer',
+                activeContext === 'organisation'
+                  ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs font-bold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              )}
+              title="Switch to Organisation Context (Company Management)"
+            >
+              <Building2 className="h-3.5 w-3.5" />
+              <span>Organisation</span>
+            </button>
+            <button
+              onClick={() => {
+                setActiveContext('superadmin');
+                if (!location.pathname.startsWith('/saas')) {
+                  navigate('/saas');
+                }
+              }}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer',
+                activeContext === 'superadmin'
+                  ? 'bg-purple-600 text-white shadow-xs font-bold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              )}
+              title="Switch to Super Admin Context (SaaS Platform Management)"
+            >
+              <Shield className="h-3.5 w-3.5" />
+              <span>Super Admin</span>
+            </button>
+          </div>
+        )}
+
         {/* Organization Switcher */}
         {currentRole !== 'saas_owner' && (
           <div className="relative hidden md:block" ref={orgDropdownRef}>

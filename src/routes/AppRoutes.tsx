@@ -135,6 +135,9 @@ export const AppRoutes: React.FC = () => {
         <Route path="/saas/plans" element={<SaasPlansPage />} />
         <Route path="/saas/billing" element={<SaasBillingInvoicesPage />} />
         <Route path="/saas/revenue" element={<SaasRevenueAnalyticsPage />} />
+        <Route path="/saas/sales" element={<SaasRevenueAnalyticsPage />} />
+        <Route path="/saas/hiring" element={<EmployeesListPage />} />
+        <Route path="/saas/tickets" element={<RequestsPage />} />
         <Route path="/saas/analytics" element={<SaasSystemAnalyticsPage />} />
         <Route path="/saas/audit-logs" element={<SaasAuditLogsPage />} />
         <Route path="/saas/settings" element={<SaasSettingsPage />} />

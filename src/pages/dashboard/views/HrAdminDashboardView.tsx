@@ -34,6 +34,7 @@ import {
   Tooltip,
 } from 'recharts';
 import { Modal, Input, Select, Button, Badge } from '../../../components/ui';
+import { DashboardHeroBanner } from '../../../components/common/DashboardHeroBanner';
 
 export const HrAdminDashboardView: React.FC = () => {
   const navigate = useNavigate();
@@ -111,6 +112,9 @@ export const HrAdminDashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* TOP HERO BANNER + WORK TIMER */}
+      <DashboardHeroBanner />
+
       {/* HEADER: HR Admin Greeting & Controls */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -128,7 +132,7 @@ export const HrAdminDashboardView: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => setIsAddEmployeeOpen(true)}
             className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/20 hover:bg-blue-700 transition-all"
@@ -159,11 +163,10 @@ export const HrAdminDashboardView: React.FC = () => {
               </div>
               <div className="flex items-baseline justify-between mt-1">
                 <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{kpi.value}</span>
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
-                  kpi.isPositive ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' :
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${kpi.isPositive ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' :
                   kpi.isNeutral ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400' :
-                  'bg-rose-50 text-rose-600'
-                }`}>
+                    'bg-rose-50 text-rose-600'
+                  }`}>
                   {kpi.change}
                 </span>
               </div>
@@ -278,9 +281,8 @@ export const HrAdminDashboardView: React.FC = () => {
               <div key={idx} className="p-3 rounded-xl bg-slate-50 border border-slate-100 dark:bg-slate-800/40 dark:border-slate-800 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-900 dark:text-white">{doc.title}</span>
-                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                    doc.status === 'Verified' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
-                  }`}>
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${doc.status === 'Verified' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                    }`}>
                     {doc.status}
                   </span>
                 </div>
