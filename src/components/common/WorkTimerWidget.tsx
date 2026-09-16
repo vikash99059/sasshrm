@@ -1,5 +1,6 @@
 import React from 'react';
 import { Clock, Play, Square, Coffee } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { useAppStore } from '../../store/useAppStore';
 import { cn } from '../../utils';
 
@@ -32,10 +33,37 @@ export const WorkTimerWidget: React.FC<WorkTimerWidgetProps> = ({ className }) =
 
     const totalBreakMins = Math.floor(totalBreakSeconds / 60);
 
+    const triggerCelebration = () => {
+        // Balloon/Confetti burst animation
+        confetti({
+            particleCount: 80,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#00B074', '#3B82F6', '#F59E0B', '#EC4899', '#8B5CF6']
+        });
+        setTimeout(() => {
+            confetti({
+                particleCount: 50,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0.1, y: 0.7 },
+                colors: ['#00B074', '#3B82F6', '#F59E0B']
+            });
+            confetti({
+                particleCount: 50,
+                angle: 120,
+                spread: 55,
+                origin: { x: 0.9, y: 0.7 },
+                colors: ['#EC4899', '#8B5CF6', '#3B82F6']
+            });
+        }, 180);
+    };
+
     const handlePunchToggle = () => {
         if (isClockedIn) {
             setClockInState(false);
         } else {
+            triggerCelebration();
             setClockInState(true, new Date().toISOString());
         }
     };

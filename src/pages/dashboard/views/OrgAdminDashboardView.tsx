@@ -9,7 +9,6 @@ import {
   Briefcase,
   Calendar,
   Plus,
-  MoreHorizontal,
   ChevronDown,
   TrendingUp,
   Cake,
@@ -18,9 +17,23 @@ import {
   DollarSign,
   AlertCircle,
   FileCheck,
-  FileSpreadsheet,
   Download,
   Check,
+  Building2,
+  Sparkles,
+  ShieldCheck,
+  Layers,
+  ArrowUpRight,
+  Send,
+  MoreVertical,
+  Sliders,
+  Filter,
+  BarChart3,
+  Search,
+  ChevronRight,
+  ExternalLink,
+  Gift,
+  PartyPopper
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -44,230 +57,345 @@ import { DashboardHeroBanner } from '../../../components/common/DashboardHeroBan
 export const OrgAdminDashboardView: React.FC = () => {
   const navigate = useNavigate();
 
-  const [dateRange, setDateRange] = useState('May 20 - May 26, 2024');
+  // Filter & dropdown states
+  const [dateRange, setDateRange] = useState('This Week (Sep 14 - Sep 20, 2026)');
   const [dateDropdownOpen, setDateDropdownOpen] = useState(false);
   const [attendancePeriod, setAttendancePeriod] = useState<'Weekly' | 'Monthly' | 'Yearly'>('Weekly');
-  const [attendanceDropdownOpen, setAttendanceDropdownOpen] = useState(false);
-  const [leavePeriod, setLeavePeriod] = useState<'This Month' | 'Last Month' | 'This Year'>('This Month');
-  const [leaveDropdownOpen, setLeaveDropdownOpen] = useState(false);
-  const [growthPeriod, setGrowthPeriod] = useState<'Last 6 Months' | 'Last 12 Months' | 'This Year'>('Last 6 Months');
-  const [growthDropdownOpen, setGrowthDropdownOpen] = useState(false);
-  const [deptFilter, setDeptFilter] = useState<'All Departments' | 'Engineering' | 'Marketing' | 'Sales'>('All Departments');
-  const [deptDropdownOpen, setDeptDropdownOpen] = useState(false);
-  const [moreActionsOpen, setMoreActionsOpen] = useState(false);
-  const [isAddEmployeeOpen, setIsAddEmployeeOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // 6 Org Admin KPI Cards
+  // Modal states
+  const [isAddEmployeeOpen, setIsAddEmployeeOpen] = useState(false);
+  const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
+
+  // Add employee form
+  const [empName, setEmpName] = useState('');
+  const [empEmail, setEmpEmail] = useState('');
+  const [empDept, setEmpDept] = useState('Engineering');
+  const [empRole, setEmpRole] = useState('Software Engineer');
+  const [empJoinDate, setEmpJoinDate] = useState('2026-10-01');
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  // 6 Executive Org Admin KPI Cards with sparkline trends
   const kpiCards = [
-    { title: 'Total Employees', value: '248', change: '+12%', isPositive: true, subtext: 'vs last week: 221', icon: Users, iconBg: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400', strokeColor: '#3B82F6', sparkline: [{ v: 210 }, { v: 218 }, { v: 224 }, { v: 220 }, { v: 235 }, { v: 242 }, { v: 248 }] },
-    { title: 'Present Today', value: '236', change: '+8%', isPositive: true, subtext: 'vs yesterday: 218', icon: UserCheck, iconBg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400', strokeColor: '#10B981', sparkline: [{ v: 200 }, { v: 212 }, { v: 225 }, { v: 218 }, { v: 230 }, { v: 228 }, { v: 236 }] },
-    { title: 'On Leave', value: '12', change: '-4%', isPositive: false, subtext: 'vs yesterday: 16', icon: CalendarMinus, iconBg: 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400', strokeColor: '#F43F5E', sparkline: [{ v: 18 }, { v: 16 }, { v: 14 }, { v: 15 }, { v: 13 }, { v: 14 }, { v: 12 }] },
-    { title: 'New Employees', value: '8', change: '+25%', isPositive: true, subtext: 'vs last month: 6', icon: UserPlus, iconBg: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400', strokeColor: '#6366F1', sparkline: [{ v: 3 }, { v: 4 }, { v: 5 }, { v: 4 }, { v: 6 }, { v: 7 }, { v: 8 }] },
-    { title: 'Pending Approvals', value: '6', change: '0%', isNeutral: true, subtext: 'vs yesterday: 6', icon: Clock, iconBg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400', strokeColor: '#F59E0B', sparkline: [{ v: 5 }, { v: 6 }, { v: 7 }, { v: 6 }, { v: 8 }, { v: 7 }, { v: 6 }] },
-    { title: 'Open Positions', value: '5', change: '+40%', isPositive: true, subtext: 'vs last month: 3', icon: Briefcase, iconBg: 'bg-cyan-50 text-cyan-600 dark:bg-cyan-950/60 dark:text-cyan-400', strokeColor: '#06B6D4', sparkline: [{ v: 2 }, { v: 3 }, { v: 3 }, { v: 4 }, { v: 4 }, { v: 5 }, { v: 5 }] },
+    {
+      title: 'Total Workforce',
+      value: '248',
+      change: '+12.4%',
+      isPositive: true,
+      subtext: 'vs last month (221)',
+      icon: Users,
+      iconBg: 'bg-blue-50 text-blue-600 dark:bg-blue-950/80 dark:text-blue-400',
+      strokeColor: '#3B82F6',
+      sparkline: [{ v: 210 }, { v: 218 }, { v: 224 }, { v: 220 }, { v: 235 }, { v: 242 }, { v: 248 }]
+    },
+    {
+      title: 'Present Today',
+      value: '236',
+      change: '95.1%',
+      isPositive: true,
+      subtext: '12 on approved leave',
+      icon: UserCheck,
+      iconBg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/80 dark:text-emerald-400',
+      strokeColor: '#10B981',
+      sparkline: [{ v: 200 }, { v: 212 }, { v: 225 }, { v: 218 }, { v: 230 }, { v: 228 }, { v: 236 }]
+    },
+    {
+      title: 'On Leave',
+      value: '12',
+      change: '-4.2%',
+      isPositive: false,
+      subtext: '8 planned • 4 sick leaves',
+      icon: CalendarMinus,
+      iconBg: 'bg-rose-50 text-rose-600 dark:bg-rose-950/80 dark:text-rose-400',
+      strokeColor: '#F43F5E',
+      sparkline: [{ v: 18 }, { v: 16 }, { v: 14 }, { v: 15 }, { v: 13 }, { v: 14 }, { v: 12 }]
+    },
+    {
+      title: 'New Hires (Q3)',
+      value: '18',
+      change: '+28.5%',
+      isPositive: true,
+      subtext: '8 onboarded this month',
+      icon: UserPlus,
+      iconBg: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400',
+      strokeColor: '#6366F1',
+      sparkline: [{ v: 3 }, { v: 6 }, { v: 8 }, { v: 11 }, { v: 14 }, { v: 16 }, { v: 18 }]
+    },
+    {
+      title: 'Pending Approvals',
+      value: '6',
+      change: 'Action',
+      isNeutral: true,
+      subtext: '3 leaves • 2 expenses • 1 doc',
+      icon: Clock,
+      iconBg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/80 dark:text-amber-400',
+      strokeColor: '#F59E0B',
+      sparkline: [{ v: 8 }, { v: 7 }, { v: 9 }, { v: 7 }, { v: 8 }, { v: 6 }, { v: 6 }]
+    },
+    {
+      title: 'Open Requisitions',
+      value: '5',
+      change: 'Active',
+      isPositive: true,
+      subtext: '42 candidates in pipeline',
+      icon: Briefcase,
+      iconBg: 'bg-cyan-50 text-cyan-600 dark:bg-cyan-950/80 dark:text-cyan-400',
+      strokeColor: '#06B6D4',
+      sparkline: [{ v: 2 }, { v: 3 }, { v: 3 }, { v: 4 }, { v: 4 }, { v: 5 }, { v: 5 }]
+    },
   ];
 
   // Attendance Overview Line Chart Data
   const attendanceData = [
-    { date: 'May 20', present: 160, absent: 85, late: 45 },
-    { date: 'May 21', present: 185, absent: 90, late: 50 },
-    { date: 'May 22', present: 170, absent: 80, late: 40 },
-    { date: 'May 23', present: 235, absent: 95, late: 60 },
-    { date: 'May 24', present: 215, absent: 90, late: 55 },
-    { date: 'May 25', present: 180, absent: 75, late: 35 },
-    { date: 'May 26', present: 230, absent: 100, late: 70 },
+    { date: 'Mon, Sep 14', present: 232, absent: 16, late: 8 },
+    { date: 'Tue, Sep 15', present: 238, absent: 10, late: 12 },
+    { date: 'Wed, Sep 16', present: 236, absent: 12, late: 9 },
+    { date: 'Thu, Sep 17', present: 240, absent: 8, late: 14 },
+    { date: 'Fri, Sep 18', present: 235, absent: 13, late: 11 },
+    { date: 'Sat, Sep 19', present: 195, absent: 53, late: 5 },
+    { date: 'Sun, Sep 20', present: 180, absent: 68, late: 4 },
   ];
 
   // Leave Overview Donut Data
   const leaveData = [
     { name: 'Approved', value: 68, percentage: '36.6%', color: '#3B82F6' },
-    { name: 'Pending', value: 48, percentage: '25.8%', color: '#10B981' },
+    { name: 'Pending Review', value: 48, percentage: '25.8%', color: '#10B981' },
     { name: 'Rejected', value: 12, percentage: '6.5%', color: '#F59E0B' },
     { name: 'Cancelled', value: 8, percentage: '4.3%', color: '#EF4444' },
-    { name: 'Others', value: 50, percentage: '26.9%', color: '#8B5CF6' },
+    { name: 'Maternity / Paternity', value: 50, percentage: '26.9%', color: '#8B5CF6' },
   ];
 
   // Growth Data
   const growthData = [
-    { month: 'Jan', total: 140, newHires: 18 },
-    { month: 'Feb', total: 180, newHires: 24 },
-    { month: 'Mar', total: 220, newHires: 32 },
-    { month: 'Apr', total: 260, newHires: 38 },
-    { month: 'May', total: 290, newHires: 42 },
-    { month: 'Jun', total: 320, newHires: 48 },
-    { month: 'Jul', total: 360, newHires: 55 },
+    { month: 'Apr', headcount: 210, newHires: 12 },
+    { month: 'May', headcount: 221, newHires: 15 },
+    { month: 'Jun', headcount: 228, newHires: 14 },
+    { month: 'Jul', headcount: 236, newHires: 16 },
+    { month: 'Aug', headcount: 242, newHires: 18 },
+    { month: 'Sep', headcount: 248, newHires: 20 },
   ];
 
   // Department Distribution
   const deptData = [
-    { name: 'Engineering', value: 28, color: '#3B82F6' },
-    { name: 'Marketing', value: 16, color: '#06B6D4' },
-    { name: 'HR', value: 12, color: '#10B981' },
-    { name: 'Sales', value: 14, color: '#F59E0B' },
-    { name: 'Finance', value: 10, color: '#EC4899' },
-    { name: 'Operations', value: 8, color: '#8B5CF6' },
+    { name: 'Engineering', count: 98, percentage: '39.5%', color: '#3B82F6' },
+    { name: 'Marketing', count: 42, percentage: '16.9%', color: '#06B6D4' },
+    { name: 'Sales & BD', count: 38, percentage: '15.3%', color: '#F59E0B' },
+    { name: 'Human Resources', count: 28, percentage: '11.3%', color: '#10B981' },
+    { name: 'Finance & Legal', count: 24, percentage: '9.7%', color: '#EC4899' },
+    { name: 'Operations', count: 18, percentage: '7.3%', color: '#8B5CF6' },
   ];
 
   // Top Performing Departments
   const topPerformers = [
-    { name: 'Engineering', percentage: 92, barGradient: 'from-blue-500 to-indigo-600' },
-    { name: 'Marketing', percentage: 78, barGradient: 'from-purple-500 to-violet-600' },
-    { name: 'Sales', percentage: 72, barGradient: 'from-teal-400 to-emerald-500' },
-    { name: 'Finance', percentage: 68, barGradient: 'from-amber-400 to-orange-500' },
-    { name: 'HR', percentage: 61, barGradient: 'from-yellow-400 to-amber-500' },
-    { name: 'Operations', percentage: 55, barGradient: 'from-pink-500 to-rose-500' },
+    { name: 'Engineering & DevOps', rating: '96%', score: 96, barGradient: 'from-blue-500 to-indigo-600', lead: 'Sarah Chen' },
+    { name: 'Product Marketing', rating: '91%', score: 91, barGradient: 'from-cyan-400 to-blue-500', lead: 'Alex Vance' },
+    { name: 'Enterprise Sales', rating: '88%', score: 88, barGradient: 'from-emerald-400 to-teal-600', lead: 'Michael Chang' },
+    { name: 'Finance & Accounting', rating: '84%', score: 84, barGradient: 'from-amber-400 to-orange-500', lead: 'Priya Sharma' },
+    { name: 'People & Culture', rating: '82%', score: 82, barGradient: 'from-purple-400 to-pink-500', lead: 'Jessica Miller' },
   ];
 
-  // Recent Joiners List
+  // Recent Joiners List (4 Items)
   const recentEmployeesList = [
-    { id: 'EMP-01', name: 'James Miller', department: 'Marketing', joiningDate: 'May 20, 2024', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80' },
-    { id: 'EMP-02', name: 'Sophia Davis', department: 'Engineering', joiningDate: 'May 18, 2024', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80' },
-    { id: 'EMP-03', name: 'William Brown', department: 'Sales', joiningDate: 'May 16, 2024', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80' },
-    { id: 'EMP-04', name: 'Olivia Wilson', department: 'HR', joiningDate: 'May 14, 2024', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80' },
-    { id: 'EMP-05', name: 'Liam Garcia', department: 'Finance', joiningDate: 'May 12, 2024', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80' },
+    { id: 'EMP-0881', name: 'James Miller', role: 'Staff Marketing Lead', department: 'Marketing', joiningDate: 'Sep 12, 2026', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80' },
+    { id: 'EMP-0882', name: 'Sophia Davis', role: 'Senior React Architect', department: 'Engineering', joiningDate: 'Sep 08, 2026', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80' },
+    { id: 'EMP-0883', name: 'William Brown', role: 'Account Executive', department: 'Sales & BD', joiningDate: 'Sep 04, 2026', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80' },
+    { id: 'EMP-0884', name: 'Olivia Wilson', role: 'HR Business Partner', department: 'Human Resources', joiningDate: 'Aug 28, 2026', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80' },
   ];
 
-  // Pending Approvals
+  // Pending Approvals (4 Items)
   const pendingApprovalsList = [
-    { title: 'Leave Requests', count: '3 pending', icon: CalendarMinus, color: 'text-amber-600', bg: 'bg-amber-50', badgeBg: 'bg-amber-50 text-amber-600' },
-    { title: 'Expense Claims', count: '2 pending', icon: DollarSign, color: 'text-blue-600', bg: 'bg-blue-50', badgeBg: 'bg-blue-50 text-blue-600' },
-    { title: 'Timesheet Approval', count: '1 pending', icon: Clock, color: 'text-purple-600', bg: 'bg-purple-50', badgeBg: 'bg-purple-50 text-purple-600' },
-    { title: 'Recruitment Approval', count: '1 pending', icon: UserPlus, color: 'text-emerald-600', bg: 'bg-emerald-50', badgeBg: 'bg-emerald-50 text-emerald-600' },
-    { title: 'Document Verification', count: '1 pending', icon: FileCheck, color: 'text-rose-600', bg: 'bg-rose-50', badgeBg: 'bg-rose-50 text-rose-600' },
+    { title: 'Annual Leave Requests', count: '3 pending', subtitle: '3 awaiting review', icon: CalendarMinus, iconBg: 'bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400', badgeBg: 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60', route: '/leave/manage' },
+    { title: 'Executive Expense Claims', count: '2 pending', subtitle: '2 awaiting approval', icon: DollarSign, iconBg: 'bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400', badgeBg: 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/60', route: '/payroll' },
+    { title: 'Overtime & Shift Logs', count: '1 pending', subtitle: '1 timesheet signoff', icon: Clock, iconBg: 'bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-400', badgeBg: 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800/60', route: '/attendance' },
+    { title: 'Hiring Requisitions', count: '1 pending', subtitle: '1 position approval', icon: UserPlus, iconBg: 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400', badgeBg: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60', route: '/recruitment' },
   ];
 
-  // Upcoming Birthdays
+  // Upcoming Birthdays (4 Items)
   const birthdaysList = [
-    { name: 'Sarah Wilson', department: 'Marketing', date: 'May 25', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80' },
-    { name: 'James Miller', department: 'Engineering', date: 'May 30', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80' },
-    { name: 'Emily Davis', department: 'HR', date: 'Jun 02', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80' },
-    { name: 'Michael Taylor', department: 'Sales', date: 'Jun 05', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80' },
+    { name: 'Sarah Wilson', department: 'Marketing', date: 'Tomorrow 🎂', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80' },
+    { name: 'James Miller', department: 'Engineering', date: 'Sep 22 🎂', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80' },
+    { name: 'Emily Davis', department: 'Human Resources', date: 'Sep 25 🎂', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80' },
+    { name: 'Michael Taylor', department: 'Sales & BD', date: 'Oct 02 🎂', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80' },
   ];
 
-  // Work Anniversaries
+  // Work Anniversaries (4 Items)
   const anniversariesList = [
-    { name: 'David Anderson', department: 'Engineering', years: '3 years', date: 'May 22', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80' },
-    { name: 'Sophia Martinez', department: 'Marketing', years: '1 year', date: 'May 24', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80' },
-    { name: 'Robert Thomas', department: 'Sales', years: '5 years', date: 'May 28', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80' },
+    { name: 'David Anderson', department: 'Engineering', years: '4 Years', medal: '🎖️', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80' },
+    { name: 'Sophia Martinez', department: 'Marketing', years: '2 Years', medal: '🎖️', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80' },
+    { name: 'Robert Thomas', department: 'Sales & BD', years: '5 Years', medal: '🏆', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80' },
+    { name: 'Priya Sharma', department: 'Finance & Legal', years: '3 Years', medal: '🎖️', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80' },
   ];
 
   // Right Sidebar Notifications
   const recentNotificationsList = [
-    { title: 'Leave Approved', desc: "Sarah Wilson's leave request has been approved.", time: '30m ago', icon: CheckCircle2, iconBg: 'bg-emerald-50 text-emerald-600' },
-    { title: 'New Employee', desc: 'James Miller has joined the Marketing team.', time: '2h ago', icon: UserPlus, iconBg: 'bg-blue-50 text-blue-600' },
-    { title: 'Payroll Processed', desc: 'April payroll has been processed successfully.', time: '5h ago', icon: DollarSign, iconBg: 'bg-teal-50 text-teal-600' },
-    { title: 'Interview Scheduled', desc: 'Interview with John Doe at 10:00 AM.', time: '6h ago', icon: Calendar, iconBg: 'bg-purple-50 text-purple-600' },
-    { title: 'Document Expiry', desc: 'Passport will expire in 15 days.', time: '8h ago', icon: AlertCircle, iconBg: 'bg-amber-50 text-amber-600' },
+    { title: 'Leave Approved', desc: "Sarah Wilson's annual leave request was approved.", time: '15m ago', icon: CheckCircle2, iconBg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400' },
+    { title: 'New Employee Joined', desc: 'James Miller has onboarded in Marketing.', time: '2h ago', icon: UserPlus, iconBg: 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400' },
+    { title: 'Payroll Dispatched', desc: 'August salary disbursement confirmed.', time: '4h ago', icon: DollarSign, iconBg: 'bg-teal-50 text-teal-600 dark:bg-teal-950 dark:text-teal-400' },
+    { title: 'Compliance Audit Ready', desc: 'Q3 statutory compliance verified (100%).', time: '6h ago', icon: ShieldCheck, iconBg: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400' },
   ];
 
   // Upcoming Events
   const upcomingEventsList = [
-    { month: 'MAY', day: '28', title: 'Executive Board Meeting', time: '10:00 AM - 11:00 AM', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-    { month: 'MAY', day: '29', title: 'Product Roadmap Sync', time: '02:00 PM - 04:00 PM', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
-    { month: 'MAY', day: '30', title: 'Birthday - Sarah Wilson', time: 'All Day', color: 'bg-rose-50 text-rose-700 border-rose-200' },
-    { month: 'JUN', day: '02', title: 'Quarterly HR Governance', time: '11:00 AM - 12:00 PM', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+    { month: 'SEP', day: '18', title: 'Executive Townhall & Q3 Review', time: '10:00 AM - 11:30 AM', color: 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border-blue-200 dark:border-blue-800' },
+    { month: 'SEP', day: '22', title: 'Product Roadmap & Engineering Sync', time: '02:00 PM - 03:30 PM', color: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800' },
+    { month: 'SEP', day: '25', title: 'All-Hands Global Celebration', time: '04:00 PM - 05:00 PM', color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' },
   ];
 
-  // Recent Activities
-  const recentActivitiesList = [
-    { user: 'Rahul Sharma', action: 'Updated employee profile', time: '2h ago', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80' },
-    { user: 'Priya Nair', action: 'Applied for leave', time: '3h ago', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80' },
-    { user: 'Finance Team', action: 'Expense claim approved', time: '4h ago', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80' },
-    { user: 'System', action: 'Automated backup completed', time: '5h ago', isSystem: true },
-    { user: 'Amit Patel', action: 'Joined the company', time: '6h ago', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80' },
-  ];
+  const handleAddEmployeeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    showToast(`Employee ${empName} added and onboarding portal invite dispatched!`);
+    setIsAddEmployeeOpen(false);
+    setEmpName('');
+    setEmpEmail('');
+  };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* TOP HERO BANNER + WORK TIMER */}
-      <DashboardHeroBanner />
-
-      {/* PAGE HEADER */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
-            <span>Executive Portal</span>
-            <span>&gt;</span>
-            <span className="text-slate-600 dark:text-slate-300">Organization Overview</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-            Organization Command Center <span className="text-2xl">🏢</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            Complete executive snapshot of headcount, operational attendance, growth metrics and financial approvals.
-          </p>
+    <div className="space-y-6 pb-12 animate-in fade-in duration-300">
+      {/* TOAST ALERT */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-slate-900/95 dark:bg-slate-100 text-white dark:text-slate-900 shadow-2xl backdrop-blur-md border border-slate-800 dark:border-slate-200 text-xs font-semibold animate-in slide-in-from-bottom-5">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 dark:text-emerald-600 flex-shrink-0" />
+          <span>{toastMessage}</span>
         </div>
+      )}
 
-        {/* Right Header Controls */}
-        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-          <div className="relative">
+      {/* 1. TOP HERO BANNER + WORK TIMER */}
+      <DashboardHeroBanner
+        employeeName="Apex Global Corp - Admin"
+        employeeDesignation="Organization Administrator"
+        employeeDepartment="Executive Leadership & Workforce Ops"
+        employeeId="ORG-8890"
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => setDateDropdownOpen(!dateDropdownOpen)}
-              className="flex items-center gap-2 rounded-xl border border-slate-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-50 dark:border-slate-800 dark:bg-dark-card dark:text-slate-200"
+              onClick={() => setIsAddEmployeeOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-xs font-bold text-white px-3.5 py-1.5 shadow-sm shadow-blue-500/20 transition-all cursor-pointer whitespace-nowrap"
             >
-              <Calendar className="h-3.5 w-3.5 text-slate-400" />
-              <span>{dateRange}</span>
-              <ChevronDown className="h-3 w-3 text-slate-400" />
+              <Plus className="h-3.5 w-3.5" />
+              <span>Add Employee</span>
+            </button>
+
+            <button
+              onClick={() => showToast('Generating organization executive monthly report...')}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200/80 dark:border-slate-700/80 bg-white/85 dark:bg-slate-800/85 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700/60 shadow-2xs hover:shadow-xs active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <Download className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+              <span>Export Report</span>
+            </button>
+
+            <button
+              onClick={() => navigate('/organization/structure')}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200/80 dark:border-slate-700/80 bg-white/85 dark:bg-slate-800/85 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700/60 shadow-2xs hover:shadow-xs active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <Building2 className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" />
+              <span>Org Tree</span>
             </button>
           </div>
+        }
+        rightContent={
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <div className="flex items-center justify-end gap-1.5 text-sm sm:text-base font-black tracking-tight text-slate-900 dark:text-white whitespace-nowrap">
+                <span>Enterprise Workforce Hub</span>
+                <Sparkles className="h-4 w-4 text-blue-500 flex-shrink-0" />
+              </div>
+              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-300 max-w-[210px] leading-tight mt-0.5">
+                Full-suite organization governance, headcount analytics and approvals.
+              </p>
+            </div>
+            {/* Executive Badge */}
+            <div className="relative flex-shrink-0 flex items-center justify-center h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25">
+              <ShieldCheck className="h-5 w-5 stroke-[2.5]" />
+            </div>
+          </div>
+        }
+      />
 
-          <button
-            onClick={() => setIsAddEmployeeOpen(true)}
-            className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/20 hover:bg-blue-700 transition-all"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Employee</span>
-          </button>
-        </div>
+      {/* 2. 6 EXECUTIVE KPI CARDS */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
+        {kpiCards.map((kpi, idx) => {
+          const Icon = kpi.icon;
+          return (
+            <div
+              key={idx}
+              className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-blue-300/80 dark:border-slate-800 dark:bg-slate-900 transition-all flex flex-col justify-between group cursor-pointer"
+              onClick={() => {
+                if (kpi.title.includes('Workforce')) navigate('/employees');
+                else if (kpi.title.includes('Present')) navigate('/attendance');
+                else if (kpi.title.includes('Leave')) navigate('/leave/manage');
+                else if (kpi.title.includes('Approvals')) navigate('/approvals');
+                else if (kpi.title.includes('Requisitions')) navigate('/recruitment');
+              }}
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate uppercase tracking-wider">
+                    {kpi.title}
+                  </span>
+                  <div className={`flex h-7 w-7 items-center justify-center rounded-xl ${kpi.iconBg} flex-shrink-0 shadow-2xs`}>
+                    <Icon className="h-3.5 w-3.5" />
+                  </div>
+                </div>
+
+                <div className="flex items-baseline justify-between mt-1">
+                  <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                    {kpi.value}
+                  </span>
+                  <span
+                    className={`inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold ${
+                      kpi.isNeutral
+                        ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/60'
+                        : kpi.isPositive
+                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60'
+                        : 'bg-rose-50 text-rose-700 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/60'
+                    }`}
+                  >
+                    {kpi.change}
+                  </span>
+                </div>
+              </div>
+
+              {/* Sparkline Visual */}
+              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium truncate">{kpi.subtext}</p>
+                <div className="h-4 w-12 flex-shrink-0">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={kpi.sparkline}>
+                      <Line type="monotone" dataKey="v" stroke={kpi.strokeColor} strokeWidth={2} dot={false} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* 3-COLUMN MAIN DASHBOARD CONTAINER */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+      {/* 3. MAIN DASHBOARD CONTENT GRID (9 Col Main + 3 Col Sidebar) */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
         {/* LEFT / CENTER CONTENT (Span 9 Columns) */}
         <div className="xl:col-span-9 space-y-6">
-          {/* 6 KPI CARDS ROW */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
-            {kpiCards.map((kpi, idx) => {
-              const Icon = kpi.icon;
-              return (
-                <div
-                  key={idx}
-                  className="rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-blue-200 dark:border-slate-800 dark:bg-dark-card transition-all"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-xl ${kpi.iconBg}`}>
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">
-                      {kpi.title}
-                    </span>
-                  </div>
-
-                  <div className="flex items-baseline justify-between mt-1">
-                    <span className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                      {kpi.value}
-                    </span>
-                    <span
-                      className={`inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold ${kpi.isNeutral ? 'bg-amber-50 text-amber-600' :
-                        kpi.isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
-                        }`}
-                    >
-                      {kpi.change}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">{kpi.subtext}</p>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* ROW 2: ATTENDANCE OVERVIEW + LEAVE OVERVIEW */}
+          {/* ROW 1: ATTENDANCE OVERVIEW (Col 7) + LEAVE OVERVIEW (Col 5) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            <div className="lg:col-span-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-4">
+            {/* Attendance Chart */}
+            <div className="lg:col-span-7 rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div>
-                  <h2 className="text-sm font-bold text-slate-900 dark:text-white">Attendance Overview</h2>
-                  <div className="flex items-center gap-4 mt-1 text-[11px] text-slate-500">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-slate-900 dark:text-white">Workforce Attendance Analytics</h2>
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold text-[10px]">
+                      95.1% Avg
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Real-time daily presence, late arrivals and absentees</p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
                     <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-blue-500" />Present</span>
                     <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-rose-500" />Absent</span>
                     <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-amber-400" />Late</span>
@@ -279,34 +407,47 @@ export const OrgAdminDashboardView: React.FC = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={attendanceData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
-                      <linearGradient id="orgPresent" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.15} />
+                      <linearGradient id="orgPresentGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.25} />
                         <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.6} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#94A3B8" opacity={0.15} />
                     <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} />
-                    <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} domain={[0, 250]} />
-                    <Tooltip contentStyle={{ backgroundColor: '#0F172A', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '11px' }} />
-                    <Area type="monotone" dataKey="present" stroke="#3B82F6" strokeWidth={2.5} fillOpacity={1} fill="url(#orgPresent)" dot={{ r: 3, fill: '#3B82F6' }} />
+                    <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} domain={[0, 260]} />
+                    <Tooltip contentStyle={{ backgroundColor: '#0F172A', borderRadius: '12px', border: '1px solid #1E293B', color: '#fff', fontSize: '11px' }} />
+                    <Area type="monotone" dataKey="present" stroke="#3B82F6" strokeWidth={2.5} fillOpacity={1} fill="url(#orgPresentGrad)" dot={{ r: 3, fill: '#3B82F6' }} />
                     <Line type="monotone" dataKey="absent" stroke="#F43F5E" strokeWidth={2} dot={{ r: 3, fill: '#F43F5E' }} />
                     <Line type="monotone" dataKey="late" stroke="#F59E0B" strokeWidth={2} dot={{ r: 3, fill: '#F59E0B' }} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
+
+              <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <span>Peak Shift Presence: <strong>240 Staff (Thu)</strong></span>
+                <button onClick={() => navigate('/attendance')} className="text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                  Full Timesheets →
+                </button>
+              </div>
             </div>
 
-            <div className="lg:col-span-5 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-sm font-bold text-slate-900 dark:text-white">Leave Overview</h2>
-                <span className="text-[10px] font-bold text-slate-400">This Month</span>
+            {/* Leave Overview Donut */}
+            <div className="lg:col-span-5 rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                  <h2 className="text-sm font-bold text-slate-900 dark:text-white">Leave & Absence Distribution</h2>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Approved vs. pending requests</p>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300">
+                  This Month
+                </span>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-between gap-5 my-auto py-2">
                 <div className="relative h-44 w-44 flex-shrink-0 flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={leaveData} cx="50%" cy="50%" innerRadius={50} outerRadius={72} paddingAngle={3} dataKey="value">
+                      <Pie data={leaveData} cx="50%" cy="50%" innerRadius={52} outerRadius={74} paddingAngle={4} dataKey="value">
                         {leaveData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
                         ))}
@@ -317,53 +458,74 @@ export const OrgAdminDashboardView: React.FC = () => {
                   <div className="absolute flex flex-col items-center justify-center pointer-events-none text-center">
                     <span className="text-[10px] uppercase font-bold text-slate-400">Total</span>
                     <span className="text-2xl font-black text-slate-900 dark:text-white leading-none my-0.5">186</span>
-                    <span className="text-[10px] text-slate-400">Leaves</span>
+                    <span className="text-[10px] text-slate-400">Days Logged</span>
                   </div>
                 </div>
 
-                <div className="flex-1 w-full space-y-2.5 min-w-0">
+                <div className="flex-1 w-full space-y-2 min-w-0">
                   {leaveData.map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between text-xs gap-3">
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <span className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+                    <div key={idx} className="flex items-center justify-between text-xs gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                        <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
                         <span className="font-medium text-slate-700 dark:text-slate-300 truncate">{item.name}</span>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0 tabular-nums">
-                        <span className="w-7 text-right font-bold text-slate-900 dark:text-white">{item.value}</span>
-                        <span className="w-14 text-right text-[11px] text-slate-400 font-medium">({item.percentage})</span>
+                      <div className="flex items-center gap-1.5 flex-shrink-0 tabular-nums">
+                        <span className="w-6 text-right font-bold text-slate-900 dark:text-white">{item.value}</span>
+                        <span className="w-12 text-right text-[10px] text-slate-400 font-medium">({item.percentage})</span>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
+
+              <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-right">
+                <button onClick={() => navigate('/leave/manage')} className="text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                  Manage Leave Requests →
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* ROW 3: EMPLOYEE GROWTH + DEPARTMENT DISTRIBUTION + TOP PERFORMERS */}
+          {/* ROW 2: 3-COL ANALYTICS (Headcount Growth + Department Distribution + Top Performers) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
-              <h3 className="text-xs font-bold text-slate-900 dark:text-white mb-2">Employee Growth</h3>
+            {/* Headcount Growth */}
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-bold text-slate-900 dark:text-white">Headcount Velocity</h3>
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">+18% YoY</span>
+              </div>
+              <p className="text-[10px] text-slate-400 mb-2">Net additions over past 6 months</p>
+
               <div className="h-44 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={growthData} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="2 2" vertical={false} stroke="#E2E8F0" opacity={0.5} />
+                    <CartesianGrid strokeDasharray="2 2" vertical={false} stroke="#94A3B8" opacity={0.15} />
                     <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94A3B8' }} />
-                    <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94A3B8' }} domain={[0, 400]} />
+                    <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94A3B8' }} domain={[0, 300]} />
                     <Tooltip contentStyle={{ backgroundColor: '#0F172A', borderRadius: '10px', color: '#fff', fontSize: '11px', border: 'none' }} />
-                    <Bar dataKey="total" fill="#3B82F6" radius={[4, 4, 0, 0]} barSize={14} />
-                    <Line type="monotone" dataKey="newHires" stroke="#6366F1" strokeWidth={2} dot={{ r: 2 }} />
+                    <Bar dataKey="headcount" fill="#3B82F6" radius={[4, 4, 0, 0]} barSize={16} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+
+              <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400 flex justify-between">
+                <span>Current: <strong>248</strong></span>
+                <span>Target: <strong>300 (Q4)</strong></span>
+              </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
-              <h3 className="text-xs font-bold text-slate-900 dark:text-white mb-1">Department Distribution</h3>
-              <div className="flex items-center justify-between gap-2 my-auto">
-                <div className="relative h-36 w-36 flex-shrink-0 flex items-center justify-center">
+            {/* Department Distribution */}
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-xs font-bold text-slate-900 dark:text-white">Department Breakdown</h3>
+                <span className="text-[10px] font-bold text-slate-400">6 Teams</span>
+              </div>
+
+              <div className="flex items-center justify-between gap-2 my-auto py-2">
+                <div className="relative h-32 w-32 flex-shrink-0 flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={deptData} cx="50%" cy="50%" innerRadius={40} outerRadius={58} paddingAngle={3} dataKey="value">
+                      <Pie data={deptData} cx="50%" cy="50%" innerRadius={36} outerRadius={52} paddingAngle={3} dataKey="count">
                         {deptData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
                         ))}
@@ -371,152 +533,288 @@ export const OrgAdminDashboardView: React.FC = () => {
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute text-center pointer-events-none">
-                    <span className="text-base font-extrabold text-slate-900 dark:text-white leading-none">248</span>
-                    <span className="text-[9px] uppercase font-bold text-slate-400 block">Total</span>
+                    <span className="text-base font-black text-slate-900 dark:text-white leading-none">248</span>
+                    <span className="text-[8px] uppercase font-bold text-slate-400 block">Total</span>
                   </div>
                 </div>
 
-                <div className="flex-1 space-y-1.5 text-[11px] min-w-0 pl-1">
-                  {deptData.map((d, i) => (
-                    <div key={i} className="flex items-center justify-between gap-2">
+                <div className="flex-1 space-y-1.5 text-[10px] min-w-0 pl-1">
+                  {deptData.slice(0, 4).map((d, i) => (
+                    <div key={i} className="flex items-center justify-between gap-1">
                       <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 truncate">
                         <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: d.color }} />
                         <span className="truncate">{d.name}</span>
                       </span>
-                      <span className="font-bold text-slate-900 dark:text-white tabular-nums">{d.value}%</span>
+                      <span className="font-bold text-slate-900 dark:text-white tabular-nums">{d.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-1 text-right">
+                <button onClick={() => navigate('/organization/departments')} className="text-[11px] text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                  View Departments →
+                </button>
+              </div>
+            </div>
+
+            {/* Top Performing Departments */}
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-bold text-slate-900 dark:text-white">Department Performance</h3>
+                <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">KPI Rating</span>
+              </div>
+
+              <div className="space-y-2.5">
+                {topPerformers.map((p, idx) => (
+                  <div key={idx} className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-medium text-slate-700 dark:text-slate-300">{p.name}</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{p.rating}</span>
+                    </div>
+                    <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div className={`h-full rounded-full bg-gradient-to-r ${p.barGradient}`} style={{ width: `${p.score}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-2 text-right">
+                <button onClick={() => navigate('/performance')} className="text-[11px] text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                  Performance Reviews →
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ROW 3: 4 OPERATIONAL HUB CARDS */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+            {/* 1. Recent Employees */}
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+                      <UserPlus className="w-3.5 h-3.5" />
+                    </div>
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white">New Onboarding</h3>
+                  </div>
+                  <button onClick={() => navigate('/employees')} className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                    View All
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  {recentEmployeesList.map((emp) => (
+                    <div
+                      key={emp.id}
+                      onClick={() => navigate('/employees')}
+                      className="flex items-center justify-between p-2 rounded-xl bg-slate-50/60 dark:bg-slate-850/50 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-slate-100 dark:border-slate-800/60 transition-all text-xs group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <img src={emp.avatar} alt={emp.name} className="h-8 w-8 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900/60 flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-900 dark:text-white text-[11px] leading-tight truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            {emp.name}
+                          </p>
+                          <p className="text-[10px] text-slate-400 truncate">{emp.department}</p>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700/60 text-[10px] font-semibold flex-shrink-0 shadow-2xs whitespace-nowrap">
+                        {emp.joiningDate}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
-              <h3 className="text-xs font-bold text-slate-900 dark:text-white mb-2">Top Performing Departments</h3>
-              <div className="space-y-2.5">
-                {topPerformers.map((p, idx) => (
-                  <div key={idx} className="space-y-1">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-medium text-slate-600 dark:text-slate-300">{p.name}</span>
-                      <span className="font-bold text-slate-800 dark:text-slate-200">{p.percentage}%</span>
+            {/* 2. Pending Approvals */}
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400">
+                      <Clock className="w-3.5 h-3.5" />
                     </div>
-                    <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                      <div className={`h-full rounded-full bg-gradient-to-r ${p.barGradient}`} style={{ width: `${p.percentage}%` }} />
-                    </div>
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white">Pending Actions</h3>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
+                  <button onClick={() => navigate('/approvals')} className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                    Review All
+                  </button>
+                </div>
 
-          {/* ROW 4: 4 WIDGET CARDS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold text-slate-900 dark:text-white">Recent Employees</h3>
-                <button onClick={() => navigate('/employees')} className="text-[10px] font-bold text-blue-600 hover:text-blue-700">View All</button>
-              </div>
-              <div className="space-y-2.5">
-                {recentEmployeesList.map((emp) => (
-                  <div key={emp.id} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <img src={emp.avatar} alt={emp.name} className="h-7 w-7 rounded-full object-cover" />
-                      <div>
-                        <p className="font-semibold text-slate-900 dark:text-white text-[11px] leading-tight">{emp.name}</p>
-                        <p className="text-[10px] text-slate-400">{emp.department}</p>
+                <div className="space-y-2">
+                  {pendingApprovalsList.map((app, idx) => {
+                    const AppIcon = app.icon;
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => navigate(app.route)}
+                        className="flex items-center justify-between p-2 rounded-xl bg-slate-50/60 dark:bg-slate-850/50 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-slate-100 dark:border-slate-800/60 transition-all text-xs group cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className={`p-2 rounded-xl ${app.iconBg} flex-shrink-0`}>
+                            <AppIcon className="w-3.5 h-3.5" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-900 dark:text-white text-[11px] leading-tight truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                              {app.title}
+                            </p>
+                            <p className="text-[10px] text-slate-400 truncate">{app.subtitle}</p>
+                          </div>
+                        </div>
+                        <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] flex-shrink-0 shadow-2xs whitespace-nowrap ${app.badgeBg}`}>
+                          {app.count}
+                        </span>
                       </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Upcoming Birthdays */}
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400">
+                      <Cake className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-[10px] text-slate-400">{emp.joiningDate}</span>
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white">Celebrations</h3>
                   </div>
-                ))}
-              </div>
-            </div>
+                  <span className="text-[10px] font-bold text-slate-400">Birthdays</span>
+                </div>
 
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold text-slate-900 dark:text-white">Pending Approvals</h3>
-                <button onClick={() => navigate('/approvals')} className="text-[10px] font-bold text-blue-600 hover:text-blue-700">View All</button>
-              </div>
-              <div className="space-y-2">
-                {pendingApprovalsList.map((app, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-xs p-1 rounded-xl">
-                    <span className="font-medium text-slate-700 dark:text-slate-300 text-[11px]">{app.title}</span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${app.badgeBg}`}>{app.count}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold text-slate-900 dark:text-white">Upcoming Birthdays</h3>
-                <button onClick={() => navigate('/employees')} className="text-[10px] font-bold text-blue-600 hover:text-blue-700">View All</button>
-              </div>
-              <div className="space-y-2.5">
-                {birthdaysList.map((b, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <img src={b.avatar} alt={b.name} className="h-7 w-7 rounded-full object-cover" />
-                      <div>
-                        <p className="font-semibold text-slate-900 dark:text-white text-[11px] leading-tight">{b.name}</p>
-                        <p className="text-[10px] text-slate-400">{b.department}</p>
+                <div className="space-y-2">
+                  {birthdaysList.map((b, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-2 rounded-xl bg-slate-50/60 dark:bg-slate-850/50 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-slate-100 dark:border-slate-800/60 transition-all text-xs group"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <img src={b.avatar} alt={b.name} className="h-8 w-8 rounded-full object-cover ring-2 ring-rose-200 dark:ring-rose-900/60 flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-900 dark:text-white text-[11px] leading-tight truncate group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                            {b.name}
+                          </p>
+                          <p className="text-[10px] text-slate-400 truncate">{b.department}</p>
+                        </div>
                       </div>
+                      <button
+                        onClick={() => showToast(`Birthday greetings sent to ${b.name}! 🎉`)}
+                        className="px-2.5 py-0.5 rounded-full font-bold text-[10px] text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/80 border border-rose-200/80 dark:border-rose-800/60 hover:bg-rose-100 dark:hover:bg-rose-900/50 hover:scale-105 active:scale-95 transition-all flex-shrink-0 shadow-2xs cursor-pointer whitespace-nowrap"
+                      >
+                        {b.date}
+                      </button>
                     </div>
-                    <span className="text-[10px] font-bold text-slate-600 bg-rose-50 px-2 py-0.5 rounded-full">{b.date} 🎂</span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold text-slate-900 dark:text-white">Work Anniversaries</h3>
-                <button onClick={() => navigate('/employees')} className="text-[10px] font-bold text-blue-600 hover:text-blue-700">View All</button>
-              </div>
-              <div className="space-y-2.5">
-                {anniversariesList.map((a, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <img src={a.avatar} alt={a.name} className="h-7 w-7 rounded-full object-cover" />
-                      <div>
-                        <p className="font-semibold text-slate-900 dark:text-white text-[11px] leading-tight">{a.name}</p>
-                        <p className="text-[10px] text-slate-400">{a.department}</p>
-                      </div>
+            {/* 4. Work Anniversaries */}
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400">
+                      <Award className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">{a.years} 🎖️</span>
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white">Milestones</h3>
                   </div>
-                ))}
+                  <span className="text-[10px] font-bold text-slate-400">Tenure</span>
+                </div>
+
+                <div className="space-y-2">
+                  {anniversariesList.map((a, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-2 rounded-xl bg-slate-50/60 dark:bg-slate-850/50 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-slate-100 dark:border-slate-800/60 transition-all text-xs group"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <img src={a.avatar} alt={a.name} className="h-8 w-8 rounded-full object-cover ring-2 ring-amber-200 dark:ring-amber-900/60 flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-900 dark:text-white text-[11px] leading-tight truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            {a.name}
+                          </p>
+                          <p className="text-[10px] text-slate-400 truncate">{a.department}</p>
+                        </div>
+                      </div>
+                      <span className="px-2.5 py-0.5 rounded-full font-bold text-[10px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/80 border border-amber-200/80 dark:border-amber-800/60 flex-shrink-0 shadow-2xs whitespace-nowrap">
+                        {a.years} {a.medal}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* RIGHT INFORMATION PANEL (Span 3 Columns) */}
+        {/* RIGHT EXECUTIVE SIDEBAR (Span 3 Columns) */}
         <div className="xl:col-span-3 space-y-5">
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card">
-            <h3 className="text-xs font-bold text-slate-900 dark:text-white mb-4">Recent Notifications</h3>
-            <div className="space-y-3.5">
-              {recentNotificationsList.map((n, idx) => (
-                <div key={idx} className="flex items-start gap-3 text-xs">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="font-bold text-slate-900 dark:text-white truncate">{n.title}</p>
-                      <span className="text-[10px] text-slate-400">{n.time}</span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 mt-0.5">{n.desc}</p>
-                  </div>
-                </div>
-              ))}
+          {/* Executive Broadcast Card */}
+          <div className="rounded-2xl border border-blue-200/80 dark:border-slate-800 bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 p-4 sm:p-5 text-white shadow-md shadow-blue-500/20 relative overflow-hidden">
+            <div className="relative z-10 space-y-2">
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/20 backdrop-blur-sm text-[10px] font-extrabold uppercase tracking-wider">
+                <Sparkles className="w-3 h-3" />
+                <span>Executive Broadcast</span>
+              </div>
+              <h4 className="text-sm font-black leading-snug">Company-Wide Policy & Announcement Dispatch</h4>
+              <p className="text-[11px] text-blue-100 leading-relaxed">
+                Send instant push notices or company memos directly to all 248 staff members.
+              </p>
+              <button
+                onClick={() => setIsBroadcastModalOpen(true)}
+                className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white text-blue-700 hover:bg-blue-50 font-bold text-xs shadow-xs active:scale-95 transition-all cursor-pointer"
+              >
+                <Send className="w-3 h-3" />
+                <span>Publish Memo</span>
+              </button>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card">
-            <h3 className="text-xs font-bold text-slate-900 dark:text-white mb-4">Upcoming Executive Events</h3>
+          {/* Recent Executive Notifications */}
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white">Organization Feed</h3>
+              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">Live</span>
+            </div>
+            <div className="space-y-3">
+              {recentNotificationsList.map((n, idx) => {
+                const Icon = n.icon;
+                return (
+                  <div key={idx} className="flex items-start gap-2.5 text-xs">
+                    <div className={`p-1.5 rounded-lg ${n.iconBg} flex-shrink-0 mt-0.5`}>
+                      <Icon className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1">
+                        <p className="font-bold text-slate-900 dark:text-white truncate">{n.title}</p>
+                        <span className="text-[10px] text-slate-400 flex-shrink-0">{n.time}</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">{n.desc}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Upcoming Executive Events */}
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white">Executive Calendar</h3>
+              <button onClick={() => navigate('/events')} className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline">All Events</button>
+            </div>
             <div className="space-y-3">
               {upcomingEventsList.map((e, idx) => (
                 <div key={idx} className="flex items-center gap-3">
                   <div className={`flex flex-col items-center justify-center h-10 w-10 flex-shrink-0 rounded-xl border font-bold ${e.color}`}>
-                    <span className="text-[8px] uppercase">{e.month}</span>
-                    <span className="text-sm">{e.day}</span>
+                    <span className="text-[8px] uppercase tracking-wider">{e.month}</span>
+                    <span className="text-sm leading-none">{e.day}</span>
                   </div>
                   <div>
                     <p className="text-xs font-bold text-slate-900 dark:text-white">{e.title}</p>
@@ -526,28 +824,169 @@ export const OrgAdminDashboardView: React.FC = () => {
               ))}
             </div>
           </div>
-
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card">
-            <h3 className="text-xs font-bold text-slate-900 dark:text-white mb-4">Recent Activities</h3>
-            <div className="space-y-3">
-              {recentActivitiesList.map((act, idx) => (
-                <div key={idx} className="flex items-center gap-3 text-xs">
-                  {act.isSystem ? (
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-blue-700 text-xs font-black">⚡</div>
-                  ) : (
-                    <img src={act.avatar} alt={act.user} className="h-7 w-7 rounded-full object-cover" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-slate-900 dark:text-white truncate">{act.user}</p>
-                    <p className="text-[11px] text-slate-500 truncate">{act.action}</p>
-                  </div>
-                  <span className="text-[10px] text-slate-400">{act.time}</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
+
+      {/* ADD EMPLOYEE MODAL */}
+      <Modal
+        isOpen={isAddEmployeeOpen}
+        onClose={() => setIsAddEmployeeOpen(false)}
+        title="Add New Organization Employee"
+        description="Onboard a new staff member and send automated self-service portal credentials."
+        size="lg"
+      >
+        <form onSubmit={handleAddEmployeeSubmit} className="space-y-4 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Full Name
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Eleanor Vance"
+                value={empName}
+                onChange={(e) => setEmpName(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Corporate Email Address
+              </label>
+              <input
+                type="email"
+                placeholder="e.g. eleanor@apex.saas-hrm.com"
+                value={empEmail}
+                onChange={(e) => setEmpEmail(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Department
+              </label>
+              <select
+                value={empDept}
+                onChange={(e) => setEmpDept(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Engineering">Engineering</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Sales & BD">Sales & BD</option>
+                <option value="Human Resources">Human Resources</option>
+                <option value="Finance & Legal">Finance & Legal</option>
+                <option value="Operations">Operations</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Designation / Job Role
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Senior Software Engineer"
+                value={empRole}
+                onChange={(e) => setEmpRole(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Joining Date
+            </label>
+            <input
+              type="date"
+              value={empJoinDate}
+              onChange={(e) => setEmpJoinDate(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsAddEmployeeOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" size="sm">
+              <Plus className="w-3.5 h-3.5 mr-1" />
+              Complete Onboarding
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* EXECUTIVE BROADCAST MODAL */}
+      <Modal
+        isOpen={isBroadcastModalOpen}
+        onClose={() => setIsBroadcastModalOpen(false)}
+        title="Publish Organization Memo"
+        description="Broadcast a high-priority memo, notice, or event invitation across the organization."
+        size="md"
+      >
+        <div className="space-y-4 text-xs">
+          <div>
+            <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Subject / Headline
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Annual Townhall & Policy Updates"
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Broadcast Message Body
+            </label>
+            <textarea
+              rows={4}
+              placeholder="Type your official announcement here..."
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsBroadcastModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                showToast('Executive memo dispatched to all 248 staff members!');
+                setIsBroadcastModalOpen(false);
+              }}
+            >
+              <Send className="w-3.5 h-3.5 mr-1" />
+              Dispatch Broadcast
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
+
+export default OrgAdminDashboardView;
+
