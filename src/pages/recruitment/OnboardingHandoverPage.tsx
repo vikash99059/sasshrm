@@ -70,9 +70,10 @@ export const OnboardingHandoverPage: React.FC = () => {
 
   const handleCompleteHandover = async () => {
     if (!selectedRecord) return;
-    await recruitmentService.completeHandoverToHR(selectedRecord.id, assignedHrName);
+    const updated = await recruitmentService.completeHandoverToHR(selectedRecord.id, assignedHrName);
     setIsChecklistModalOpen(false);
-    showToast(`Successfully handed over ${selectedRecord.candidateName} to HR Onboarding`);
+    const empCodeMsg = updated.employeeId ? ` (Created Employee Master: ${updated.employeeId})` : '';
+    showToast(`Successfully handed over ${selectedRecord.candidateName} to HR Onboarding${empCodeMsg}`);
     loadData();
   };
 
@@ -238,19 +239,17 @@ export const OnboardingHandoverPage: React.FC = () => {
             <button
               key={tab.key}
               onClick={() => setSearchParams({ tab: tab.key })}
-              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition whitespace-nowrap ${
-                isActive
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition whitespace-nowrap ${isActive
                   ? 'border-blue-600 text-blue-600 dark:text-blue-400'
                   : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
+                }`}
             >
               {tab.label}
               <span
-                className={`px-1.5 py-0.5 text-[10px] rounded-full ${
-                  isActive
+                className={`px-1.5 py-0.5 text-[10px] rounded-full ${isActive
                     ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
                     : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
-                }`}
+                  }`}
               >
                 {tab.count}
               </span>

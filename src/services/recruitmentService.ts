@@ -23,6 +23,7 @@ import {
   INITIAL_HANDOVERS,
 } from './mockDb';
 import { getFromStorage, saveToStorage } from './storage';
+import { employeeService } from './employeeService';
 
 export const recruitmentService = {
   // =========================================================================
@@ -539,9 +540,39 @@ export const recruitmentService = {
     const list = await recruitmentService.getHandovers();
     const index = list.findIndex((h) => h.id === id);
     if (index === -1) throw new Error('Handover record not found');
-    list[index].handoverStatus = 'Handover to HR';
-    list[index].assignedHrName = assignedHrName;
-    list[index].handoverDate = new Date().toISOString().split('T')[0];
+
+    const item = list[index];
+    item.handoverStatus = 'Handover to HR';
+    item.assignedHrName = assignedHrName;
+    item.handoverDate = new Date().toISOString().split('T')[0];
+
+    // Seed/create Employee Master record if not already linked
+    if (!item.employeeId) {
+      const nameParts = item.candidateName.split(' ');
+      const firstName = nameParts[0] || 'Candidate';
+      const lastName = nameParts.slice(1).join(' ') || 'Employee';
+
+      try {
+        const createdEmp = await employeeService.createEmployee({
+          organizationId: item.organizationId || 'org-1',
+          firstName,
+          lastName,
+          email: item.candidateEmail,
+          personalEmail: item.candidateEmail,
+          phone: item.candidatePhone,
+          avatar: item.candidateAvatar,
+          department: item.department || 'Engineering',
+          designation: item.designation || item.jobTitle || 'Software Engineer',
+          joiningDate: item.joiningDate || new Date().toISOString().split('T')[0],
+          employmentType: 'Full-time',
+          status: 'Active',
+        });
+        item.employeeId = createdEmp.employeeId;
+      } catch (err) {
+        console.error('Failed to auto-seed employee master record:', err);
+      }
+    }
+
     saveToStorage('onboarding_handovers', list);
     return list[index];
   },
