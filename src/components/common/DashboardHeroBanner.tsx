@@ -16,7 +16,16 @@ export const DashboardHeroBanner: React.FC<DashboardHeroBannerProps> = ({ classN
         currentRole,
         isClockedIn,
         clockInTime,
+        isOnBreak,
+        breakSecondsElapsed,
     } = useAppStore();
+
+    const formatTimerHMS = (totalSeconds: number) => {
+        const hrs = Math.floor(totalSeconds / 3600);
+        const mins = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
+        return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    };
 
     const currentPersona = ROLE_PERSONAS[currentRole] || ROLE_PERSONAS.employee;
 
@@ -154,7 +163,12 @@ export const DashboardHeroBanner: React.FC<DashboardHeroBannerProps> = ({ classN
                                     </span>
                                 </div>
 
-                                {isClockedIn ? (
+                                {isOnBreak ? (
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 font-bold text-[11px] border border-amber-200/80 dark:border-amber-800/80 shadow-2xs">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                        On Break ({formatTimerHMS(breakSecondsElapsed)})
+                                    </span>
+                                ) : isClockedIn ? (
                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] border border-emerald-200/80 dark:border-emerald-800/80 shadow-2xs">
                                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                         Punched In at {formattedPunchInTime}
