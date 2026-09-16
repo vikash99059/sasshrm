@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { attendanceService } from '../../services/attendanceService';
-import { Card, CardHeader, CardTitle, Button, Badge, Avatar } from '../../components/ui';
+import { Card, CardHeader, CardTitle, Button, Badge } from '../../components/ui';
 import {
   Clock,
   Play,
@@ -9,10 +9,6 @@ import {
   Coffee,
   MapPin,
   Wifi,
-  Sparkles,
-  CheckCircle2,
-  Calendar,
-  AlertCircle,
 } from 'lucide-react';
 import { formatDate } from '../../utils';
 
@@ -22,29 +18,20 @@ export const ClockInPage: React.FC = () => {
     isClockedIn,
     clockInTime,
     secondsElapsed,
+    isOnBreak,
+    breakSecondsElapsed,
+    totalBreakSeconds,
     setClockInState,
+    toggleBreak,
   } = useAppStore();
 
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [isOnBreak, setIsOnBreak] = useState(false);
-  const [breakSeconds, setBreakSeconds] = useState(0);
 
   // Live Digital Clock
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-
-  // Break Timer
-  useEffect(() => {
-    let interval: any = null;
-    if (isOnBreak) {
-      interval = setInterval(() => setBreakSeconds((s) => s + 1), 1000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isOnBreak]);
 
   const handleToggleClockIn = async () => {
     if (!isClockedIn) {
@@ -58,7 +45,6 @@ export const ClockInPage: React.FC = () => {
     } else {
       await attendanceService.clockOut(currentUser.id);
       setClockInState(false);
-      setIsOnBreak(false);
     }
   };
 
@@ -68,6 +54,8 @@ export const ClockInPage: React.FC = () => {
     const s = total % 60;
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
+
+  const totalBreakDisplaySeconds = totalBreakSeconds + (isOnBreak ? breakSecondsElapsed : 0);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -93,24 +81,36 @@ export const ClockInPage: React.FC = () => {
             </h2>
           </div>
 
-          {/* Pulsing Active Working Ring */}
+          {/* Pulsing Active Working / Break Ring */}
           <div className="relative flex items-center justify-center">
             {isClockedIn && (
-              <div className="absolute h-48 w-48 rounded-full bg-blue-500/15 animate-ping" />
+              <div
+                className={`absolute h-48 w-48 rounded-full animate-ping ${isOnBreak ? 'bg-amber-500/15' : 'bg-emerald-500/15'
+                  }`}
+              />
             )}
             <div
-              className={`h-44 w-44 rounded-full border-4 flex flex-col items-center justify-center transition-all ${
-                isClockedIn
-                  ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300 shadow-glow'
-                  : 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50 text-slate-400'
-              }`}
+              className={`h-44 w-44 rounded-full border-4 flex flex-col items-center justify-center transition-all ${isOnBreak
+                  ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 shadow-amber-500/20'
+                  : isClockedIn
+                    ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300 shadow-glow'
+                    : 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50 text-slate-400'
+                }`}
             >
-              <Clock className={`h-8 w-8 mb-1 ${isClockedIn ? 'text-emerald-500 animate-pulse' : 'text-slate-400'}`} />
+              {isOnBreak ? (
+                <Coffee className="h-8 w-8 mb-1 text-amber-500 animate-pulse" />
+              ) : (
+                <Clock className={`h-8 w-8 mb-1 ${isClockedIn ? 'text-emerald-500 animate-pulse' : 'text-slate-400'}`} />
+              )}
               <span className="text-2xl font-black font-mono">
-                {isClockedIn ? formatSeconds(secondsElapsed) : '00:00:00'}
+                {isOnBreak
+                  ? formatSeconds(breakSecondsElapsed)
+                  : isClockedIn
+                    ? formatSeconds(secondsElapsed)
+                    : '00:00:00'}
               </span>
               <span className="text-[10px] font-bold uppercase tracking-wider">
-                {isClockedIn ? (isOnBreak ? 'On Break' : 'Working') : 'Not Checked In'}
+                {isOnBreak ? 'On Break' : isClockedIn ? 'Working' : 'Not Checked In'}
               </span>
             </div>
           </div>
@@ -131,11 +131,14 @@ export const ClockInPage: React.FC = () => {
               <Button
                 size="lg"
                 variant="outline"
-                onClick={() => setIsOnBreak(!isOnBreak)}
-                className="py-3 text-sm"
-                leftIcon={<Coffee className="h-4 w-4 text-amber-500" />}
+                onClick={toggleBreak}
+                className={`py-3 text-sm transition-all ${isOnBreak
+                    ? 'border-blue-500 text-blue-600 bg-blue-50/80 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300'
+                    : 'border-amber-400 text-amber-700 bg-amber-50/80 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300'
+                  }`}
+                leftIcon={isOnBreak ? <Play className="h-4 w-4 text-blue-600 fill-current" /> : <Coffee className="h-4 w-4 text-amber-500" />}
               >
-                {isOnBreak ? 'End Break' : 'Take Break'}
+                {isOnBreak ? 'Resume Work' : 'Take Break'}
               </Button>
             )}
           </div>
@@ -190,13 +193,13 @@ export const ClockInPage: React.FC = () => {
               <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
                 <span className="text-slate-400">Break Logged</span>
                 <span className="font-mono font-semibold text-amber-600">
-                  {formatSeconds(breakSeconds)}
+                  {formatSeconds(totalBreakDisplaySeconds)}
                 </span>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-slate-400">Attendance Status</span>
-                <Badge variant={isClockedIn ? 'success' : 'neutral'} size="sm" dot>
-                  {isClockedIn ? 'Active (Present)' : 'Pending'}
+                <Badge variant={isOnBreak ? 'warning' : isClockedIn ? 'success' : 'neutral'} size="sm" dot>
+                  {isOnBreak ? 'On Break' : isClockedIn ? 'Active (Present)' : 'Pending'}
                 </Badge>
               </div>
             </div>

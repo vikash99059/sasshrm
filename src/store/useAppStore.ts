@@ -20,10 +20,14 @@ interface AppState {
   notificationsOpen: boolean;
   notifications: NotificationItem[];
 
-  // Live Clock In State
+  // Live Clock In & Break State
   isClockedIn: boolean;
   clockInTime: string | null;
   secondsElapsed: number;
+  isOnBreak: boolean;
+  breakStartTime: string | null;
+  breakSecondsElapsed: number;
+  totalBreakSeconds: number;
 
   // Actions
   switchRole: (role: UserRole) => Promise<void>;
@@ -37,6 +41,7 @@ interface AppState {
   markNotificationRead: (id: string) => void;
   markAllNotificationsRead: () => void;
   setClockInState: (active: boolean, time?: string) => void;
+  toggleBreak: () => void;
   tickClockTimer: () => void;
   logout: () => Promise<void>;
 }
@@ -64,6 +69,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   isClockedIn: false,
   clockInTime: null,
   secondsElapsed: 0,
+  isOnBreak: false,
+  breakStartTime: null,
+  breakSecondsElapsed: 0,
+  totalBreakSeconds: 0,
 
   switchRole: async (role: UserRole) => {
     const updatedUser = await authService.switchRole(role);
@@ -115,15 +124,45 @@ export const useAppStore = create<AppState>((set, get) => ({
   setClockInState: (active, time) => set({
     isClockedIn: active,
     clockInTime: time || (active ? new Date().toISOString() : null),
-    secondsElapsed: active ? 0 : 0,
+    secondsElapsed: 0,
+    isOnBreak: false,
+    breakStartTime: null,
+    breakSecondsElapsed: 0,
+    totalBreakSeconds: 0,
   }),
 
+  toggleBreak: () => {
+    const { isOnBreak, breakStartTime, breakSecondsElapsed, totalBreakSeconds } = get();
+    if (isOnBreak) {
+      // Ending break
+      set({
+        isOnBreak: false,
+        totalBreakSeconds: totalBreakSeconds + breakSecondsElapsed,
+        breakStartTime: null,
+        breakSecondsElapsed: 0,
+      });
+    } else {
+      // Starting break
+      set({
+        isOnBreak: true,
+        breakStartTime: new Date().toISOString(),
+        breakSecondsElapsed: 0,
+      });
+    }
+  },
+
   tickClockTimer: () => {
-    const { isClockedIn, clockInTime } = get();
-    if (isClockedIn && clockInTime) {
-      const start = new Date(clockInTime).getTime();
+    const { isClockedIn, clockInTime, isOnBreak, breakStartTime, totalBreakSeconds } = get();
+    if (isClockedIn) {
       const now = Date.now();
-      set({ secondsElapsed: Math.max(0, Math.floor((now - start) / 1000)) });
+      if (isOnBreak && breakStartTime) {
+        const breakStart = new Date(breakStartTime).getTime();
+        set({ breakSecondsElapsed: Math.max(0, Math.floor((now - breakStart) / 1000)) });
+      } else if (clockInTime) {
+        const workStart = new Date(clockInTime).getTime();
+        const totalElapsed = Math.floor((now - workStart) / 1000);
+        set({ secondsElapsed: Math.max(0, totalElapsed - totalBreakSeconds) });
+      }
     }
   },
 
