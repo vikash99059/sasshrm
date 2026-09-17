@@ -14,10 +14,12 @@ import { Button } from './Button';
 
 export interface Column<T> {
   header: string;
-  accessorKey?: keyof T;
+  accessorKey?: string | keyof T;
   cell?: (row: T, index: number) => React.ReactNode;
   sortable?: boolean;
   className?: string;
+  key?: string | keyof T;
+  render?: (val: any, row: T) => React.ReactNode;
 }
 
 export interface DataTableProps<T> {
@@ -30,6 +32,7 @@ export interface DataTableProps<T> {
   actions?: React.ReactNode;
   exportFileName?: string;
   filterComponent?: React.ReactNode;
+  keyField?: keyof T;
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -42,6 +45,7 @@ export function DataTable<T extends Record<string, any>>({
   actions,
   exportFileName = 'export.csv',
   filterComponent,
+  keyField,
 }: DataTableProps<T>) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: keyof T; direction: 'asc' | 'desc' } | null>(null);
@@ -189,9 +193,13 @@ export function DataTable<T extends Record<string, any>>({
                       <td key={colIdx} className={cn('px-5 py-4 whitespace-nowrap', col.className)}>
                         {col.cell
                           ? col.cell(row, (currentPage - 1) * pageSize + rowIdx)
-                          : col.accessorKey
-                          ? String(row[col.accessorKey] ?? '--')
-                          : null}
+                          : col.render
+                            ? col.render(col.key ? row[col.key as keyof T] : row, row)
+                            : col.accessorKey
+                              ? String(row[col.accessorKey] ?? '--')
+                              : col.key
+                                ? String(row[col.key as keyof T] ?? '--')
+                                : null}
                       </td>
                     ))}
                   </tr>

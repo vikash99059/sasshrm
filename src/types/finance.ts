@@ -87,6 +87,33 @@ export interface Invoice {
   notes?: string;
 }
 
+export interface ClientInvoice {
+  id: string;
+  invoiceId: string;
+  client: string;
+  date: string;
+  dueDate: string;
+  amount: number;
+  status: 'Draft' | 'Pending' | 'Sent' | 'Paid' | 'Overdue';
+  poReference?: string;
+  currency?: string;
+  paymentTerms?: string;
+}
+
+export type VoucherType = 'Journal' | 'Payment' | 'Receipt' | 'Contra';
+
+export interface JournalVoucher {
+  id: string;
+  voucherNo: string;
+  type: VoucherType;
+  date: string;
+  description: string;
+  amount: number;
+  reference?: string;
+  department?: string;
+  attachedDocs?: string;
+}
+
 // Bills & Payables
 export type BillStatus = 'Draft' | 'Pending Approval' | 'Approved' | 'Paid' | 'Overdue';
 

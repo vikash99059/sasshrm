@@ -592,11 +592,10 @@ export const SaasOwnerDashboardView: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        tenant.status === 'Paid'
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${tenant.status === 'Paid'
                           ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
                           : 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                      }`}>
+                        }`}>
                         {tenant.status}
                       </span>
                       <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">

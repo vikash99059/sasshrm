@@ -145,7 +145,7 @@ export const PageHeaderCard: React.FC<PageHeaderCardProps> = ({
 
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white truncate">
+                <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white break-words">
                   {title}
                 </h1>
                 {badge && (
