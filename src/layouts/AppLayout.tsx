@@ -4,6 +4,8 @@ import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { CommandPalette } from './components/CommandPalette';
 import { NotificationsDrawer } from './components/NotificationsDrawer';
+import { ScrollToTop } from '../components/common/ScrollToTop';
+import { ScrollToTopButton } from '../components/common/ScrollToTopButton';
 import { useAppStore } from '../store/useAppStore';
 import { cn } from '../utils';
 
@@ -25,6 +27,9 @@ export const AppLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F4F7FC] dark:bg-[#0B1120] text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased">
+      {/* Route Change Scroll Reset Handler */}
+      <ScrollToTop />
+
       {/* Sidebar Navigation */}
       <Sidebar />
 
@@ -65,6 +70,9 @@ export const AppLayout: React.FC = () => {
           </div>
         </footer>
       </div>
+
+      {/* Global Floating Scroll To Top Button */}
+      <ScrollToTopButton />
 
       {/* Global Command Palette & Notifications Drawer */}
       <CommandPalette />

@@ -23,7 +23,10 @@ export const CORPORATE_MODULES: CorporateModule[] = [
       'Role-based access',
       'Approval hierarchy',
       'Policies & documents',
-      'Organization structure'
+      'Organization structure',
+      'Project Management',
+      'Kanban Boards',
+      'Project Chat'
     ],
     featureGroups: [
       {
@@ -35,8 +38,8 @@ export const CORPORATE_MODULES: CorporateModule[] = [
         items: ['Departments & Designations catalog', 'User management & multi-role provisioning', 'Role-based access controls (RBAC)', 'Multi-level approval hierarchy'],
       },
       {
-        groupName: 'Policy Administration',
-        items: ['Company policies & statutory documents', 'Compliance and governance guidelines'],
+        groupName: 'Policy & Projects',
+        items: ['Company policies & statutory documents', 'Compliance and governance guidelines', 'Project Management & milestones', 'Kanban boards & task tracking', 'Project Chat & team workspace'],
       },
     ],
   },

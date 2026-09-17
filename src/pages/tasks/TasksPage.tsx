@@ -1,1482 +1,2183 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppStore } from '../../store/useAppStore';
 import { cn } from '../../utils';
 import {
-  CalendarCheck,
-  FileText,
-  CheckCircle2,
-  Clock,
-  Hourglass,
-  AlertTriangle,
-  Flame,
-  ChevronRight,
-  ChevronLeft,
+  Folder,
+  Layers,
+  ListTodo,
+  Boxes,
+  MessageSquare,
+  Plus,
   Search,
   Filter,
-  Plus,
-  MoreHorizontal,
-  Calendar,
-  Kanban,
-  BarChart2,
-  List,
-  CheckSquare,
+  CheckCircle2,
+  AlertTriangle,
+  Clock,
+  Hourglass,
+  Flame,
+  ChevronRight,
+  ChevronDown,
   X,
+  FileText,
   User,
-  Folder,
-  Eye,
-  Trash2,
+  ShieldCheck,
+  Zap,
+  GitBranch,
+  Bug,
+  Rocket,
+  RotateCcw,
+  BarChart2,
+  CheckSquare,
+  Sparkles,
+  ExternalLink,
+  Tag,
+  ArrowRight,
+  Calendar,
+  Building2,
+  Award,
+  Users,
+  UserPlus,
+  Settings,
+  ShieldAlert,
   Edit2,
-  SlidersHorizontal,
+  Trash2,
+  ArrowLeft,
+  LayoutGrid,
 } from 'lucide-react';
 
-export interface TaskItem {
+// ============================================================================
+// TYPES & INTERFACES (TEAMTRAKR PROJECT ARCHITECTURE)
+// ============================================================================
+
+export type JiraWorkType = 'Epic' | 'Story' | 'Task' | 'Sub-task' | 'Bug';
+export type JiraPriority = 'Critical' | 'High' | 'Medium' | 'Low';
+export type JiraStatus =
+  | 'TO DO'
+  | 'IN PROGRESS'
+  | 'CODE REVIEW'
+  | 'READY FOR QA'
+  | 'IN QA'
+  | 'QA PASSED'
+  | 'RELEASE READY'
+  | 'DONE';
+
+export interface ProjectMember {
   id: string;
-  taskId: string;
   name: string;
-  description: string;
-  project: string;
-  projectColor: string;
-  assignee: {
-    name: string;
-    role: string;
-    avatar: string;
-  };
-  priority: 'High' | 'Medium' | 'Low';
-  status: 'In Progress' | 'Pending' | 'Completed' | 'Overdue';
-  dueDate: string;
-  dueDateObj?: string;
-  progress: number;
+  role: string;
+  avatar: string;
+  email: string;
 }
 
-const INITIAL_TASKS: TaskItem[] = [
+export interface ProjectEntity {
+  id: string;
+  key: string;
+  name: string;
+  description: string;
+  category: string;
+  owner: string;
+  manager: string;
+  techLead: string;
+  budget: string;
+  techStack: string[];
+  members: ProjectMember[];
+  status: 'Planning' | 'Active' | 'Completed';
+  startDate: string;
+  targetEndDate: string;
+}
+
+export interface EpicItem {
+  id: string;
+  epicKey: string;
+  title: string;
+  description: string;
+  color: string;
+  progress: number;
+  totalStories: number;
+  completedStories: number;
+  owner: string;
+  targetRelease: string;
+  projectId: string;
+}
+
+export interface JiraWorkItem {
+  id: string;
+  itemKey: string;
+  type: JiraWorkType;
+  title: string;
+  description: string;
+  epicId?: string;
+  epicName?: string;
+  projectId: string;
+  projectName: string;
+  assignee: ProjectMember;
+  priority: JiraPriority;
+  status: JiraStatus;
+  storyPoints: number;
+  acceptanceCriteria?: string[];
+  bugSeverity?: 'Critical' | 'High' | 'Medium' | 'Low';
+  stepsToReproduce?: string;
+  dueDate: string;
+  releaseVersion: string;
+}
+
+// ============================================================================
+// INITIAL DEMO DATA
+// ============================================================================
+
+const AVAILABLE_ORGS_MEMBERS: ProjectMember[] = [
+  { id: 'm-1', name: 'Amit Verma', role: 'UI/UX Lead', email: 'amit@company.com', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80' },
+  { id: 'm-2', name: 'Neha Singh', role: 'Backend Lead', email: 'neha@company.com', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80' },
+  { id: 'm-3', name: 'Rahul Mehta', role: 'QA Lead', email: 'rahul@company.com', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80' },
+  { id: 'm-4', name: 'Pooja Sharma', role: 'Product Manager', email: 'pooja@company.com', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80' },
+  { id: 'm-5', name: 'Sahil Khan', role: 'DevOps & Security', email: 'sahil@company.com', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80' },
+  { id: 'm-6', name: 'Rohan Gupta', role: 'Frontend Developer', email: 'rohan@company.com', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80' },
+];
+
+const INITIAL_PROJECTS: ProjectEntity[] = [
   {
-    id: '1',
-    taskId: '#T-001',
-    name: 'Design Dashboard UI',
-    description: 'Create new dashboard design',
-    project: 'HRM Portal',
-    projectColor: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400',
-    assignee: {
-      name: 'Amit Verma',
-      role: 'UI/UX Designer',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'High',
-    status: 'In Progress',
-    dueDate: 'Apr 18, 2025',
-    dueDateObj: '2025-04-18',
-    progress: 60,
+    id: 'proj-1',
+    key: 'HRM',
+    name: 'HRM Portal & Employee Suite',
+    description: 'Enterprise human capital management platform including attendance, leave, and performance appraisal.',
+    category: 'Human Resources',
+    owner: 'Amit Verma',
+    manager: 'Pooja Sharma',
+    techLead: 'Neha Singh',
+    budget: '₹45,00,000',
+    techStack: ['React', 'Node.js', 'MongoDB', 'Tailwind'],
+    members: [AVAILABLE_ORGS_MEMBERS[0], AVAILABLE_ORGS_MEMBERS[1], AVAILABLE_ORGS_MEMBERS[2], AVAILABLE_ORGS_MEMBERS[3]],
+    status: 'Active',
+    startDate: 'Jan 15, 2025',
+    targetEndDate: 'Jun 30, 2025',
   },
   {
-    id: '2',
-    taskId: '#T-002',
-    name: 'API Integration',
-    description: 'Integrate payment gateway',
-    project: 'Finance App',
-    projectColor: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400',
-    assignee: {
-      name: 'Neha Singh',
-      role: 'Developer',
-      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'Medium',
-    status: 'In Progress',
-    dueDate: 'Apr 20, 2025',
-    dueDateObj: '2025-04-20',
-    progress: 40,
+    id: 'proj-2',
+    key: 'PAY',
+    name: 'Statutory Payroll Engine',
+    description: 'Automated EPF, ESI, TDS, PT calculations, tax slab configuration, and payslip generation.',
+    category: 'Finance & Compliance',
+    owner: 'Pooja Sharma',
+    manager: 'Neha Singh',
+    techLead: 'Sahil Khan',
+    budget: '₹30,00,000',
+    techStack: ['Python', 'PostgreSQL', 'Docker', 'Redis'],
+    members: [AVAILABLE_ORGS_MEMBERS[1], AVAILABLE_ORGS_MEMBERS[4], AVAILABLE_ORGS_MEMBERS[5]],
+    status: 'Active',
+    startDate: 'Feb 01, 2025',
+    targetEndDate: 'May 31, 2025',
   },
   {
-    id: '3',
-    taskId: '#T-003',
-    name: 'User Testing',
-    description: 'Conduct user acceptance test',
-    project: 'HRM Portal',
-    projectColor: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400',
-    assignee: {
-      name: 'Rahul Mehta',
-      role: 'QA Engineer',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'Low',
-    status: 'Pending',
-    dueDate: 'Apr 22, 2025',
-    dueDateObj: '2025-04-22',
-    progress: 0,
-  },
-  {
-    id: '4',
-    taskId: '#T-004',
-    name: 'Documentation',
-    description: 'Write module documentation',
-    project: 'HRM Portal',
-    projectColor: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400',
-    assignee: {
-      name: 'Pooja Sharma',
-      role: 'Technical Writer',
-      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'Medium',
-    status: 'Completed',
-    dueDate: 'Apr 15, 2025',
-    dueDateObj: '2025-04-15',
-    progress: 100,
-  },
-  {
-    id: '5',
-    taskId: '#T-005',
-    name: 'Database Optimization',
-    description: 'Improve query performance',
-    project: 'Backend',
-    projectColor: 'bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400',
-    assignee: {
-      name: 'Sahil Khan',
-      role: 'Developer',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'High',
-    status: 'In Progress',
-    dueDate: 'Apr 19, 2025',
-    dueDateObj: '2025-04-19',
-    progress: 70,
-  },
-  {
-    id: '6',
-    taskId: '#T-006',
-    name: 'Mobile App Testing',
-    description: 'Test mobile app on devices',
-    project: 'Mobile App',
-    projectColor: 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400',
-    assignee: {
-      name: 'Sneha Patel',
-      role: 'QA Engineer',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'Medium',
-    status: 'Pending',
-    dueDate: 'Apr 23, 2025',
-    dueDateObj: '2025-04-23',
-    progress: 20,
-  },
-  {
-    id: '7',
-    taskId: '#T-007',
-    name: 'Marketing Campaign',
-    description: 'Prepare campaign materials',
-    project: 'Marketing',
-    projectColor: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400',
-    assignee: {
-      name: 'Karan Yadav',
-      role: 'Marketing',
-      avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'Low',
-    status: 'Pending',
-    dueDate: 'Apr 25, 2025',
-    dueDateObj: '2025-04-25',
-    progress: 0,
-  },
-  {
-    id: '8',
-    taskId: '#T-008',
-    name: 'Server Maintenance',
-    description: 'Routine server checkup',
-    project: 'IT Support',
-    projectColor: 'bg-cyan-50 text-cyan-600 dark:bg-cyan-950/60 dark:text-cyan-400',
-    assignee: {
-      name: 'Vikas Kumar',
-      role: 'IT Admin',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'Medium',
-    status: 'In Progress',
-    dueDate: 'Apr 21, 2025',
-    dueDateObj: '2025-04-21',
-    progress: 50,
-  },
-  // Additional tasks to complete 15 total tasks as shown in reference:
-  {
-    id: '9',
-    taskId: '#T-009',
-    name: 'SOC-2 Compliance Audit Prep',
-    description: 'Prepare evidence for SOC-2 security audit',
-    project: 'Security',
-    projectColor: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400',
-    assignee: {
-      name: 'Sahil Khan',
-      role: 'Security Lead',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'High',
-    status: 'Overdue',
-    dueDate: 'Apr 10, 2025',
-    dueDateObj: '2025-04-10',
-    progress: 85,
-  },
-  {
-    id: '10',
-    taskId: '#T-010',
-    name: 'Employee Onboarding Flow',
-    description: 'Refine wizard for new hires',
-    project: 'HRM Portal',
-    projectColor: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400',
-    assignee: {
-      name: 'Amit Verma',
-      role: 'UI/UX Designer',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'Medium',
-    status: 'Completed',
-    dueDate: 'Apr 12, 2025',
-    dueDateObj: '2025-04-12',
-    progress: 100,
-  },
-  {
-    id: '11',
-    taskId: '#T-011',
-    name: 'Payroll Deduction Calculation',
-    description: 'Verify tax slab logic updates',
-    project: 'Finance App',
-    projectColor: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400',
-    assignee: {
-      name: 'Neha Singh',
-      role: 'Developer',
-      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'High',
-    status: 'Completed',
-    dueDate: 'Apr 14, 2025',
-    dueDateObj: '2025-04-14',
-    progress: 100,
-  },
-  {
-    id: '12',
-    taskId: '#T-012',
-    name: 'Candidate ATS Kanban Drag & Drop',
-    description: 'Add fluid touch gestures',
-    project: 'HRM Portal',
-    projectColor: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400',
-    assignee: {
-      name: 'Rahul Mehta',
-      role: 'QA Engineer',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'Low',
-    status: 'Completed',
-    dueDate: 'Apr 08, 2025',
-    dueDateObj: '2025-04-08',
-    progress: 100,
-  },
-  {
-    id: '13',
-    taskId: '#T-013',
-    name: 'Benefits PDF Brochure Design',
-    description: 'Finalize brochure typography and layout',
-    project: 'HRM Portal',
-    projectColor: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400',
-    assignee: {
-      name: 'Pooja Sharma',
-      role: 'Technical Writer',
-      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'Medium',
-    status: 'Completed',
-    dueDate: 'Apr 06, 2025',
-    dueDateObj: '2025-04-06',
-    progress: 100,
-  },
-  {
-    id: '14',
-    taskId: '#T-014',
-    name: 'Weekly Cloud Cost Optimization',
-    description: 'Audit idle EC2 and Redis cache usage',
-    project: 'Backend',
-    projectColor: 'bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400',
-    assignee: {
-      name: 'Vikas Kumar',
-      role: 'IT Admin',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'Low',
-    status: 'Completed',
-    dueDate: 'Apr 04, 2025',
-    dueDateObj: '2025-04-04',
-    progress: 100,
-  },
-  {
-    id: '15',
-    taskId: '#T-015',
-    name: 'Dark Mode Glassmorphism Polish',
-    description: 'Ensure contrast and crisp text rendering across all tables',
-    project: 'HRM Portal',
-    projectColor: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400',
-    assignee: {
-      name: 'Amit Verma',
-      role: 'UI/UX Designer',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    },
-    priority: 'High',
-    status: 'In Progress',
-    dueDate: 'Apr 26, 2025',
-    dueDateObj: '2025-04-26',
-    progress: 55,
+    id: 'proj-3',
+    key: 'MOB',
+    name: 'Mobile ESS & Attendance App',
+    description: 'Cross-platform mobile application for employee self-service, geo-fenced clock-in, and leave apply.',
+    category: 'Mobile Apps',
+    owner: 'Neha Singh',
+    manager: 'Amit Verma',
+    techLead: 'Rohan Gupta',
+    budget: '₹20,00,000',
+    techStack: ['React Native', 'GraphQL', 'Firebase'],
+    members: [AVAILABLE_ORGS_MEMBERS[0], AVAILABLE_ORGS_MEMBERS[5]],
+    status: 'Planning',
+    startDate: 'Mar 10, 2025',
+    targetEndDate: 'Aug 15, 2025',
   },
 ];
 
+const INITIAL_EPICS: EpicItem[] = [
+  {
+    id: 'epic-1',
+    epicKey: 'EPIC-01',
+    title: 'Employee Onboarding & Lifecycle Management',
+    description: 'Complete digital onboarding, document uploads, and contract generation.',
+    color: 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-800',
+    progress: 75,
+    totalStories: 12,
+    completedStories: 9,
+    owner: 'Amit Verma',
+    targetRelease: 'Release v1.2.0',
+    projectId: 'proj-1',
+  },
+  {
+    id: 'epic-2',
+    epicKey: 'EPIC-02',
+    title: 'Statutory Payroll & Tax Slab Processing',
+    description: 'Automated EPF, ESI, TDS, PT deductions, and payslip distribution.',
+    color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+    progress: 60,
+    totalStories: 15,
+    completedStories: 9,
+    owner: 'Neha Singh',
+    targetRelease: 'Release v1.2.0',
+    projectId: 'proj-2',
+  },
+];
+
+const INITIAL_WORK_ITEMS: JiraWorkItem[] = [
+  {
+    id: 'item-1',
+    itemKey: 'HRM-101',
+    type: 'Story',
+    title: 'As an HR Admin, I want to create an employee account with custom seat permissions',
+    description: 'Allow org admins to register employees, set designations, and send onboarding emails.',
+    epicId: 'epic-1',
+    epicName: 'Employee Onboarding & Lifecycle Management',
+    projectId: 'proj-1',
+    projectName: 'HRM Portal & Employee Suite',
+    assignee: AVAILABLE_ORGS_MEMBERS[0],
+    priority: 'High',
+    status: 'IN PROGRESS',
+    storyPoints: 5,
+    dueDate: 'Apr 28, 2025',
+    releaseVersion: 'Release v1.1.0',
+  },
+  {
+    id: 'item-2',
+    itemKey: 'PAY-102',
+    type: 'Task',
+    title: 'Implement EPF & TDS Tax Deduction Engine in Payroll Service',
+    description: 'Integrate Indian statutory tax slabs calculation based on gross monthly salary.',
+    epicId: 'epic-2',
+    epicName: 'Statutory Payroll & Tax Slab Processing',
+    projectId: 'proj-2',
+    projectName: 'Statutory Payroll Engine',
+    assignee: AVAILABLE_ORGS_MEMBERS[1],
+    priority: 'Critical',
+    status: 'CODE REVIEW',
+    storyPoints: 8,
+    dueDate: 'Apr 30, 2025',
+    releaseVersion: 'Release v1.2.0',
+  },
+  {
+    id: 'item-3',
+    itemKey: 'HRM-103',
+    type: 'Bug',
+    title: 'Kanban Board drag-and-drop state reset on page refresh',
+    description: 'When moving card to IN QA column, refreshing page reverts card back.',
+    epicId: 'epic-1',
+    epicName: 'Employee Onboarding & Lifecycle Management',
+    projectId: 'proj-1',
+    projectName: 'HRM Portal & Employee Suite',
+    assignee: AVAILABLE_ORGS_MEMBERS[2],
+    priority: 'High',
+    status: 'IN QA',
+    storyPoints: 3,
+    bugSeverity: 'Critical',
+    stepsToReproduce: '1. Go to Sprint Board\n2. Drag card to IN QA\n3. Press F5 refresh',
+    dueDate: 'Apr 26, 2025',
+    releaseVersion: 'Release v1.1.0',
+  },
+  {
+    id: 'item-4',
+    itemKey: 'PAY-104',
+    type: 'Story',
+    title: 'Generate Statutory Form 16 & Tax Computation Sheets',
+    description: 'Provide annual tax computation breakdown and downloadable PDF reports.',
+    epicId: 'epic-2',
+    epicName: 'Statutory Payroll & Tax Slab Processing',
+    projectId: 'proj-2',
+    projectName: 'Statutory Payroll Engine',
+    assignee: AVAILABLE_ORGS_MEMBERS[4],
+    priority: 'High',
+    status: 'TO DO',
+    storyPoints: 5,
+    dueDate: 'May 10, 2025',
+    releaseVersion: 'Release v1.2.0',
+  },
+];
+
+// ============================================================================
+// MAIN COMPONENT: TEAMTRAKR PROJECT-FIRST WORKSPACE
+// ============================================================================
+
 export const TasksPage: React.FC = () => {
   const navigate = useNavigate();
-  const [tasks, setTasks] = useState<TaskItem[]>(INITIAL_TASKS);
-  const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
+  const { currentUser, currentRole } = useAppStore();
+
+  // Navigation State: null = All Projects Grid View; string = Active Project ID View
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [activeProjectTab, setActiveProjectTab] = useState<'kanban' | 'epics' | 'backlog' | 'bugs' | 'team'>('kanban');
+
+  // Core Collections
+  const [projects, setProjects] = useState<ProjectEntity[]>(INITIAL_PROJECTS);
+  const [epics, setEpics] = useState<EpicItem[]>(INITIAL_EPICS);
+  const [workItems, setWorkItems] = useState<JiraWorkItem[]>(INITIAL_WORK_ITEMS);
+
+  // Search & Filters
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('All');
-  const [selectedPriorityFilter, setSelectedPriorityFilter] = useState<string>('All');
-  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
-  const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 8;
 
-  // New Task Modal
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newDescription, setNewDescription] = useState('');
-  const [newProject, setNewProject] = useState('HRM Portal');
-  const [newAssignee, setNewAssignee] = useState('Amit Verma');
-  const [newPriority, setNewPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
-  const [newStatus, setNewStatus] = useState<'In Progress' | 'Pending' | 'Completed'>('In Progress');
-  const [newDueDate, setNewDueDate] = useState('Apr 28, 2025');
+  // Login-Based Project Access Control Logic (tied to active logged-in user profile & role)
+  const visibleProjects = useMemo(() => {
+    return projects.filter((proj) => {
+      // 1. Search Query Filter
+      const matchesSearch =
+        searchQuery === '' ||
+        proj.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        proj.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        proj.category.toLowerCase().includes(searchQuery.toLowerCase());
 
-  // Active Toast Notification
+      if (!matchesSearch) return false;
+
+      // 2. Role Access Rules
+      // Super Admin, Org Owner, Org Admin, HR Admin see ALL workspace projects
+      if (
+        currentRole === 'saas_owner' ||
+        currentRole === 'org_owner' ||
+        currentRole === 'org_admin' ||
+        currentRole === 'hr_admin'
+      ) {
+        return true;
+      }
+
+      // Engineering Manager sees projects where they are Manager, Owner, or Team Member
+      if (currentRole === 'manager') {
+        const isManager =
+          proj.manager === currentUser.name ||
+          proj.owner === currentUser.name ||
+          proj.manager === 'Pooja Sharma';
+        const isMember = proj.members.some(
+          (m) => m.name === currentUser.name || m.email === currentUser.email || m.id === currentUser.id
+        );
+        return isManager || isMember;
+      }
+
+      // Employee / Member / HR Executive / Recruiter sees ONLY projects where they are in team roster or assigned a task
+      const isMember = proj.members.some(
+        (m) =>
+          m.name === currentUser.name ||
+          m.email === currentUser.email ||
+          m.id === currentUser.id ||
+          m.name.toLowerCase().includes(currentUser.name.split(' ')[0].toLowerCase())
+      );
+      const hasTask = workItems.some(
+        (item) =>
+          item.projectId === proj.id &&
+          (item.assignee.name === currentUser.name || item.assignee.id === currentUser.id)
+      );
+
+      return isMember || hasTask;
+    });
+  }, [projects, searchQuery, currentRole, currentUser, workItems]);
+
+  // Modals (CRUD)
+  const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
+  const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<ProjectEntity | null>(null);
+  const [isDeleteProjectConfirmOpen, setIsDeleteProjectConfirmOpen] = useState(false);
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
+
+  // Task & Member Modals
+  const [isWorkItemModalOpen, setIsWorkItemModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Create Project Form State
+  const [projName, setProjName] = useState('');
+  const [projKey, setProjKey] = useState('');
+  const [projDesc, setProjDesc] = useState('');
+  const [projCategory, setProjCategory] = useState('Human Resources');
+  const [projOwner, setProjOwner] = useState('Amit Verma');
+  const [projManager, setProjManager] = useState('Pooja Sharma');
+  const [projTechLead, setProjTechLead] = useState('Neha Singh');
+  const [projMemberIds, setProjMemberIds] = useState<string[]>(['m-1', 'm-2', 'm-3']);
+
+  // Create Work Item Form State
+  const [itemTitle, setItemTitle] = useState('');
+  const [itemDesc, setItemDesc] = useState('');
+  const [itemType, setItemType] = useState<JiraWorkType | 'Epic'>('Story');
+  const [itemPriority, setItemPriority] = useState<JiraPriority>('Medium');
+  const [itemPoints, setItemPoints] = useState(5);
+  const [itemAssigneeId, setItemAssigneeId] = useState(AVAILABLE_ORGS_MEMBERS[0].id);
+
+  // Edit & Delete Work Item State
+  const [editingWorkItem, setEditingWorkItem] = useState<JiraWorkItem | null>(null);
+  const [isEditWorkItemModalOpen, setIsEditWorkItemModalOpen] = useState(false);
+  const [deletingWorkItemId, setDeletingWorkItemId] = useState<string | null>(null);
+  const [isDeleteWorkItemConfirmOpen, setIsDeleteWorkItemConfirmOpen] = useState(false);
+
+  // Edit & Delete Epic State
+  const [editingEpic, setEditingEpic] = useState<EpicItem | null>(null);
+  const [isEditEpicModalOpen, setIsEditEpicModalOpen] = useState(false);
+  const [deletingEpicId, setDeletingEpicId] = useState<string | null>(null);
+  const [isDeleteEpicConfirmOpen, setIsDeleteEpicConfirmOpen] = useState(false);
+
+  // Drag and Drop Kanban Board State
+  const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<JiraStatus | null>(null);
+
+  const openCreateWorkItemModal = (defaultType: JiraWorkType | 'Epic' = 'Story') => {
+    setItemType(defaultType);
+    setItemTitle('');
+    setItemDesc('');
+    setIsWorkItemModalOpen(true);
+  };
+
+  const openEditWorkItemModal = (item: JiraWorkItem, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setEditingWorkItem(item);
+    setItemTitle(item.title);
+    setItemDesc(item.description);
+    setItemType(item.type);
+    setItemPriority(item.priority);
+    setItemPoints(item.storyPoints);
+    setItemAssigneeId(item.assignee.id);
+    setIsEditWorkItemModalOpen(true);
+  };
+
+  const openDeleteWorkItemConfirm = (itemId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setDeletingWorkItemId(itemId);
+    setIsDeleteWorkItemConfirmOpen(true);
+  };
+
+  const openEditEpicModal = (epic: EpicItem, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setEditingEpic(epic);
+    setItemTitle(epic.title);
+    setItemDesc(epic.description);
+    setIsEditEpicModalOpen(true);
+  };
+
+  const openDeleteEpicConfirm = (epicId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setDeletingEpicId(epicId);
+    setIsDeleteEpicConfirmOpen(true);
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Filter Tasks
-  const filteredTasks = useMemo(() => {
-    return tasks.filter((t) => {
-      // Search
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesName = t.name.toLowerCase().includes(q);
-        const matchesDesc = t.description.toLowerCase().includes(q);
-        const matchesProject = t.project.toLowerCase().includes(q);
-        const matchesAssignee = t.assignee.name.toLowerCase().includes(q);
-        if (!matchesName && !matchesDesc && !matchesProject && !matchesAssignee) return false;
-      }
+  // Active Project Reference
+  const activeProject = useMemo(() => {
+    return projects.find((p) => p.id === selectedProjectId) || null;
+  }, [projects, selectedProjectId]);
 
-      // Status
-      if (selectedStatusFilter !== 'All' && t.status !== selectedStatusFilter) {
-        return false;
-      }
+  // Tasks for Active Project
+  const activeProjectTasks = useMemo(() => {
+    if (!selectedProjectId) return workItems;
+    return workItems.filter((i) => i.projectId === selectedProjectId);
+  }, [workItems, selectedProjectId]);
 
-      // Priority
-      if (selectedPriorityFilter !== 'All' && t.priority !== selectedPriorityFilter) {
-        return false;
-      }
+  // ============================================================================
+  // PROJECT CRUD HANDLERS
+  // ============================================================================
 
-      return true;
-    });
-  }, [tasks, searchQuery, selectedStatusFilter, selectedPriorityFilter]);
-
-  // Pagination for List View
-  const totalPages = Math.ceil(filteredTasks.length / pageSize) || 1;
-  const paginatedTasks = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredTasks.slice(start, start + pageSize);
-  }, [filteredTasks, currentPage]);
-
-  // Metrics Count Calculation
-  const totalCount = tasks.length;
-  const completedCount = tasks.filter((t) => t.status === 'Completed').length;
-  const inProgressCount = tasks.filter((t) => t.status === 'In Progress').length;
-  const pendingCount = tasks.filter((t) => t.status === 'Pending').length;
-  const overdueCount = tasks.filter((t) => t.status === 'Overdue').length;
-  const highPriorityCount = tasks.filter((t) => t.priority === 'High').length;
-
-  const completedPercentage = Math.round((completedCount / totalCount) * 100) || 0;
-
-  // Handle Select All checkbox
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedTaskIds(paginatedTasks.map((t) => t.id));
-    } else {
-      setSelectedTaskIds([]);
-    }
-  };
-
-  const handleToggleRow = (id: string) => {
-    setSelectedTaskIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
-
-  // Create Task Submission
-  const handleCreateTask = (e: React.FormEvent) => {
+  // 1. CREATE PROJECT
+  const handleCreateProjectSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim()) return;
+    if (!projName.trim() || !projKey.trim()) return;
 
-    const newTaskNumber = tasks.length + 1;
-    const formattedId = `#T-${String(newTaskNumber).padStart(3, '0')}`;
-
-    const newTask: TaskItem = {
-      id: String(Date.now()),
-      taskId: formattedId,
-      name: newTitle,
-      description: newDescription || 'Standard task item',
-      project: newProject,
-      projectColor: newProject === 'HRM Portal' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600',
-      assignee: {
-        name: newAssignee,
-        role: newAssignee === 'Amit Verma' ? 'UI/UX Designer' : 'Developer',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-      },
-      priority: newPriority,
-      status: newStatus,
-      dueDate: newDueDate,
-      progress: newStatus === 'Completed' ? 100 : newStatus === 'In Progress' ? 25 : 0,
+    const assignedMembers = AVAILABLE_ORGS_MEMBERS.filter((m) => projMemberIds.includes(m.id));
+    const newProj: ProjectEntity = {
+      id: `proj-${Date.now()}`,
+      key: projKey.toUpperCase().trim(),
+      name: projName.trim(),
+      description: projDesc.trim() || 'Enterprise software project.',
+      category: projCategory,
+      owner: projOwner,
+      manager: projManager,
+      techLead: projTechLead,
+      budget: '₹25,00,000',
+      techStack: ['React', 'Node.js', 'PostgreSQL'],
+      members: assignedMembers,
+      status: 'Active',
+      startDate: 'Apr 01, 2025',
+      targetEndDate: 'Oct 31, 2025',
     };
 
-    setTasks([newTask, ...tasks]);
-    setIsCreateModalOpen(false);
-    setNewTitle('');
-    setNewDescription('');
-    showToast(`Task ${formattedId} created successfully!`);
+    setProjects([...projects, newProj]);
+    setIsCreateProjectModalOpen(false);
+    setProjName('');
+    setProjKey('');
+    setProjDesc('');
+    showToast(`Project "${newProj.name}" created!`);
   };
 
-  // Upcoming Deadlines List (from reference)
-  const upcomingDeadlines = [
-    {
-      id: 'd-1',
-      title: 'Design Dashboard UI',
-      date: 'Apr 18, 2025',
-      relative: '(Today)',
-      priority: 'High',
-      isToday: true,
-    },
-    {
-      id: 'd-2',
-      title: 'API Integration',
-      date: 'Apr 20, 2025',
-      relative: '(In 2 days)',
-      priority: 'Medium',
-      isToday: false,
-    },
-    {
-      id: 'd-3',
-      title: 'Server Maintenance',
-      date: 'Apr 21, 2025',
-      relative: '(In 3 days)',
-      priority: 'High',
-      isToday: false,
-    },
-    {
-      id: 'd-4',
-      title: 'Mobile App Testing',
-      date: 'Apr 23, 2025',
-      relative: '(In 5 days)',
-      priority: 'Medium',
-      isToday: false,
-    },
+  // 2. EDIT PROJECT (OPEN MODAL)
+  const openEditProjectModal = (proj: ProjectEntity, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingProject(proj);
+    setProjName(proj.name);
+    setProjKey(proj.key);
+    setProjDesc(proj.description);
+    setProjCategory(proj.category);
+    setProjOwner(proj.owner);
+    setProjManager(proj.manager || 'Pooja Sharma');
+    setProjTechLead(proj.techLead);
+    setProjMemberIds(proj.members.map((m) => m.id));
+    setIsEditProjectModalOpen(true);
+  };
+
+  // UPDATE PROJECT SUBMIT
+  const handleUpdateProjectSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProject || !projName.trim()) return;
+
+    const assignedMembers = AVAILABLE_ORGS_MEMBERS.filter((m) => projMemberIds.includes(m.id));
+    setProjects((prev) =>
+      prev.map((p) =>
+        p.id === editingProject.id
+          ? {
+            ...p,
+            name: projName.trim(),
+            key: projKey.toUpperCase().trim(),
+            description: projDesc.trim(),
+            category: projCategory,
+            owner: projOwner,
+            manager: projManager,
+            techLead: projTechLead,
+            members: assignedMembers,
+          }
+          : p
+      )
+    );
+    setIsEditProjectModalOpen(false);
+    setEditingProject(null);
+    showToast(`Project "${projName}" updated successfully!`);
+  };
+
+  // 3. DELETE PROJECT CONFIRM
+  const openDeleteProjectConfirm = (projId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeletingProjectId(projId);
+    setIsDeleteProjectConfirmOpen(true);
+  };
+
+  const handleConfirmDeleteProject = () => {
+    if (!deletingProjectId) return;
+    const projToDelete = projects.find((p) => p.id === deletingProjectId);
+    setProjects((prev) => prev.filter((p) => p.id !== deletingProjectId));
+    setWorkItems((prev) => prev.filter((i) => i.projectId !== deletingProjectId));
+
+    if (selectedProjectId === deletingProjectId) {
+      setSelectedProjectId(null);
+    }
+    setIsDeleteProjectConfirmOpen(false);
+    setDeletingProjectId(null);
+    showToast(`Project "${projToDelete?.name || ''}" deleted.`);
+  };
+
+  // Transition Task Status
+  const handleTransitionStatus = (itemId: string, newStatus: JiraStatus) => {
+    setWorkItems((prev) =>
+      prev.map((item) => (item.id === itemId ? { ...item, status: newStatus } : item))
+    );
+    showToast(`Status updated to ${newStatus}`);
+  };
+
+  // Add Task / Epic / Bug to Active Project
+  const handleCreateWorkItemSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!itemTitle.trim() || !selectedProjectId) return;
+    const projObj = projects.find((p) => p.id === selectedProjectId);
+    if (!projObj) return;
+
+    const assigneeObj = AVAILABLE_ORGS_MEMBERS.find((m) => m.id === itemAssigneeId) || AVAILABLE_ORGS_MEMBERS[0];
+
+    if (itemType === 'Epic') {
+      const epicKeyFormatted = `EPIC-${String(epics.length + 1).padStart(2, '0')}`;
+      const newEpic: EpicItem = {
+        id: `epic-${Date.now()}`,
+        epicKey: epicKeyFormatted,
+        title: itemTitle,
+        description: itemDesc || 'Strategic requirement module.',
+        color: 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-800',
+        progress: 0,
+        totalStories: 0,
+        completedStories: 0,
+        owner: assigneeObj.name,
+        targetRelease: 'Release v1.2.0',
+        projectId: projObj.id,
+      };
+      setEpics([newEpic, ...epics]);
+      setIsWorkItemModalOpen(false);
+      setItemTitle('');
+      setItemDesc('');
+      showToast(`Epic ${epicKeyFormatted} created for ${projObj.name}!`);
+      return;
+    }
+
+    const formattedKey = `${projObj.key}-${100 + workItems.length + 1}`;
+    const newItem: JiraWorkItem = {
+      id: `item-${Date.now()}`,
+      itemKey: formattedKey,
+      type: itemType as JiraWorkType,
+      title: itemTitle,
+      description: itemDesc || (itemType === 'Bug' ? 'Defect reported during QA run.' : 'Added during sprint planning.'),
+      projectId: projObj.id,
+      projectName: projObj.name,
+      assignee: assigneeObj,
+      priority: itemPriority,
+      status: itemType === 'Bug' ? 'IN QA' : 'TO DO',
+      storyPoints: Number(itemPoints),
+      dueDate: 'May 15, 2025',
+      releaseVersion: 'Release v1.2.0',
+      ...(itemType === 'Bug' ? { bugSeverity: itemPriority === 'Critical' ? 'Critical' : 'High', stepsToReproduce: itemDesc } : {}),
+    };
+
+    setWorkItems([newItem, ...workItems]);
+    setIsWorkItemModalOpen(false);
+    setItemTitle('');
+    setItemDesc('');
+    showToast(`${itemType} ${formattedKey} created for ${projObj.name}!`);
+  };
+
+  // UPDATE WORK ITEM (Story / Bug / Task)
+  const handleUpdateWorkItemSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingWorkItem || !itemTitle.trim()) return;
+
+    const assigneeObj = AVAILABLE_ORGS_MEMBERS.find((m) => m.id === itemAssigneeId) || editingWorkItem.assignee;
+
+    setWorkItems((prev) =>
+      prev.map((item) =>
+        item.id === editingWorkItem.id
+          ? {
+            ...item,
+            title: itemTitle,
+            description: itemDesc,
+            type: itemType as JiraWorkType,
+            priority: itemPriority,
+            storyPoints: Number(itemPoints),
+            assignee: assigneeObj,
+          }
+          : item
+      )
+    );
+
+    setIsEditWorkItemModalOpen(false);
+    setEditingWorkItem(null);
+    showToast(`Work item ${editingWorkItem.itemKey} updated!`);
+  };
+
+  // DELETE WORK ITEM
+  const handleConfirmDeleteWorkItem = () => {
+    if (!deletingWorkItemId) return;
+    const itemToDelete = workItems.find((i) => i.id === deletingWorkItemId);
+    setWorkItems((prev) => prev.filter((i) => i.id !== deletingWorkItemId));
+    setIsDeleteWorkItemConfirmOpen(false);
+    setDeletingWorkItemId(null);
+    showToast(`Work item ${itemToDelete?.itemKey || ''} deleted.`);
+  };
+
+  // UPDATE EPIC
+  const handleUpdateEpicSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingEpic || !itemTitle.trim()) return;
+
+    setEpics((prev) =>
+      prev.map((epic) =>
+        epic.id === editingEpic.id
+          ? {
+            ...epic,
+            title: itemTitle,
+            description: itemDesc,
+          }
+          : epic
+      )
+    );
+
+    setIsEditEpicModalOpen(false);
+    setEditingEpic(null);
+    showToast(`Epic ${editingEpic.epicKey} updated!`);
+  };
+
+  // DELETE EPIC
+  const handleConfirmDeleteEpic = () => {
+    if (!deletingEpicId) return;
+    const epicToDelete = epics.find((e) => e.id === deletingEpicId);
+    setEpics((prev) => prev.filter((e) => e.id !== deletingEpicId));
+    setIsDeleteEpicConfirmOpen(false);
+    setDeletingEpicId(null);
+    showToast(`Epic ${epicToDelete?.epicKey || ''} deleted.`);
+  };
+
+  const SPRINT_COLUMNS: JiraStatus[] = [
+    'TO DO',
+    'IN PROGRESS',
+    'CODE REVIEW',
+    'READY FOR QA',
+    'IN QA',
+    'QA PASSED',
+    'RELEASE READY',
+    'DONE',
   ];
 
   return (
-    <div className="space-y-4 animate-page-enter pb-12">
-      
+    <div className="space-y-6 pb-12 animate-in fade-in">
       {/* =========================================================================
-          1. HEADER (BLUE CALENDAR/CHECKLIST ICON + TITLE + 2 SUBTITLE LINES)
+          MODE 1: ALL PROJECTS GRID OVERVIEW (HOME DASHBOARD)
          ========================================================================= */}
-      <div className="flex items-start gap-3.5">
-        <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-100 dark:border-blue-900/60 shadow-xs flex-shrink-0">
-          <CalendarCheck className="w-6 h-6 stroke-[2.2]" />
-        </div>
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            My Tasks
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-            Manage your assigned tasks, track progress and stay on top of your work.
-          </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Complete your tasks on time and achieve your goals.
-          </p>
-        </div>
-      </div>
-
-      {/* =========================================================================
-          2. TOP METRIC KPI STAT CARDS (6 HORIZONTAL CARDS MATCHING REFERENCE)
-         ========================================================================= */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
-        
-        {/* Card 1: Total Tasks */}
-        <div
-          onClick={() => { setSelectedStatusFilter('All'); setSelectedPriorityFilter('All'); }}
-          className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#12121B] p-3.5 shadow-xs hover-card-lift transition-all cursor-pointer group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-xs flex-shrink-0">
-              <FileText className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-[11.5px] font-semibold text-slate-500 dark:text-slate-400 block truncate">
-                Total Tasks
-              </span>
-              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                {totalCount}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10.5px] font-medium text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-            <span>All assigned tasks</span>
-            <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-              <ChevronRight className="w-2.5 h-2.5" />
-            </span>
-          </div>
-        </div>
-
-        {/* Card 2: Completed */}
-        <div
-          onClick={() => setSelectedStatusFilter('Completed')}
-          className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#12121B] p-3.5 shadow-xs hover-card-lift transition-all cursor-pointer group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shadow-xs flex-shrink-0">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-[11.5px] font-semibold text-slate-500 dark:text-slate-400 block truncate">
-                Completed
-              </span>
-              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                {completedCount}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10.5px] font-medium text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-            <span>Finished tasks</span>
-            <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-              <ChevronRight className="w-2.5 h-2.5" />
-            </span>
-          </div>
-        </div>
-
-        {/* Card 3: In Progress */}
-        <div
-          onClick={() => setSelectedStatusFilter('In Progress')}
-          className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#12121B] p-3.5 shadow-xs hover-card-lift transition-all cursor-pointer group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shadow-xs flex-shrink-0">
-              <Clock className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-[11.5px] font-semibold text-slate-500 dark:text-slate-400 block truncate">
-                In Progress
-              </span>
-              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                {inProgressCount}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10.5px] font-medium text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-            <span>Currently working</span>
-            <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-amber-600 group-hover:text-white transition-colors">
-              <ChevronRight className="w-2.5 h-2.5" />
-            </span>
-          </div>
-        </div>
-
-        {/* Card 4: Pending */}
-        <div
-          onClick={() => setSelectedStatusFilter('Pending')}
-          className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#12121B] p-3.5 shadow-xs hover-card-lift transition-all cursor-pointer group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shadow-xs flex-shrink-0">
-              <Hourglass className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-[11.5px] font-semibold text-slate-500 dark:text-slate-400 block truncate">
-                Pending
-              </span>
-              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                {pendingCount}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10.5px] font-medium text-slate-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-            <span>Not started yet</span>
-            <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-              <ChevronRight className="w-2.5 h-2.5" />
-            </span>
-          </div>
-        </div>
-
-        {/* Card 5: Overdue */}
-        <div
-          onClick={() => setSelectedStatusFilter('Overdue')}
-          className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#12121B] p-3.5 shadow-xs hover-card-lift transition-all cursor-pointer group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shadow-xs flex-shrink-0">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-[11.5px] font-semibold text-slate-500 dark:text-slate-400 block truncate">
-                Overdue
-              </span>
-              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                {overdueCount}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10.5px] font-medium text-slate-400 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
-            <span>Past due date</span>
-            <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-rose-600 group-hover:text-white transition-colors">
-              <ChevronRight className="w-2.5 h-2.5" />
-            </span>
-          </div>
-        </div>
-
-        {/* Card 6: High Priority */}
-        <div
-          onClick={() => setSelectedPriorityFilter('High')}
-          className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#12121B] p-3.5 shadow-xs hover-card-lift transition-all cursor-pointer group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-xs flex-shrink-0">
-              <Flame className="w-5 h-5 fill-current" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-[11.5px] font-semibold text-slate-500 dark:text-slate-400 block truncate">
-                High Priority
-              </span>
-              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                {highPriorityCount}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10.5px] font-medium text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-            <span>Urgent tasks</span>
-            <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-              <ChevronRight className="w-2.5 h-2.5" />
-            </span>
-          </div>
-        </div>
-
-      </div>
-
-      {/* =========================================================================
-          3. MAIN SECTION: LEFT DATA CARD (8.5 COLS) + RIGHT WIDGETS (3.5 COLS)
-         ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        
-        {/* =======================================================================
-            LEFT COLUMN: TASKS TABLE CONTAINER (8.5 COLS)
-           ======================================================================= */}
-        <div className="lg:col-span-8 xl:col-span-8.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#12121B] shadow-xs overflow-hidden">
-          
-          {/* Top Control Bar: View Switcher Tabs (Left) + Search & Filter (Right) */}
-          <div className="p-3.5 border-b border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            
-            {/* View Switcher Pills - List View & Kanban View only */}
-            <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/70 p-1 rounded-xl">
-              <button
-                type="button"
-                onClick={() => setViewMode('list')}
-                className={cn(
-                  'flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap',
-                  viewMode === 'list'
-                    ? 'bg-blue-600 text-white shadow-2xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                )}
-              >
-                <List className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>List View</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setViewMode('kanban')}
-                className={cn(
-                  'flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap',
-                  viewMode === 'kanban'
-                    ? 'bg-blue-600 text-white shadow-2xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                )}
-              >
-                <Kanban className="w-3.5 h-3.5" />
-                <span>Kanban View</span>
-              </button>
-            </div>
-
-            {/* Right: Search & Filter */}
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1 sm:w-56">
-                <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  placeholder="Search tasks..."
-                  className="w-full h-9 pl-9 pr-3 text-xs bg-slate-50/70 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
+      {!selectedProjectId && (
+        <div className="space-y-6">
+          {/* Top Command Header */}
+          <div className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md shrink-0">
+                <Boxes className="w-6 h-6 stroke-[2.2]" />
               </div>
+              <div>
+                <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                  TeamTrakr Multi-Project Workspace
+                </h1>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Select a project to open its Kanban board, assign team members, and manage sprint deliverables.
+                </p>
+              </div>
+            </div>
 
-              {/* Filter Dropdown Popover */}
-              <div className="relative">
-                <button
-                  onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-                  className={cn(
-                    'h-9 px-3 rounded-xl border flex items-center gap-1.5 text-xs font-semibold transition-all cursor-pointer shadow-2xs',
-                    selectedStatusFilter !== 'All' || selectedPriorityFilter !== 'All'
-                      ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                      : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'
-                  )}
-                >
-                  <Filter className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                  <span>Filters</span>
-                </button>
+            <button
+              onClick={() => setIsCreateProjectModalOpen(true)}
+              className="h-10 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Create New Project</span>
+            </button>
+          </div>
 
-                {isFilterDropdownOpen && (
-                  <div className="absolute right-0 mt-1.5 w-52 rounded-xl border border-slate-200 bg-white p-3 shadow-xl dark:border-slate-700 dark:bg-slate-800 z-30 text-xs space-y-2.5 animate-toast-slide">
-                    <div>
-                      <p className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400 mb-1">Status</p>
-                      <div className="grid grid-cols-2 gap-1">
-                        {['All', 'In Progress', 'Pending', 'Completed', 'Overdue'].map((st) => (
-                          <button
-                            key={st}
-                            onClick={() => {
-                              setSelectedStatusFilter(st);
-                              setIsFilterDropdownOpen(false);
-                            }}
-                            className={cn(
-                              'px-2 py-1 rounded text-left text-[11px] font-medium transition-colors',
-                              selectedStatusFilter === st
-                                ? 'bg-blue-600 text-white font-bold'
-                                : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
-                            )}
-                          >
-                            {st}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+          {/* Automatic Login-Based Access Info Banner */}
+          <div className="bg-slate-50/80 dark:bg-[#161624] border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-slate-900 dark:text-white">
+                    Logged in as: <span className="text-blue-600 dark:text-blue-400 font-black">{currentUser.name}</span>
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-extrabold text-[10px] uppercase border border-blue-200 dark:border-blue-800">
+                    {currentRole.replace('_', ' ')}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Showing projects automatically filtered for your account role. Switch active role in top profile dropdown to test other personas.
+                </p>
+              </div>
+            </div>
 
-                    <div className="pt-2 border-t border-slate-100 dark:border-slate-700">
-                      <p className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400 mb-1">Priority</p>
-                      <div className="grid grid-cols-3 gap-1">
-                        {['All', 'High', 'Medium', 'Low'].map((pr) => (
-                          <button
-                            key={pr}
-                            onClick={() => {
-                              setSelectedPriorityFilter(pr);
-                              setIsFilterDropdownOpen(false);
-                            }}
-                            className={cn(
-                              'px-2 py-1 rounded text-center text-[11px] font-medium transition-colors',
-                              selectedPriorityFilter === pr
-                                ? 'bg-blue-600 text-white font-bold'
-                                : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
-                            )}
-                          >
-                            {pr}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+            <span className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs shrink-0 self-start sm:self-center shadow-2xs">
+              <strong className="text-blue-600 dark:text-blue-400 font-black">{visibleProjects.length}</strong> of {projects.length} Workspace Projects
+            </span>
+          </div>
+
+          {/* Projects Grid */}
+          {visibleProjects.length === 0 ? (
+            <div className="bg-white dark:bg-[#12121B] border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center space-y-3">
+              <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center">
+                <Folder className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">No Projects Assigned to {currentUser.name}</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                No workspace projects are currently assigned to your logged-in profile. Switch your active role persona to <strong className="text-blue-600">Organization Admin</strong> in the top header menu to view all projects.
+              </p>
+            </div>
+          ) : (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {visibleProjects.map((proj) => {
+          const projTasks = workItems.filter((i) => i.projectId === proj.id);
+          const completedTasks = projTasks.filter((i) => i.status === 'DONE').length;
+          const progressPct = projTasks.length > 0 ? Math.round((completedTasks / projTasks.length) * 100) : 0;
+
+          return (
+            <div
+              key={proj.id}
+              onClick={() => setSelectedProjectId(proj.id)}
+              className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col justify-between group space-y-4"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-black px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                    {proj.key}
+                  </span>
+
+                  {/* Project CRUD Action Icons */}
+                  <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100">
+                    <button
+                      onClick={(e) => openEditProjectModal(proj, e)}
+                      title="Edit Project"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => openDeleteProjectConfirm(proj.id, e)}
+                      title="Delete Project"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                )}
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-base group-hover:text-blue-600 transition-colors">
+                    {proj.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+                    {proj.description}
+                  </p>
+                </div>
+
+                {/* Task Completion Progress Bar */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[11px] font-bold">
+                    <span className="text-slate-500">Task Progress</span>
+                    <span className="text-blue-600">{completedTasks} / {projTasks.length} Tasks ({progressPct}%)</span>
+                  </div>
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div
+                      className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                      style={{ width: `${progressPct}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Assigned Members */}
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                  <span className="text-slate-500 font-medium">Assigned Team:</span>
+                  <div className="flex items-center -space-x-1.5">
+                    {proj.members.slice(0, 4).map((m) => (
+                      <img
+                        key={m.id}
+                        src={m.avatar}
+                        alt={m.name}
+                        title={`${m.name} (${m.role})`}
+                        className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-900 object-cover"
+                      />
+                    ))}
+                    {proj.members.length > 4 && (
+                      <span className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-800 text-[10px] font-extrabold text-slate-700 dark:text-slate-300 flex items-center justify-center border-2 border-white dark:border-slate-900">
+                        +{proj.members.length - 4}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
+
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform">
+                <span>Open Project Kanban Workspace</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+          )}
+    </div>
+  )
+}
+
+{/* =========================================================================
+          MODE 2: SINGLE PROJECT DEEP-DIVE WORKSPACE (WHEN PROJECT IS CLICKED)
+         ========================================================================= */}
+{
+  selectedProjectId && activeProject && (
+    <div className="space-y-6">
+      {/* Breadcrumb Header */}
+      <div className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <button
+              onClick={() => setSelectedProjectId(null)}
+              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to All Projects
+            </button>
+
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-sm font-black px-3 py-1 rounded-xl bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-200">
+                KEY: {activeProject.key}
+              </span>
+              <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                {activeProject.name}
+              </h1>
+            </div>
+
+            <p className="text-xs text-slate-500 max-w-3xl">
+              {activeProject.description}
+            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsWorkItemModalOpen(true)}
+              className="h-9 px-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Create Task</span>
+            </button>
+
+            <button
+              onClick={(e) => openEditProjectModal(activeProject, e)}
+              className="h-9 px-3 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold text-xs flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 cursor-pointer"
+            >
+              <Edit2 className="w-3.5 h-3.5" />
+              <span>Edit Project</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Team Members List Pill Bar */}
+        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-700 dark:text-slate-300">Assigned Team:</span>
+            <div className="flex items-center gap-2 flex-wrap">
+              {activeProject.members.map((m) => (
+                <div key={m.id} className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-800 dark:text-slate-200">
+                  <img src={m.avatar} alt={m.name} className="w-4 h-4 rounded-full object-cover" />
+                  <span>{m.name} ({m.role})</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Table Container (List View) */}
-          {viewMode === 'list' && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-bold text-slate-600 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-900/30">
-                    <th className="py-3 px-3.5 w-10 text-center">
-                      <input
-                        type="checkbox"
-                        checked={paginatedTasks.length > 0 && selectedTaskIds.length === paginatedTasks.length}
-                        onChange={(e) => handleSelectAll(e.target.checked)}
-                        className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                      />
-                    </th>
-                    <th className="py-3 px-2 font-bold">Task ID</th>
-                    <th className="py-3 px-3 font-bold">Task Name</th>
-                    <th className="py-3 px-3 font-bold">Project</th>
-                    <th className="py-3 px-3 font-bold">Assigned To</th>
-                    <th className="py-3 px-3 font-bold">Priority</th>
-                    <th className="py-3 px-3 font-bold">Status</th>
-                    <th className="py-3 px-3 font-bold">Due Date</th>
-                    <th className="py-3 px-3 font-bold">Progress</th>
-                    <th className="py-3 px-3 text-right font-bold">Actions</th>
-                  </tr>
-                </thead>
+          <div className="flex items-center gap-3.5 text-[11px] font-medium flex-wrap">
+            <span className="text-slate-500">👑 Owner: <strong className="text-slate-800 dark:text-slate-200">{activeProject.owner}</strong></span>
+            <span className="text-slate-500">📋 PM: <strong className="text-blue-600 dark:text-blue-400">{activeProject.manager}</strong></span>
+            <span className="text-slate-500">⚡ Tech Lead: <strong className="text-slate-800 dark:text-slate-200">{activeProject.techLead}</strong></span>
+          </div>
+        </div>
+      </div>
 
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
-                  {paginatedTasks.length === 0 ? (
-                    <tr>
-                      <td colSpan={10} className="py-12 text-center text-slate-400">
-                        No tasks match your filter criteria.
-                      </td>
-                    </tr>
-                  ) : (
-                    paginatedTasks.map((task) => {
-                      const isSelected = selectedTaskIds.includes(task.id);
+      {/* Tabs Navigation for Active Project */}
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-1">
+        {[
+          { id: 'kanban', label: '🏃 Project Kanban Board', count: activeProjectTasks.length },
+          { id: 'epics', label: '📌 Epics & Requirements', count: epics.filter((e) => e.projectId === activeProject.id).length },
+          { id: 'bugs', label: '🐞 QA Defect Desk', count: activeProjectTasks.filter((i) => i.type === 'Bug').length },
+          { id: 'team', label: '👥 Team Directory', count: activeProject.members.length },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveProjectTab(tab.id as any)}
+            className={cn(
+              'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer',
+              activeProjectTab === tab.id
+                ? 'bg-blue-600 text-white shadow-2xs'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            )}
+          >
+            <span>{tab.label}</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-white/20 font-black">
+              {tab.count}
+            </span>
+          </button>
+        ))}
+      </div>
 
-                      return (
-                        <tr
-                          key={task.id}
-                          className={cn(
-                            'hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors',
-                            isSelected && 'bg-blue-50/40 dark:bg-blue-950/20'
-                          )}
-                        >
-                          {/* 1. Checkbox */}
-                          <td className="py-3 px-3.5 text-center">
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={() => handleToggleRow(task.id)}
-                              className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                            />
-                          </td>
-
-                          {/* 2. Task ID */}
-                          <td className="py-3 px-2 font-medium text-slate-400">
-                            {task.taskId}
-                          </td>
-
-                          {/* 3. Task Name & Description */}
-                          <td className="py-3 px-3 max-w-[200px]">
-                            <p className="font-bold text-slate-900 dark:text-white truncate">
-                              {task.name}
-                            </p>
-                            <p className="text-[10.5px] text-slate-400 truncate mt-0.5">
-                              {task.description}
-                            </p>
-                          </td>
-
-                          {/* 4. Project Pill */}
-                          <td className="py-3 px-3">
-                            <span className={cn('px-2.5 py-1 rounded-lg text-[11px] font-semibold inline-block whitespace-nowrap', task.projectColor)}>
-                              {task.project}
-                            </span>
-                          </td>
-
-                          {/* 5. Assigned To (Avatar + Name + Role) */}
-                          <td className="py-3 px-3">
-                            <div className="flex items-center gap-2 min-w-[150px]">
-                              <img
-                                src={task.assignee.avatar}
-                                alt={task.assignee.name}
-                                className="w-7 h-7 rounded-full object-cover shadow-2xs border border-slate-200 dark:border-slate-700 flex-shrink-0"
-                              />
-                              <div className="truncate">
-                                <p className="font-bold text-slate-800 dark:text-slate-200 leading-tight truncate">
-                                  {task.assignee.name}
-                                </p>
-                                <p className="text-[10px] text-slate-400 leading-tight truncate">
-                                  ({task.assignee.role})
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* 6. Priority */}
-                          <td className="py-3 px-3">
-                            <span className={cn(
-                              'px-2.5 py-1 rounded-lg text-[11px] font-bold inline-block text-center min-w-[62px]',
-                              task.priority === 'High' && 'bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400',
-                              task.priority === 'Medium' && 'bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400',
-                              task.priority === 'Low' && 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400'
-                            )}>
-                              {task.priority}
-                            </span>
-                          </td>
-
-                          {/* 7. Status */}
-                          <td className="py-3 px-3">
-                            <span className={cn(
-                              'px-2.5 py-1 rounded-lg text-[11px] font-bold inline-block text-center min-w-[85px]',
-                              task.status === 'In Progress' && 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400',
-                              task.status === 'Completed' && 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400',
-                              task.status === 'Pending' && 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400',
-                              task.status === 'Overdue' && 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400'
-                            )}>
-                              {task.status}
-                            </span>
-                          </td>
-
-                          {/* 8. Due Date */}
-                          <td className="py-3 px-3 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
-                            <div className="flex items-center gap-1.5">
-                              <Calendar className="w-3.5 h-3.5 text-blue-500" />
-                              <span>{task.dueDate}</span>
-                            </div>
-                          </td>
-
-                          {/* 9. Progress Bar */}
-                          <td className="py-3 px-3 min-w-[110px]">
-                            <div className="space-y-1">
-                              <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300">
-                                {task.progress}%
-                              </span>
-                              <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                                <div
-                                  className={cn(
-                                    'h-full rounded-full transition-all duration-300',
-                                    task.progress === 100
-                                      ? 'bg-emerald-500'
-                                      : task.progress > 50
-                                      ? 'bg-blue-600'
-                                      : 'bg-emerald-500'
-                                  )}
-                                  style={{ width: `${task.progress}%` }}
-                                />
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* 10. Actions */}
-                          <td className="py-3 px-3 text-right">
-                            <button
-                              onClick={() => showToast(`Action menu for ${task.taskId}`)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-                            >
-                              <MoreHorizontal className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {/* Kanban View Mode */}
-          {viewMode === 'kanban' && (
-            <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-              {(['Pending', 'In Progress', 'Completed'] as const).map((col) => {
-                const colTasks = filteredTasks.filter((t) => t.status === col);
-
-                return (
-                  <div key={col} className="rounded-xl bg-slate-50/70 dark:bg-[#151522] p-3 border border-slate-200/80 dark:border-slate-800 space-y-2.5">
-                    <div className="flex items-center justify-between pb-1">
-                      <span className="font-bold text-xs text-slate-800 dark:text-white flex items-center gap-1.5">
-                        <span>{col}</span>
-                        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white dark:bg-slate-800 text-slate-500 font-semibold shadow-2xs">
-                          {colTasks.length}
-                        </span>
+      {/* PROJECT KANBAN BOARD */}
+      {activeProjectTab === 'kanban' && (
+        <div className="flex overflow-x-auto gap-4 pb-6 pt-1 scrollbar-custom">
+          {SPRINT_COLUMNS.map((colStatus) => {
+            const colItems = activeProjectTasks.filter((item) => item.status === colStatus);
+            const isOverThisCol = dragOverColumn === colStatus;
+            return (
+              <div
+                key={colStatus}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = 'move';
+                  if (dragOverColumn !== colStatus) setDragOverColumn(colStatus);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  if (dragOverColumn === colStatus) setDragOverColumn(null);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const droppedId = e.dataTransfer.getData('text/plain') || draggedItemId;
+                  if (droppedId) {
+                    handleTransitionStatus(droppedId, colStatus);
+                  }
+                  setDragOverColumn(null);
+                  setDraggedItemId(null);
+                }}
+                className={cn(
+                  'w-72 shrink-0 rounded-2xl border p-3 space-y-3 flex flex-col justify-between transition-all duration-200',
+                  isOverThisCol
+                    ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 ring-2 ring-blue-500/50 shadow-lg scale-[1.01]'
+                    : 'bg-slate-100/70 dark:bg-[#12121C] border-slate-200/80 dark:border-slate-800/80'
+                )}
+              >
+                <div>
+                  <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-200/80 dark:border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${isOverThisCol ? 'bg-blue-600 animate-pulse' : 'bg-blue-500'}`}></span>
+                      <span className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                        {colStatus}
                       </span>
                     </div>
+                    <span className="px-2 py-0.5 rounded-full bg-slate-200/80 dark:bg-slate-800 text-[10px] font-extrabold text-slate-700 dark:text-slate-300">
+                      {colItems.length}
+                    </span>
+                  </div>
 
-                    <div className="space-y-2 max-h-[480px] overflow-y-auto pr-0.5">
-                      {colTasks.map((task) => (
-                        <div key={task.id} className="p-3 rounded-xl bg-white dark:bg-[#1A1A26] border border-slate-200/80 dark:border-slate-700 shadow-2xs space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-slate-400">{task.taskId}</span>
-                            <span className={cn(
-                              'text-[9.5px] px-1.5 py-0.2 rounded font-bold',
-                              task.priority === 'High' && 'bg-rose-50 text-rose-600',
-                              task.priority === 'Medium' && 'bg-amber-50 text-amber-600',
-                              task.priority === 'Low' && 'bg-emerald-50 text-emerald-600'
-                            )}>
-                              {task.priority}
-                            </span>
-                          </div>
-
-                          <h4 className="font-bold text-xs text-slate-900 dark:text-white leading-tight">{task.name}</h4>
-                          <p className="text-[11px] text-slate-400">{task.project}</p>
-
-                          <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800 text-[10px]">
-                            <div className="flex items-center gap-1.5">
-                              <img src={task.assignee.avatar} alt={task.assignee.name} className="w-5 h-5 rounded-full object-cover" />
-                              <span className="text-slate-600 dark:text-slate-300 font-medium">{task.assignee.name}</span>
+                  <div className="space-y-2.5 min-h-[350px] max-h-[620px] overflow-y-auto pr-0.5 scrollbar-thin">
+                    {colItems.length === 0 ? (
+                      <div className={`h-24 border border-dashed rounded-xl flex items-center justify-center text-xs font-semibold transition-colors ${isOverThisCol ? 'border-blue-400 bg-blue-100/50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300' : 'border-slate-200 dark:border-slate-800/80 text-slate-400'
+                        }`}>
+                        {isOverThisCol ? '↓ Drop task here' : 'No tasks in this column'}
+                      </div>
+                    ) : (
+                      colItems.map((item) => {
+                        const isBeingDragged = draggedItemId === item.id;
+                        return (
+                          <div
+                            key={item.id}
+                            draggable={true}
+                            onDragStart={(e) => {
+                              e.dataTransfer.setData('text/plain', item.id);
+                              e.dataTransfer.effectAllowed = 'move';
+                              setDraggedItemId(item.id);
+                            }}
+                            onDragEnd={() => {
+                              setDraggedItemId(null);
+                              setDragOverColumn(null);
+                            }}
+                            className={cn(
+                              'bg-white dark:bg-[#181825] border border-slate-200/80 dark:border-slate-800 rounded-xl p-3 shadow-2xs hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all space-y-2.5 group cursor-grab active:cursor-grabbing select-none',
+                              isBeingDragged ? 'opacity-40 scale-95 border-dashed border-blue-500 ring-2 ring-blue-400/50' : ''
+                            )}
+                          >
+                            <div className="flex items-center justify-between text-[10px] gap-1.5">
+                              <span className="font-mono font-bold text-blue-600 dark:text-blue-400 shrink-0">
+                                {item.itemKey}
+                              </span>
+                              <span className={`px-2 py-0.5 rounded font-bold text-[10px] uppercase truncate shrink-0 border ${item.type === 'Bug'
+                                ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border-rose-200/70 dark:border-rose-800'
+                                : item.type === 'Story'
+                                  ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/70 dark:text-blue-300 border-blue-200/70 dark:border-blue-800'
+                                  : item.type === 'Epic'
+                                    ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300 border-purple-200/70 dark:border-purple-800'
+                                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                                }`}>
+                                {item.type}
+                              </span>
                             </div>
-                            <span className="text-slate-400">{task.dueDate}</span>
+
+                            <p className="text-xs font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">
+                              {item.title}
+                            </p>
+
+                            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-[10.5px]">
+                              <div className="flex items-center gap-1.5">
+                                <img
+                                  src={item.assignee.avatar}
+                                  alt={item.assignee.name}
+                                  className="w-5 h-5 rounded-full object-cover shrink-0"
+                                />
+                                <span className="text-slate-600 dark:text-slate-300 font-medium truncate max-w-[90px]">
+                                  {item.assignee.name.split(' ')[0]}
+                                </span>
+                              </div>
+                              <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold shrink-0">
+                                {item.storyPoints} pts
+                              </span>
+                            </div>
+
+                            <div className="pt-1 flex items-center justify-between text-[10px]">
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={(e) => openEditWorkItemModal(item, e)}
+                                  title="Edit Work Item"
+                                  className="p-1 rounded-md text-slate-400 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                                >
+                                  <Edit2 className="w-3 h-3" />
+                                </button>
+                                <button
+                                  onClick={(e) => openDeleteWorkItemConfirm(item.id, e)}
+                                  title="Delete Work Item"
+                                  className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              </div>
+                              {colStatus !== 'DONE' && (
+                                <button
+                                  onClick={() => {
+                                    const nextIndex = SPRINT_COLUMNS.indexOf(colStatus) + 1;
+                                    if (nextIndex < SPRINT_COLUMNS.length) {
+                                      handleTransitionStatus(item.id, SPRINT_COLUMNS[nextIndex]);
+                                    }
+                                  }}
+                                  className="text-blue-600 dark:text-blue-400 font-bold hover:underline flex items-center gap-0.5 ml-auto"
+                                >
+                                  Move Next <ChevronRight className="w-3 h-3" />
+                                </button>
+                              )}
+                            </div>
                           </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* PROJECT EPICS & REQUIREMENTS */}
+      {activeProjectTab === 'epics' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">Project Epics & Strategic Modules</h3>
+              <p className="text-xs text-slate-500">Track high-level requirements, milestones, and epic completion rates.</p>
+            </div>
+            <button
+              onClick={() => openCreateWorkItemModal('Epic')}
+              className="h-8 px-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Create Epic / Requirement</span>
+            </button>
+          </div>
+
+          {epics.filter((e) => e.projectId === activeProject.id).length === 0 ? (
+            <div className="bg-white dark:bg-[#12121B] border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-10 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center mx-auto">
+                <Layers className="w-6 h-6" />
+              </div>
+              <h4 className="font-bold text-slate-900 dark:text-white text-sm">No Epics Created for this Project</h4>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                Epics help structure large initiatives, feature sets, and release goals for your engineering team.
+              </p>
+              <button
+                onClick={() => openCreateWorkItemModal('Epic')}
+                className="h-8 px-4 rounded-xl bg-blue-600 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-xs cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Create First Epic</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {epics.filter((e) => e.projectId === activeProject.id).map((epic) => {
+                const epicStories = activeProjectTasks.filter((t) => t.epicId === epic.id);
+                return (
+                  <div
+                    key={epic.id}
+                    className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4 hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-xs font-black text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-md border border-purple-200 dark:border-purple-800">
+                            {epic.epicKey}
+                          </span>
+                          <span className="text-xs text-slate-400 font-medium">{epic.targetRelease}</span>
                         </div>
-                      ))}
+                        <h4 className="font-bold text-slate-900 dark:text-white text-sm leading-snug">{epic.title}</h4>
+                        <p className="text-xs text-slate-500 line-clamp-2">{epic.description}</p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={(e) => openEditEpicModal(epic, e)}
+                          className="p-1 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                          title="Edit Epic"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={(e) => openDeleteEpicConfirm(epic.id, e)}
+                          className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                          title="Delete Epic"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="space-y-1.5 pt-1">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-slate-600 dark:text-slate-400">Progress ({epic.progress}%)</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-mono">
+                          {epic.completedStories} / {epic.totalStories} Stories Completed
+                        </span>
+                      </div>
+                      <div className="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500"
+                          style={{ width: `${epic.progress}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Linked Work Items */}
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                      <span className="text-slate-500 font-medium">Owner: <strong className="text-slate-800 dark:text-slate-200">{epic.owner}</strong></span>
+                      <span className="text-slate-500 font-medium">{epicStories.length} Work Items Linked</span>
                     </div>
                   </div>
                 );
               })}
             </div>
           )}
+        </div>
+      )}
 
+      {/* QA DEFECT DESK */}
+      {activeProjectTab === 'bugs' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">QA Defect Desk & Bug Tracker</h3>
+              <p className="text-xs text-slate-500">Manage software defects, steps to reproduce, and QA verification statuses.</p>
+            </div>
+            <button
+              onClick={() => openCreateWorkItemModal('Bug')}
+              className="h-8 px-3 rounded-xl bg-rose-600 text-white hover:bg-rose-700 font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Log New Bug / Defect</span>
+            </button>
+          </div>
 
-
-          {/* Table Footer: "Showing 1 to 8 of 15 tasks" + Pagination */}
-          <div className="p-3.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-            <span>
-              Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filteredTasks.length)} of {filteredTasks.length} tasks
-            </span>
-
-            <div className="flex items-center gap-1.5">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
-                className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
-              >
-                <ChevronLeft className="w-3.5 h-3.5" />
-              </button>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pg) => (
-                <button
-                  key={pg}
-                  onClick={() => setCurrentPage(pg)}
-                  className={cn(
-                    'w-7 h-7 rounded-lg text-xs font-bold transition-all cursor-pointer',
-                    currentPage === pg
-                      ? 'bg-blue-600 text-white shadow-xs'
-                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                  )}
-                >
-                  {pg}
-                </button>
-              ))}
-
-              <button
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(currentPage + 1)}
-                className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
-              >
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
+          {/* Bug Summary Metric Pills */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="p-3.5 bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
+              <span className="text-[11px] font-semibold text-slate-400">Total Reported Bugs</span>
+              <p className="text-xl font-black text-slate-900 dark:text-white">
+                {activeProjectTasks.filter((i) => i.type === 'Bug').length}
+              </p>
+            </div>
+            <div className="p-3.5 bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
+              <span className="text-[11px] font-semibold text-rose-500">Critical / High Bugs</span>
+              <p className="text-xl font-black text-rose-600">
+                {activeProjectTasks.filter((i) => i.type === 'Bug' && (i.priority === 'Critical' || i.priority === 'High')).length}
+              </p>
+            </div>
+            <div className="p-3.5 bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
+              <span className="text-[11px] font-semibold text-amber-500">In QA Verification</span>
+              <p className="text-xl font-black text-amber-600">
+                {activeProjectTasks.filter((i) => i.type === 'Bug' && i.status === 'IN QA').length}
+              </p>
+            </div>
+            <div className="p-3.5 bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
+              <span className="text-[11px] font-semibold text-emerald-500">Resolved / Passed</span>
+              <p className="text-xl font-black text-emerald-600">
+                {activeProjectTasks.filter((i) => i.type === 'Bug' && (i.status === 'QA PASSED' || i.status === 'DONE')).length}
+              </p>
             </div>
           </div>
 
-        </div>
-
-        {/* =======================================================================
-            RIGHT COLUMN: 3 STACKED WIDGETS (3.5 COLS)
-           ======================================================================= */}
-        <div className="lg:col-span-4 xl:col-span-3.5 space-y-4">
-          
-          {/* Widget 1: Upcoming Deadlines */}
-          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#12121B] p-4 shadow-xs space-y-3.5">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span>Upcoming Deadlines</span>
-              </span>
-
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold shadow-xs transition-all cursor-pointer"
-              >
-                <Plus className="w-3 h-3 stroke-[2.5]" />
-                <span>Create Task</span>
-              </button>
+          {activeProjectTasks.filter((i) => i.type === 'Bug').length === 0 ? (
+            <div className="bg-white dark:bg-[#12121B] border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-10 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center mx-auto">
+                <ShieldAlert className="w-6 h-6" />
+              </div>
+              <h4 className="font-bold text-slate-900 dark:text-white text-sm">No Active Defects Logged</h4>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                All QA test runs are clean for this project! No open defects are currently registered.
+              </p>
             </div>
-
-            <div className="flex items-center justify-end">
-              <button
-                type="button"
-                onClick={() => navigate('/calendar')}
-                className="text-[11px] font-bold text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <span>View All</span>
-                <span>→</span>
-              </button>
-            </div>
-
+          ) : (
             <div className="space-y-3">
-              {upcomingDeadlines.map((dl) => (
-                <div key={dl.id} className="flex items-start justify-between gap-2 text-xs">
-                  <div className="flex items-start gap-2">
-                    <span className={cn(
-                      'px-1.5 py-0.5 rounded text-[9.5px] font-bold min-w-[42px] text-center mt-0.5',
-                      dl.priority === 'High' ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400' : 'bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400'
-                    )}>
-                      {dl.priority}
-                    </span>
-                    <div>
-                      <p className="font-bold text-slate-800 dark:text-slate-200 leading-tight">
-                        {dl.title}
-                      </p>
-                      <p className="text-[10.5px] text-slate-400 mt-0.5">
-                        {dl.date}
-                      </p>
+              {activeProjectTasks.filter((i) => i.type === 'Bug').map((bug) => (
+                <div
+                  key={bug.id}
+                  className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:shadow-md transition-all space-y-3"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <span className="font-mono text-xs font-black text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded-md border border-rose-200 dark:border-rose-800">
+                        {bug.itemKey}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase border ${bug.priority === 'Critical'
+                        ? 'bg-rose-100 text-rose-800 border-rose-300'
+                        : 'bg-amber-100 text-amber-800 border-amber-300'
+                        }`}>
+                        {bug.priority} Severity
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold">
+                        Status: {bug.status}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => openEditWorkItemModal(bug, e)}
+                        className="p-1 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                        title="Edit Defect"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={(e) => openDeleteWorkItemConfirm(bug.id, e)}
+                        className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                        title="Delete Defect"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleTransitionStatus(bug.id, bug.status === 'DONE' ? 'IN QA' : 'QA PASSED')}
+                        className="h-7 px-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 cursor-pointer"
+                      >
+                        {bug.status === 'QA PASSED' || bug.status === 'DONE' ? '✓ QA Verified' : 'Pass QA'}
+                      </button>
                     </div>
                   </div>
 
-                  <span className={cn(
-                    'text-[10.5px] font-bold flex-shrink-0',
-                    dl.isToday ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'
-                  )}>
-                    {dl.relative}
-                  </span>
+                  <h4 className="font-bold text-slate-900 dark:text-white text-sm leading-snug">{bug.title}</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 font-mono">
+                    {bug.description}
+                  </p>
+
+                  <div className="flex items-center justify-between pt-1 text-xs text-slate-500">
+                    <div className="flex items-center gap-2">
+                      <img src={bug.assignee.avatar} alt={bug.assignee.name} className="w-5 h-5 rounded-full object-cover" />
+                      <span>Assignee: <strong className="text-slate-800 dark:text-slate-200">{bug.assignee.name}</strong></span>
+                    </div>
+                    <span className="font-medium text-slate-400">Target: {bug.releaseVersion}</span>
+                  </div>
                 </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* PROJECT TEAM DIRECTORY */}
+      {activeProjectTab === 'team' && (
+        <div className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-slate-900 dark:text-white text-base">Assigned Project Members & Roles</h3>
+            <button
+              onClick={(e) => openEditProjectModal(activeProject, e)}
+              className="h-8 px-3 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 hover:bg-blue-100 font-bold text-xs flex items-center gap-1.5 border border-blue-200 dark:border-blue-800 cursor-pointer"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Update / Assign Team Members</span>
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {activeProject.members.map((m) => (
+              <div key={m.id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center gap-3">
+                <img src={m.avatar} alt={m.name} className="w-10 h-10 rounded-full object-cover" />
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-white text-xs">{m.name}</h4>
+                  <p className="text-[11px] text-blue-600 font-semibold">{m.role}</p>
+                  <p className="text-[10px] text-slate-400 font-mono">{m.email}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+{/* =========================================================================
+          WIDE 2-COLUMN HORIZONTAL MODAL (LESS HEIGHT, MORE WIDTH: MAX-W-4XL)
+         ========================================================================= */}
+
+{/* CREATE PROJECT MODAL */ }
+{
+  isCreateProjectModalOpen && (
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 z-50 animate-in fade-in">
+      <div className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 max-w-4xl w-full shadow-2xl space-y-4 max-h-[88vh] flex flex-col justify-between">
+        {/* Modal Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+              <Folder className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-slate-900 dark:text-white text-lg leading-tight">
+                Create New Project & Assign Team
+              </h3>
+              <p className="text-xs text-slate-500">Configure key project parameters and select team members side-by-side.</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsCreateProjectModalOpen(false)}
+            className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* 2-COLUMN HORIZONTAL GRID FORM BODY */}
+        <form onSubmit={handleCreateProjectSubmit} id="create-proj-form" className="grow overflow-y-auto pr-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+
+            {/* LEFT COLUMN: PROJECT DETAILS */}
+            <div className="space-y-3.5">
+              <div className="grid grid-cols-3 gap-2.5">
+                <div className="col-span-2 space-y-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300">Project Name *</label>
+                  <input
+                    type="text"
+                    value={projName}
+                    onChange={(e) => setProjName(e.target.value)}
+                    placeholder="e.g. AI Copilot Integration"
+                    className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300">Project Key *</label>
+                  <input
+                    type="text"
+                    value={projKey}
+                    onChange={(e) => setProjKey(e.target.value)}
+                    placeholder="e.g. AIC"
+                    className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 font-mono uppercase font-black text-blue-600 dark:text-blue-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block font-bold text-slate-700 dark:text-slate-300">Project Scope / Description</label>
+                <textarea
+                  value={projDesc}
+                  onChange={(e) => setProjDesc(e.target.value)}
+                  placeholder="Define key objectives and sprint goals..."
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white h-20 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300">Project Owner</label>
+                  <select
+                    value={projOwner}
+                    onChange={(e) => setProjOwner(e.target.value)}
+                    className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium text-xs outline-none"
+                  >
+                    {AVAILABLE_ORGS_MEMBERS.map((m) => (
+                      <option key={m.id} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300">Project Manager (PM)</label>
+                  <select
+                    value={projManager}
+                    onChange={(e) => setProjManager(e.target.value)}
+                    className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium text-xs outline-none"
+                  >
+                    {AVAILABLE_ORGS_MEMBERS.map((m) => (
+                      <option key={m.id} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300">Technical Lead</label>
+                  <select
+                    value={projTechLead}
+                    onChange={(e) => setProjTechLead(e.target.value)}
+                    className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium text-xs outline-none"
+                  >
+                    {AVAILABLE_ORGS_MEMBERS.map((m) => (
+                      <option key={m.id} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN: TEAM MEMBER ASSIGNMENT */}
+            <div className="space-y-2 flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <label className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-blue-600" />
+                  <span>Assign Team Members *</span>
+                </label>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
+                  {projMemberIds.length} Members Selected
+                </span>
+              </div>
+
+              <div className="space-y-2 max-h-[220px] overflow-y-auto p-2 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800">
+                {AVAILABLE_ORGS_MEMBERS.map((m) => {
+                  const isSelected = projMemberIds.includes(m.id);
+                  return (
+                    <label
+                      key={m.id}
+                      className={cn(
+                        'flex items-center justify-between p-2 rounded-xl border transition-all cursor-pointer',
+                        isSelected
+                          ? 'bg-blue-50/90 dark:bg-blue-950/40 border-blue-300 dark:border-blue-800 shadow-2xs'
+                          : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-slate-300'
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={(e) => {
+                            if (e.target.checked) setProjMemberIds([...projMemberIds, m.id]);
+                            else setProjMemberIds(projMemberIds.filter((id) => id !== m.id));
+                          }}
+                          className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
+                        />
+                        <img src={m.avatar} alt={m.name} className="w-6 h-6 rounded-full object-cover shrink-0" />
+                        <div>
+                          <p className="font-bold text-slate-900 dark:text-white text-xs leading-tight">{m.name}</p>
+                          <p className="text-[10px] text-slate-500">{m.email}</p>
+                        </div>
+                      </div>
+
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                        {m.role}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+          </div>
+        </form>
+
+        {/* Compact Modal Footer */}
+        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800 shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsCreateProjectModalOpen(false)}
+            className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="create-proj-form"
+            className="h-9 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create Project & Assign Members</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+{/* EDIT PROJECT MODAL */ }
+{
+  isEditProjectModalOpen && editingProject && (
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 z-50 animate-in fade-in">
+      <div className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 max-w-4xl w-full shadow-2xl space-y-4 max-h-[88vh] flex flex-col justify-between">
+        {/* Modal Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+              <Edit2 className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-slate-900 dark:text-white text-lg leading-tight">
+                Edit Project & Team Members
+              </h3>
+              <p className="text-xs text-slate-500">Update project details and add or remove assigned team members.</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsEditProjectModalOpen(false)}
+            className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* 2-COLUMN HORIZONTAL GRID FORM BODY */}
+        <form onSubmit={handleUpdateProjectSubmit} id="edit-proj-form" className="grow overflow-y-auto pr-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+
+            {/* LEFT COLUMN: PROJECT DETAILS */}
+            <div className="space-y-3.5">
+              <div className="grid grid-cols-3 gap-2.5">
+                <div className="col-span-2 space-y-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300">Project Name *</label>
+                  <input
+                    type="text"
+                    value={projName}
+                    onChange={(e) => setProjName(e.target.value)}
+                    placeholder="e.g. AI Copilot Integration"
+                    className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300">Project Key *</label>
+                  <input
+                    type="text"
+                    value={projKey}
+                    onChange={(e) => setProjKey(e.target.value)}
+                    placeholder="e.g. AIC"
+                    className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 font-mono uppercase font-black text-blue-600 dark:text-blue-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block font-bold text-slate-700 dark:text-slate-300">Project Scope / Description</label>
+                <textarea
+                  value={projDesc}
+                  onChange={(e) => setProjDesc(e.target.value)}
+                  placeholder="Define key objectives and sprint goals..."
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white h-20 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300">Project Owner</label>
+                  <select
+                    value={projOwner}
+                    onChange={(e) => setProjOwner(e.target.value)}
+                    className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium text-xs outline-none"
+                  >
+                    {AVAILABLE_ORGS_MEMBERS.map((m) => (
+                      <option key={m.id} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300">Project Manager (PM)</label>
+                  <select
+                    value={projManager}
+                    onChange={(e) => setProjManager(e.target.value)}
+                    className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium text-xs outline-none"
+                  >
+                    {AVAILABLE_ORGS_MEMBERS.map((m) => (
+                      <option key={m.id} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300">Technical Lead</label>
+                  <select
+                    value={projTechLead}
+                    onChange={(e) => setProjTechLead(e.target.value)}
+                    className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium text-xs outline-none"
+                  >
+                    {AVAILABLE_ORGS_MEMBERS.map((m) => (
+                      <option key={m.id} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN: TEAM MEMBER ASSIGNMENT */}
+            <div className="space-y-2 flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <label className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-blue-600" />
+                  <span>Assigned Team Members *</span>
+                </label>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
+                  {projMemberIds.length} Members Selected
+                </span>
+              </div>
+
+              <div className="space-y-2 max-h-[220px] overflow-y-auto p-2 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800">
+                {AVAILABLE_ORGS_MEMBERS.map((m) => {
+                  const isSelected = projMemberIds.includes(m.id);
+                  return (
+                    <label
+                      key={m.id}
+                      className={cn(
+                        'flex items-center justify-between p-2 rounded-xl border transition-all cursor-pointer',
+                        isSelected
+                          ? 'bg-blue-50/90 dark:bg-blue-950/40 border-blue-300 dark:border-blue-800 shadow-2xs'
+                          : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-slate-300'
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={(e) => {
+                            if (e.target.checked) setProjMemberIds([...projMemberIds, m.id]);
+                            else setProjMemberIds(projMemberIds.filter((id) => id !== m.id));
+                          }}
+                          className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
+                        />
+                        <img src={m.avatar} alt={m.name} className="w-6 h-6 rounded-full object-cover shrink-0" />
+                        <div>
+                          <p className="font-bold text-slate-900 dark:text-white text-xs leading-tight">{m.name}</p>
+                          <p className="text-[10px] text-slate-500">{m.email}</p>
+                        </div>
+                      </div>
+
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                        {m.role}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+          </div>
+        </form>
+
+        {/* Compact Modal Footer */}
+        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800 shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsEditProjectModalOpen(false)}
+            className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="edit-proj-form"
+            className="h-9 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Save & Update Project Members</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+{/* DELETE CONFIRMATION MODAL */ }
+{
+  isDeleteProjectConfirmOpen && (
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
+      <div className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 text-center">
+        <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 mx-auto flex items-center justify-center">
+          <Trash2 className="w-6 h-6" />
+        </div>
+        <div>
+          <h3 className="font-bold text-slate-900 dark:text-white text-base">Delete Project?</h3>
+          <p className="text-xs text-slate-500 mt-1">This will permanently delete the project and associated sprint tasks.</p>
+        </div>
+        <div className="flex justify-center gap-2 pt-2">
+          <button onClick={() => setIsDeleteProjectConfirmOpen(false)} className="h-9 px-4 border rounded-xl text-xs font-semibold">Cancel</button>
+          <button onClick={handleConfirmDeleteProject} className="h-9 px-5 bg-rose-600 text-white font-bold text-xs rounded-xl shadow-xs">Delete Project</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+{/* CREATE WORK ITEM / EPIC / BUG MODAL */ }
+{
+  isWorkItemModalOpen && selectedProjectId && (
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in">
+      <div className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-xs ${itemType === 'Bug' ? 'bg-rose-600' : itemType === 'Epic' ? 'bg-purple-600' : 'bg-blue-600'
+              }`}>
+              {itemType === 'Bug' ? <Bug className="w-5 h-5" /> : itemType === 'Epic' ? <Layers className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+            </div>
+            <div>
+              <h3 className="font-extrabold text-slate-900 dark:text-white text-base leading-tight">
+                Create New {itemType}
+              </h3>
+              <p className="text-xs text-slate-500">Project: <strong className="text-slate-800 dark:text-slate-200">{activeProject?.name}</strong></p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsWorkItemModalOpen(false)}
+            className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <form onSubmit={handleCreateWorkItemSubmit} className="space-y-3.5 text-xs">
+          {/* Type selector */}
+          <div className="space-y-1">
+            <label className="block font-bold text-slate-700 dark:text-slate-300">Work Item Category *</label>
+            <div className="grid grid-cols-4 gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl">
+              {(['Story', 'Bug', 'Task', 'Epic'] as const).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setItemType(t)}
+                  className={cn(
+                    'py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer',
+                    itemType === t
+                      ? t === 'Bug' ? 'bg-rose-600 text-white' : t === 'Epic' ? 'bg-purple-600 text-white' : 'bg-blue-600 text-white'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                  )}
+                >
+                  {t}
+                </button>
               ))}
             </div>
           </div>
 
-          {/* Widget 2: My Task Summary (Donut Chart & Legend) */}
-          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#12121B] p-4 shadow-xs space-y-3">
-            <div className="flex items-center gap-1.5">
-              <CalendarCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
-                My Task Summary
-              </h3>
-            </div>
-
-            <div className="flex items-center justify-between gap-3 pt-1">
-              {/* Donut Chart Visual SVG */}
-              <div className="relative w-28 h-28 flex-shrink-0 flex items-center justify-center">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                  {/* Background Circle */}
-                  <path
-                    className="text-slate-100 dark:text-slate-800"
-                    strokeWidth="3.8"
-                    stroke="currentColor"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                  {/* Completed Segment (Green) - 40% */}
-                  <path
-                    className="text-emerald-500 transition-all duration-500"
-                    strokeDasharray="40, 100"
-                    strokeWidth="3.8"
-                    strokeLinecap="round"
-                    stroke="currentColor"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                  {/* In Progress Segment (Blue) - 33% */}
-                  <path
-                    className="text-blue-600 transition-all duration-500"
-                    strokeDasharray="33, 100"
-                    strokeDashoffset="-40"
-                    strokeWidth="3.8"
-                    strokeLinecap="round"
-                    stroke="currentColor"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                  {/* Pending Segment (Orange) - 20% */}
-                  <path
-                    className="text-amber-500 transition-all duration-500"
-                    strokeDasharray="20, 100"
-                    strokeDashoffset="-73"
-                    strokeWidth="3.8"
-                    strokeLinecap="round"
-                    stroke="currentColor"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                  {/* Overdue Segment (Red) - 7% */}
-                  <path
-                    className="text-rose-500 transition-all duration-500"
-                    strokeDasharray="7, 100"
-                    strokeDashoffset="-93"
-                    strokeWidth="3.8"
-                    strokeLinecap="round"
-                    stroke="currentColor"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                </svg>
-
-                {/* Donut Center Text */}
-                <div className="absolute flex flex-col items-center justify-center text-center">
-                  <span className="text-sm font-black text-slate-900 dark:text-white leading-none">
-                    {completedPercentage}%
-                  </span>
-                  <span className="text-[8px] text-slate-400 font-semibold uppercase mt-0.5">
-                    Completed
-                  </span>
-                  <span className="text-[7.5px] text-slate-400">
-                    {completedCount} of {totalCount} tasks
-                  </span>
-                </div>
-              </div>
-
-              {/* Legend List */}
-              <div className="flex-1 space-y-2 text-xs">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                    <span className="text-slate-600 dark:text-slate-300 font-medium">Completed</span>
-                  </div>
-                  <span className="font-bold text-slate-800 dark:text-white">{completedCount}</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
-                    <span className="text-slate-600 dark:text-slate-300 font-medium">In Progress</span>
-                  </div>
-                  <span className="font-bold text-slate-800 dark:text-white">{inProgressCount}</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                    <span className="text-slate-600 dark:text-slate-300 font-medium">Pending</span>
-                  </div>
-                  <span className="font-bold text-slate-800 dark:text-white">{pendingCount}</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                    <span className="text-slate-600 dark:text-slate-300 font-medium">Overdue</span>
-                  </div>
-                  <span className="font-bold text-slate-800 dark:text-white">{overdueCount}</span>
-                </div>
-              </div>
-            </div>
+          {/* Title */}
+          <div className="space-y-1">
+            <label className="block font-bold text-slate-700 dark:text-slate-300">
+              {itemType === 'Epic' ? 'Epic Title' : itemType === 'Bug' ? 'Bug Summary' : 'Task Title'} *
+            </label>
+            <input
+              type="text"
+              value={itemTitle}
+              onChange={(e) => setItemTitle(e.target.value)}
+              placeholder={
+                itemType === 'Epic'
+                  ? 'e.g. Statutory Payroll & Tax Slab Processing'
+                  : itemType === 'Bug'
+                    ? 'e.g. Kanban board drag-and-drop state reset on refresh'
+                    : 'e.g. Implement user authentication flow'
+              }
+              className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 font-medium text-slate-900 dark:text-white"
+              required
+            />
           </div>
 
-          {/* Widget 3: Quick Actions */}
-          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#12121B] p-4 shadow-xs space-y-3">
-            <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
-              Quick Actions
-            </h3>
-
-            <div className="space-y-2">
-              {/* Action 1: Create New Task */}
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="w-full p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors flex items-center gap-3 text-left cursor-pointer group"
-              >
-                <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xs flex-shrink-0 group-hover:scale-105 transition-transform">
-                  <Plus className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-bold text-xs text-slate-800 dark:text-slate-200">
-                    Create New Task
-                  </p>
-                  <p className="text-[10.5px] text-slate-400 truncate">
-                    Assign a new task to yourself or team
-                  </p>
-                </div>
-              </button>
-
-              {/* Action 2: View My Tasks */}
-              <button
-                onClick={() => {
-                  setSelectedStatusFilter('All');
-                  setSelectedPriorityFilter('All');
-                  setViewMode('list');
-                  showToast('Viewing all your assigned tasks');
-                }}
-                className="w-full p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors flex items-center gap-3 text-left cursor-pointer group"
-              >
-                <div className="w-9 h-9 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-xs flex-shrink-0 group-hover:scale-105 transition-transform">
-                  <List className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-bold text-xs text-slate-800 dark:text-slate-200">
-                    View My Tasks
-                  </p>
-                  <p className="text-[10.5px] text-slate-400 truncate">
-                    See all your assigned tasks
-                  </p>
-                </div>
-              </button>
-
-              {/* Action 3: View Calendar */}
-              <button
-                onClick={() => navigate('/calendar')}
-                className="w-full p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors flex items-center gap-3 text-left cursor-pointer group"
-              >
-                <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs flex-shrink-0 group-hover:scale-105 transition-transform">
-                  <Calendar className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-bold text-xs text-slate-800 dark:text-slate-200">
-                    View Calendar
-                  </p>
-                  <p className="text-[10.5px] text-slate-400 truncate">
-                    Check task deadlines & schedule
-                  </p>
-                </div>
-              </button>
-            </div>
+          {/* Description / Steps */}
+          <div className="space-y-1">
+            <label className="block font-bold text-slate-700 dark:text-slate-300">
+              {itemType === 'Bug' ? 'Steps to Reproduce & Expected Behavior' : 'Description & Scope'}
+            </label>
+            <textarea
+              value={itemDesc}
+              onChange={(e) => setItemDesc(e.target.value)}
+              rows={3}
+              placeholder={
+                itemType === 'Bug'
+                  ? '1. Open Sprint board\n2. Move card to IN QA\n3. Refresh browser page'
+                  : 'Provide details, scope, or requirements...'
+              }
+              className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 font-medium resize-none text-slate-900 dark:text-white"
+            />
           </div>
 
-        </div>
+          {itemType !== 'Epic' && (
+            <div className="grid grid-cols-3 gap-3">
+              {/* Priority */}
+              <div className="space-y-1">
+                <label className="block font-bold text-slate-700 dark:text-slate-300">Priority</label>
+                <select
+                  value={itemPriority}
+                  onChange={(e) => setItemPriority(e.target.value as any)}
+                  className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-medium text-slate-900 dark:text-white"
+                >
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                  <option value="Critical">Critical</option>
+                </select>
+              </div>
 
+              {/* Assignee */}
+              <div className="space-y-1">
+                <label className="block font-bold text-slate-700 dark:text-slate-300">Assignee</label>
+                <select
+                  value={itemAssigneeId}
+                  onChange={(e) => setItemAssigneeId(e.target.value)}
+                  className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-medium text-slate-900 dark:text-white"
+                >
+                  {AVAILABLE_ORGS_MEMBERS.map((m) => (
+                    <option key={m.id} value={m.id}>{m.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Story Points */}
+              <div className="space-y-1">
+                <label className="block font-bold text-slate-700 dark:text-slate-300">Points</label>
+                <select
+                  value={itemPoints}
+                  onChange={(e) => setItemPoints(Number(e.target.value))}
+                  className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-medium text-slate-900 dark:text-white"
+                >
+                  {[1, 2, 3, 5, 8, 13].map((pts) => (
+                    <option key={pts} value={pts}>{pts} pts</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
+          {/* Footer Buttons */}
+          <div className="flex justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <button
+              type="button"
+              onClick={() => setIsWorkItemModalOpen(false)}
+              className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-100 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className={`h-9 px-5 text-white font-bold rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5 ${itemType === 'Bug' ? 'bg-rose-600 hover:bg-rose-700' : itemType === 'Epic' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create {itemType}</span>
+            </button>
+          </div>
+        </form>
       </div>
+    </div>
+  )
+}
 
-      {/* =========================================================================
-          4. CREATE NEW TASK MODAL DIALOG
-         ========================================================================= */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="w-full max-w-lg bg-white dark:bg-[#141420] text-slate-900 dark:text-white rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <span className="font-bold text-sm flex items-center gap-2">
-                <Plus className="w-4 h-4 text-blue-600" />
-                <span>Create New Task</span>
-              </span>
-              <button
-                onClick={() => setIsCreateModalOpen(false)}
-                className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"
+{/* EDIT WORK ITEM / BUG MODAL */ }
+{
+  isEditWorkItemModalOpen && editingWorkItem && (
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in">
+      <div className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
+              <Edit2 className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-slate-900 dark:text-white text-base leading-tight">
+                Edit Work Item ({editingWorkItem.itemKey})
+              </h3>
+              <p className="text-xs text-slate-500">Update work item details, priority, and assignee</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsEditWorkItemModalOpen(false)}
+            className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <form onSubmit={handleUpdateWorkItemSubmit} className="space-y-3.5 text-xs">
+          <div className="space-y-1">
+            <label className="block font-bold text-slate-700 dark:text-slate-300">Title *</label>
+            <input
+              type="text"
+              value={itemTitle}
+              onChange={(e) => setItemTitle(e.target.value)}
+              className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-medium text-slate-900 dark:text-white"
+              required
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="block font-bold text-slate-700 dark:text-slate-300">Description</label>
+            <textarea
+              value={itemDesc}
+              onChange={(e) => setItemDesc(e.target.value)}
+              rows={3}
+              className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-medium resize-none text-slate-900 dark:text-white"
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1">
+              <label className="block font-bold text-slate-700 dark:text-slate-300">Priority</label>
+              <select
+                value={itemPriority}
+                onChange={(e) => setItemPriority(e.target.value as any)}
+                className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-medium text-slate-900 dark:text-white"
               >
-                <X className="w-4 h-4" />
-              </button>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
             </div>
 
-            <form onSubmit={handleCreateTask} className="p-5 space-y-3.5 text-xs">
-              <div>
-                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-                  Task Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="e.g. Design Dashboard UI"
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
-                />
-              </div>
+            <div className="space-y-1">
+              <label className="block font-bold text-slate-700 dark:text-slate-300">Assignee</label>
+              <select
+                value={itemAssigneeId}
+                onChange={(e) => setItemAssigneeId(e.target.value)}
+                className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-medium text-slate-900 dark:text-white"
+              >
+                {AVAILABLE_ORGS_MEMBERS.map((m) => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
+            </div>
 
-              <div>
-                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  value={newDescription}
-                  onChange={(e) => setNewDescription(e.target.value)}
-                  placeholder="e.g. Create new dashboard design"
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-                    Project
-                  </label>
-                  <select
-                    value={newProject}
-                    onChange={(e) => setNewProject(e.target.value)}
-                    className="w-full h-9 px-2.5 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
-                  >
-                    <option value="HRM Portal">HRM Portal</option>
-                    <option value="Finance App">Finance App</option>
-                    <option value="Backend">Backend</option>
-                    <option value="Mobile App">Mobile App</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="IT Support">IT Support</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-                    Assigned To
-                  </label>
-                  <select
-                    value={newAssignee}
-                    onChange={(e) => setNewAssignee(e.target.value)}
-                    className="w-full h-9 px-2.5 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
-                  >
-                    <option value="Amit Verma">Amit Verma (UI/UX Designer)</option>
-                    <option value="Neha Singh">Neha Singh (Developer)</option>
-                    <option value="Rahul Mehta">Rahul Mehta (QA Engineer)</option>
-                    <option value="Pooja Sharma">Pooja Sharma (Technical Writer)</option>
-                    <option value="Sahil Khan">Sahil Khan (Developer)</option>
-                    <option value="Vikas Kumar">Vikas Kumar (IT Admin)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-                    Priority
-                  </label>
-                  <select
-                    value={newPriority}
-                    onChange={(e) => setNewPriority(e.target.value as any)}
-                    className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
-                  >
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-                    Status
-                  </label>
-                  <select
-                    value={newStatus}
-                    onChange={(e) => setNewStatus(e.target.value as any)}
-                    className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
-                  >
-                    <option value="In Progress">In Progress</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Completed">Completed</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-                    Due Date
-                  </label>
-                  <input
-                    type="text"
-                    value={newDueDate}
-                    onChange={(e) => setNewDueDate(e.target.value)}
-                    placeholder="Apr 28, 2025"
-                    className="w-full h-9 px-2.5 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-50 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-xs cursor-pointer"
-                >
-                  Create Task
-                </button>
-              </div>
-            </form>
+            <div className="space-y-1">
+              <label className="block font-bold text-slate-700 dark:text-slate-300">Points</label>
+              <select
+                value={itemPoints}
+                onChange={(e) => setItemPoints(Number(e.target.value))}
+                className="w-full h-9 px-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-medium text-slate-900 dark:text-white"
+              >
+                {[1, 2, 3, 5, 8, 13].map((pts) => (
+                  <option key={pts} value={pts}>{pts} pts</option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
-      )}
 
-      {/* Toast Notification Alert */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-bold animate-toast-slide">
-          <CheckCircle2 className="h-4 w-4 text-emerald-400 dark:text-emerald-600" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
+          <div className="flex justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <button
+              type="button"
+              onClick={() => setIsEditWorkItemModalOpen(false)}
+              className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-100 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="h-9 px-5 bg-blue-600 text-white font-bold rounded-xl shadow-xs hover:bg-blue-700 cursor-pointer"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+  )
+}
+
+{/* DELETE WORK ITEM CONFIRMATION MODAL */ }
+{
+  isDeleteWorkItemConfirmOpen && (
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
+      <div className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 text-center">
+        <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 mx-auto flex items-center justify-center">
+          <Trash2 className="w-6 h-6" />
+        </div>
+        <div>
+          <h3 className="font-bold text-slate-900 dark:text-white text-base">Delete Work Item?</h3>
+          <p className="text-xs text-slate-500 mt-1">Are you sure you want to delete this work item from the project board?</p>
+        </div>
+        <div className="flex justify-center gap-2 pt-2">
+          <button
+            onClick={() => setIsDeleteWorkItemConfirmOpen(false)}
+            className="h-9 px-4 border rounded-xl text-xs font-semibold cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirmDeleteWorkItem}
+            className="h-9 px-5 bg-rose-600 text-white font-bold text-xs rounded-xl shadow-xs hover:bg-rose-700 cursor-pointer"
+          >
+            Delete Item
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+{/* EDIT EPIC MODAL */ }
+{
+  isEditEpicModalOpen && editingEpic && (
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in">
+      <div className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-purple-600 flex items-center justify-center text-white shadow-xs">
+              <Edit2 className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-slate-900 dark:text-white text-base leading-tight">
+                Edit Epic ({editingEpic.epicKey})
+              </h3>
+              <p className="text-xs text-slate-500">Modify strategic requirement title and scope</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsEditEpicModalOpen(false)}
+            className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <form onSubmit={handleUpdateEpicSubmit} className="space-y-3.5 text-xs">
+          <div className="space-y-1">
+            <label className="block font-bold text-slate-700 dark:text-slate-300">Epic Title *</label>
+            <input
+              type="text"
+              value={itemTitle}
+              onChange={(e) => setItemTitle(e.target.value)}
+              className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-medium text-slate-900 dark:text-white"
+              required
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="block font-bold text-slate-700 dark:text-slate-300">Scope & Description</label>
+            <textarea
+              value={itemDesc}
+              onChange={(e) => setItemDesc(e.target.value)}
+              rows={3}
+              className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-medium resize-none text-slate-900 dark:text-white"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <button
+              type="button"
+              onClick={() => setIsEditEpicModalOpen(false)}
+              className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-100 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="h-9 px-5 bg-purple-600 text-white font-bold rounded-xl shadow-xs hover:bg-purple-700 cursor-pointer"
+            >
+              Save Epic
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+{/* DELETE EPIC CONFIRMATION MODAL */ }
+{
+  isDeleteEpicConfirmOpen && (
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
+      <div className="bg-white dark:bg-[#12121B] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 text-center">
+        <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 mx-auto flex items-center justify-center">
+          <Trash2 className="w-6 h-6" />
+        </div>
+        <div>
+          <h3 className="font-bold text-slate-900 dark:text-white text-base">Delete Epic?</h3>
+          <p className="text-xs text-slate-500 mt-1">This will permanently delete the Epic requirement from the project.</p>
+        </div>
+        <div className="flex justify-center gap-2 pt-2">
+          <button
+            onClick={() => setIsDeleteEpicConfirmOpen(false)}
+            className="h-9 px-4 border rounded-xl text-xs font-semibold cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirmDeleteEpic}
+            className="h-9 px-5 bg-rose-600 text-white font-bold text-xs rounded-xl shadow-xs hover:bg-rose-700 cursor-pointer"
+          >
+            Delete Epic
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+{/* Toast Alert */ }
+{
+  toastMessage && (
+    <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-bold animate-toast-slide">
+      <CheckCircle2 className="h-4 w-4 text-emerald-400 dark:text-emerald-600" />
+      <span>{toastMessage}</span>
+    </div>
+  )
+}
+    </div >
   );
 };
+
+export default TasksPage;

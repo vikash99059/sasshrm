@@ -222,7 +222,7 @@ function getRawNavigationForRole(role: UserRole, activeContext: 'organisation' |
           items: [
             { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
             { title: 'Clock In / Out', href: '/clock-in', icon: Clock, badge: 'Live', moduleId: 'employee_hr_management' },
-            { title: 'Tasks', href: '/tasks', icon: ListTodo, badge: '4', moduleId: 'project_task_management' },
+            { title: 'Project Management', href: '/tasks', icon: ListTodo, badge: '4', moduleId: 'organization_management', subModule: 'Project Management' },
             { title: 'Calendar', href: '/calendar', icon: CalendarDays },
             { title: 'Timesheet', href: '/timesheets', icon: Clock, moduleId: 'employee_hr_management' },
             { title: 'Attendance', href: '/attendance', icon: UserCheck, moduleId: 'employee_hr_management' },
@@ -276,13 +276,13 @@ function getRawNavigationForRole(role: UserRole, activeContext: 'organisation' |
           ]
         },
         {
-          sectionTitle: 'PEOPLE',
+          sectionTitle: 'ORGANISATION',
           items: [
-            { title: 'Employees', href: '/employees', icon: Users, moduleId: 'organization_management', subModule: 'User management' },
-            { title: 'Departments', href: '/departments', icon: Building2, moduleId: 'organization_management', subModule: 'Departments' },
-            { title: 'Designations', href: '/designations', icon: Award, moduleId: 'organization_management', subModule: 'Designations & roles' },
-            { title: 'Teams', href: '/teams', icon: Users, moduleId: 'organization_management', subModule: 'Company / Business Unit / Branch setup' },
             { title: 'Organization Structure', href: '/org-structure', icon: Layers, moduleId: 'organization_management', subModule: 'Organization structure' },
+            { title: 'Departments & Teams', href: '/departments', icon: Building2, moduleId: 'organization_management', subModule: 'Departments' },
+            { title: 'Project Management', href: '/tasks', icon: ListTodo, moduleId: 'organization_management', subModule: 'Project Management' },
+            { title: 'Employees & Roster', href: '/employees', icon: Users, moduleId: 'organization_management', subModule: 'User management' },
+            { title: 'Designations & Roles', href: '/designations', icon: Award, moduleId: 'organization_management', subModule: 'Designations & roles' },
           ]
         },
         {
