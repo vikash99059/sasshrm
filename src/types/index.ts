@@ -93,6 +93,22 @@ export interface Designation {
   createdAt?: string;
 }
 
+export interface Team {
+  id: string;
+  organizationId: string;
+  name: string;
+  departmentId?: string;
+  department: string;
+  leadName: string;
+  leadRole: string;
+  leadEmployeeId?: string;
+  memberCount: number;
+  memberIds?: string[];
+  color: string;
+  description?: string;
+  createdAt?: string;
+}
+
 export interface Employee {
   id: string;
   organizationId: string;

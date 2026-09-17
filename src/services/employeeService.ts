@@ -1,5 +1,5 @@
-import { Employee, Department, Designation } from '../types';
-import { INITIAL_EMPLOYEES, INITIAL_DEPARTMENTS } from './mockDb';
+import { Employee, Department, Designation, Team } from '../types';
+import { INITIAL_EMPLOYEES, INITIAL_DEPARTMENTS, INITIAL_TEAMS } from './mockDb';
 import { getFromStorage, saveToStorage } from './storage';
 
 export const employeeService = {
@@ -12,8 +12,8 @@ export const employeeService = {
     const list = getFromStorage<Employee[]>('employees', INITIAL_EMPLOYEES);
     if (!id) return list[0] || INITIAL_EMPLOYEES[0];
     const cleanId = id.toLowerCase().trim();
-    const found = list.find(e => 
-      e.id.toLowerCase() === cleanId || 
+    const found = list.find(e =>
+      e.id.toLowerCase() === cleanId ||
       e.employeeId?.toLowerCase() === cleanId ||
       e.email?.toLowerCase() === cleanId ||
       e.fullName?.toLowerCase().includes(cleanId)
@@ -213,5 +213,50 @@ export const employeeService = {
     const list = await employeeService.getDesignations();
     const filtered = list.filter(d => d.id !== id);
     saveToStorage('designations', filtered);
+  },
+
+  // =========================================================================
+  // TEAM CRUD
+  // =========================================================================
+  getTeams: async (_orgId: string = 'org-1'): Promise<Team[]> => {
+    return getFromStorage<Team[]>('teams', INITIAL_TEAMS);
+  },
+
+  createTeam: async (data: Partial<Team>): Promise<Team> => {
+    const list = getFromStorage<Team[]>('teams', INITIAL_TEAMS);
+    const newTeam: Team = {
+      id: `team-${Date.now()}`,
+      organizationId: data.organizationId || 'org-1',
+      name: data.name || 'New Team',
+      departmentId: data.departmentId,
+      department: data.department || '',
+      leadName: data.leadName || 'Not Assigned',
+      leadRole: data.leadRole || '',
+      leadEmployeeId: data.leadEmployeeId,
+      memberCount: data.memberCount || 0,
+      memberIds: data.memberIds || [],
+      color: data.color || '#3B82F6',
+      description: data.description || '',
+      createdAt: new Date().toISOString().split('T')[0],
+    };
+    const updated = [newTeam, ...list];
+    saveToStorage('teams', updated);
+    return newTeam;
+  },
+
+  updateTeam: async (id: string, data: Partial<Team>): Promise<Team> => {
+    const list = getFromStorage<Team[]>('teams', INITIAL_TEAMS);
+    const index = list.findIndex(t => t.id === id);
+    if (index === -1) throw new Error(`Team with ID ${id} not found`);
+    const updatedTeam: Team = { ...list[index], ...data };
+    list[index] = updatedTeam;
+    saveToStorage('teams', list);
+    return updatedTeam;
+  },
+
+  deleteTeam: async (id: string): Promise<void> => {
+    const list = getFromStorage<Team[]>('teams', INITIAL_TEAMS);
+    const filtered = list.filter(t => t.id !== id);
+    saveToStorage('teams', filtered);
   },
 };

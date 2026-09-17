@@ -296,7 +296,8 @@ function getRawNavigationForRole(role: UserRole, activeContext: 'organisation' |
           sectionTitle: 'ORGANISATION',
           items: [
             { title: 'Organization Structure', href: '/org-structure', icon: Layers, moduleId: 'organization_management', subModule: 'Organization structure' },
-            { title: 'Departments & Teams', href: '/departments', icon: Building2, moduleId: 'organization_management', subModule: 'Departments' },
+            { title: 'Departments', href: '/departments', icon: Building2, moduleId: 'organization_management', subModule: 'Departments' },
+            { title: 'Teams & Pods', href: '/teams', icon: Users, moduleId: 'organization_management', subModule: 'Departments' },
             { title: 'Project Management', href: '/tasks', icon: ListTodo, moduleId: 'organization_management', subModule: 'Project Management' },
             { title: 'Employees & Roster', href: '/employees', icon: Users, moduleId: 'organization_management', subModule: 'User management' },
             { title: 'Designations & Roles', href: '/designations', icon: Award, moduleId: 'organization_management', subModule: 'Designations & roles' },
