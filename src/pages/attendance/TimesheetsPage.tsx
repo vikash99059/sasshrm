@@ -170,7 +170,7 @@ export const TimesheetsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
-      
+
       {/* Toast Notification */}
       {notification && (
         <div className="fixed top-4 right-4 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 text-xs font-semibold animate-fade-in">
@@ -197,32 +197,31 @@ export const TimesheetsPage: React.FC = () => {
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-1" />
               </button>
 
-              {isRangeOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl p-2 z-30 animate-fade-in text-xs">
-                  {[
-                    'Apr 21, 2025 – Apr 27, 2025',
-                    'Apr 14, 2025 – Apr 20, 2025',
-                    'Apr 07, 2025 – Apr 13, 2025',
-                    'Mar 31, 2025 – Apr 06, 2025'
-                  ].map((range) => (
-                    <button
-                      key={range}
-                      onClick={() => {
-                        setSelectedRange(range);
-                        setIsRangeOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-xl font-medium transition-colors ${
-                        selectedRange === range
-                          ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-semibold'
-                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+            {isRangeOpen && (
+              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl p-2 z-30 animate-fade-in text-xs">
+                {[
+                  'Apr 21, 2025 – Apr 27, 2025',
+                  'Apr 14, 2025 – Apr 20, 2025',
+                  'Apr 07, 2025 – Apr 13, 2025',
+                  'Mar 31, 2025 – Apr 06, 2025'
+                ].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => {
+                      setSelectedRange(range);
+                      setIsRangeOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-xl font-medium transition-colors ${selectedRange === range
+                        ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-semibold'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                       }`}
-                    >
-                      {range}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+                  >
+                    {range}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
             {/* Add Timesheet Button */}
             <button
@@ -240,7 +239,7 @@ export const TimesheetsPage: React.FC = () => {
           TOP 4 METRIC STAT CARDS WITH COMPACT HORIZONTAL ROW LAYOUT & GLASS EFFECT
          ========================================================================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        
+
         {/* Card 1: Total Hours */}
         <div className="relative overflow-hidden rounded-2xl p-3.5 sm:p-4 border border-white/80 dark:border-slate-800/80 bg-gradient-to-br from-white/95 via-white/90 to-blue-50/30 dark:from-[#0F172A]/95 dark:via-[#0F172A]/90 dark:to-blue-950/20 backdrop-blur-xl shadow-xs hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-300 dark:hover:border-blue-700/60 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group flex items-center justify-between">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 dark:via-blue-500/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
@@ -354,12 +353,12 @@ export const TimesheetsPage: React.FC = () => {
           MAIN SECTION: 2-COLUMN LAYOUT (TABLE ON LEFT, CARDS ON RIGHT)
          ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
+
         {/* =====================================================================
             LEFT COLUMN: TIMESHEET DETAILS TABLE
            ===================================================================== */}
         <div className="lg:col-span-8 bg-white dark:bg-[#0F172A] rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden p-6 space-y-4">
-          
+
           {/* Section Header with Title & Export Button */}
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <h2 className="text-base font-bold text-slate-900 dark:text-white">
@@ -422,13 +421,12 @@ export const TimesheetsPage: React.FC = () => {
                     {/* Status Pill */}
                     <td className="py-3.5 px-3 text-center">
                       <span
-                        className={`inline-block px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap ${
-                          row.status === 'Present'
+                        className={`inline-block px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap ${row.status === 'Present'
                             ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400'
                             : row.status === 'Absent'
-                            ? 'bg-rose-50 text-rose-500 dark:bg-rose-950/60 dark:text-rose-400'
-                            : 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400'
-                        }`}
+                              ? 'bg-rose-50 text-rose-500 dark:bg-rose-950/60 dark:text-rose-400'
+                              : 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400'
+                          }`}
                       >
                         {row.status}
                       </span>
@@ -480,10 +478,10 @@ export const TimesheetsPage: React.FC = () => {
             RIGHT COLUMN: 3 STACKED CARDS (PROGRESS, WEEKLY HOURS, QUICK ACTIONS)
            ===================================================================== */}
         <div className="lg:col-span-4 space-y-5">
-          
+
           {/* Card 1: Your Progress */}
           <div className="bg-gradient-to-br from-blue-50/80 via-sky-50/50 to-indigo-50/60 dark:from-blue-950/40 dark:via-sky-950/20 dark:to-indigo-950/30 rounded-3xl p-5 border border-blue-100/80 dark:border-blue-900/40 shadow-xs relative overflow-hidden">
-            
+
             <div className="flex items-center gap-4">
               {/* Illustration Clock with decorative leaves/curves */}
               <div className="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
@@ -581,11 +579,10 @@ export const TimesheetsPage: React.FC = () => {
                   {/* Bar Height Container (90px tall) */}
                   <div className="w-full h-24 flex items-end justify-center">
                     <div
-                      className={`w-full max-w-[28px] rounded-xl transition-all duration-300 ${
-                        item.active
+                      className={`w-full max-w-[28px] rounded-xl transition-all duration-300 ${item.active
                           ? 'bg-gradient-to-t from-blue-700 via-blue-600 to-sky-400 shadow-sm'
                           : 'bg-slate-100 dark:bg-slate-800/80'
-                      }`}
+                        }`}
                       style={{ height: item.height }}
                     />
                   </div>
@@ -768,9 +765,10 @@ export const TimesheetsPage: React.FC = () => {
             </form>
           </div>
         </div>
-      )}
+      )
+      }
 
-    </div>
+    </div >
   );
 };
 

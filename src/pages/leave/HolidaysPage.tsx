@@ -94,19 +94,17 @@ export const HolidaysPage: React.FC = () => {
         {holidays.map((h) => (
           <div
             key={h.id}
-            className={`bg-white dark:bg-slate-900 border rounded-2xl p-4 shadow-xs transition-all ${
-              h.isUpcoming
+            className={`bg-white dark:bg-slate-900 border rounded-2xl p-4 shadow-xs transition-all ${h.isUpcoming
                 ? 'border-blue-200 dark:border-blue-900/50 hover:shadow-md'
                 : 'border-slate-200 dark:border-slate-800 opacity-70'
-            }`}
+              }`}
           >
             <div className="flex items-start justify-between gap-2">
               <div>
-                <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                  h.type === 'Public Holiday' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400' :
-                  h.type === 'Company Observance' ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400' :
-                  'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400'
-                }`}>
+                <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${h.type === 'Public Holiday' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400' :
+                    h.type === 'Company Observance' ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400' :
+                      'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400'
+                  }`}>
                   {h.type}
                 </span>
                 <h3 className="font-bold text-slate-900 dark:text-white text-base mt-2">{h.name}</h3>

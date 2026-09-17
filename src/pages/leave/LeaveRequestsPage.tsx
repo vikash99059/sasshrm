@@ -189,11 +189,10 @@ export const LeaveRequestsPage: React.FC = () => {
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                statusFilter === st
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${statusFilter === st
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
+                }`}
             >
               {st}
             </button>
@@ -244,15 +243,13 @@ export const LeaveRequestsPage: React.FC = () => {
                     {req.reason}
                   </td>
                   <td className="py-4 px-4">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                      req.status === 'Approved' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400' :
-                      req.status === 'Pending' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400' :
-                      'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400'
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${
-                        req.status === 'Approved' ? 'bg-emerald-500' :
-                        req.status === 'Pending' ? 'bg-amber-500' : 'bg-rose-500'
-                      }`} />
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${req.status === 'Approved' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400' :
+                        req.status === 'Pending' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400' :
+                          'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400'
+                      }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${req.status === 'Approved' ? 'bg-emerald-500' :
+                          req.status === 'Pending' ? 'bg-amber-500' : 'bg-rose-500'
+                        }`} />
                       {req.status}
                     </span>
                   </td>

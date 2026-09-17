@@ -2,6 +2,8 @@ import {
   ChartAccount,
   JournalEntry,
   Invoice,
+  ClientInvoice,
+  JournalVoucher,
   VendorBill,
   PaymentReceiptVoucher,
   BankAccount,
@@ -275,6 +277,17 @@ export const INITIAL_GST_FILINGS: GstFilingPeriod[] = [
   { periodKey: '2024-05', returnType: 'GSTR-3B', outwardTaxableSupplies: 2190000, igstPayable: 145000, cgstPayable: 124550, sgstPayable: 124550, totalLiability: 394100, eligibleItc: 210000, netTaxPaid: 184100, filingDueDate: '2024-06-20', status: 'Pending' },
 ];
 
+export const INITIAL_CLIENT_INVOICES: ClientInvoice[] = [
+  { id: 'cinv-1', invoiceId: 'INV-2026-001', client: 'Acme Corp', date: '2026-03-01', dueDate: '2026-03-31', amount: 15000, status: 'Paid' },
+  { id: 'cinv-2', invoiceId: 'INV-2026-002', client: 'Initech', date: '2026-03-10', dueDate: '2026-04-10', amount: 8400, status: 'Pending' },
+  { id: 'cinv-3', invoiceId: 'INV-2026-003', client: 'Soylent', date: '2026-03-15', dueDate: '2026-04-15', amount: 22000, status: 'Draft' },
+];
+
+export const INITIAL_JOURNAL_VOUCHERS: JournalVoucher[] = [
+  { id: 'jv-1', voucherNo: 'JV-2026-001', type: 'Journal', date: '2026-03-01', description: 'Adjustment for prepaid software subscription', amount: 4500, reference: 'REF-2026-X1', department: 'Corporate' },
+  { id: 'jv-2', voucherNo: 'JV-2026-002', type: 'Payment', date: '2026-03-05', description: 'Vendor disbursement settlement', amount: 12800, reference: 'REF-2026-X2', department: 'Corporate' },
+];
+
 export const financeService = {
   // Chart of Accounts
   getAccounts: async (): Promise<ChartAccount[]> => {
@@ -323,6 +336,48 @@ export const financeService = {
       };
     });
     saveToStorage('finance_invoices', updated);
+  },
+
+  // Client Invoices
+  getClientInvoices: async (): Promise<ClientInvoice[]> => {
+    return getFromStorage<ClientInvoice[]>('finance_client_invoices', INITIAL_CLIENT_INVOICES);
+  },
+
+  addInvoice: async (data: Omit<ClientInvoice, 'id' | 'invoiceId'>): Promise<ClientInvoice> => {
+    const list = await financeService.getClientInvoices();
+    const count = list.length + 1;
+    const newInv: ClientInvoice = {
+      ...data,
+      id: `cinv-${Date.now()}`,
+      invoiceId: `INV-2026-00${count}`,
+    };
+    const updated = [newInv, ...list];
+    saveToStorage('finance_client_invoices', updated);
+    return newInv;
+  },
+
+  updateInvoice: async (id: string, updates: Partial<ClientInvoice>): Promise<void> => {
+    const list = await financeService.getClientInvoices();
+    const updated = list.map(inv => inv.id === id ? { ...inv, ...updates } : inv);
+    saveToStorage('finance_client_invoices', updated);
+  },
+
+  // Journal Vouchers
+  getJournalVouchers: async (): Promise<JournalVoucher[]> => {
+    return getFromStorage<JournalVoucher[]>('finance_journal_vouchers', INITIAL_JOURNAL_VOUCHERS);
+  },
+
+  addVoucher: async (data: Omit<JournalVoucher, 'id' | 'voucherNo'>): Promise<JournalVoucher> => {
+    const list = await financeService.getJournalVouchers();
+    const count = list.length + 1;
+    const newVoucher: JournalVoucher = {
+      ...data,
+      id: `jv-${Date.now()}`,
+      voucherNo: `JV-2026-00${count}`,
+    };
+    const updated = [newVoucher, ...list];
+    saveToStorage('finance_journal_vouchers', updated);
+    return newVoucher;
   },
 
   // Bills & Payables
