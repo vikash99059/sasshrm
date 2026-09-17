@@ -41,6 +41,8 @@ import {
   RotateCcw,
   X,
   UserCheck,
+  Save,
+  AlertCircle,
 } from 'lucide-react';
 import { formatCurrency } from '../../utils';
 
@@ -100,8 +102,42 @@ export const SaasModulesPage: React.FC = () => {
   // Current selected organization
   const selectedOrg = organizations.find((o) => o.id === selectedOrgId);
   const currentOrgSub = subscriptions.find((s) => s.organizationId === selectedOrgId);
-  const assignedModuleIds: CorporateModuleId[] =
-    currentOrgSub?.subscribedModuleIds || selectedOrg?.subscribedModules || [];
+
+  // Local Draft State for Organization Module & Submodule Assignments
+  const [draftSubscribedModuleIds, setDraftSubscribedModuleIds] = useState<CorporateModuleId[]>([]);
+  const [draftDisabledSubModules, setDraftDisabledSubModules] = useState<Record<string, string[]>>({});
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Sync draft state whenever selectedOrgId, subscriptions, or organizations load
+  useEffect(() => {
+    if (!selectedOrgId) return;
+    const sub = subscriptions.find((s) => s.organizationId === selectedOrgId);
+    const org = organizations.find((o) => o.id === selectedOrgId);
+    const savedModuleIds: CorporateModuleId[] = sub?.subscribedModuleIds || org?.subscribedModules || [];
+    const savedDisabledMap: Record<string, string[]> = sub?.disabledSubModules || org?.disabledSubModules || {};
+
+    setDraftSubscribedModuleIds(savedModuleIds);
+    setDraftDisabledSubModules(savedDisabledMap);
+  }, [selectedOrgId, subscriptions, organizations]);
+
+  const assignedModuleIds: CorporateModuleId[] = draftSubscribedModuleIds;
+
+  // Calculate if there are unsaved draft changes
+  const hasUnsavedChanges = React.useMemo(() => {
+    if (!selectedOrg) return false;
+    const sub = subscriptions.find((s) => s.organizationId === selectedOrgId);
+    const org = organizations.find((o) => o.id === selectedOrgId);
+    const savedModuleIds: CorporateModuleId[] = sub?.subscribedModuleIds || org?.subscribedModules || [];
+    const savedDisabledMap: Record<string, string[]> = sub?.disabledSubModules || org?.disabledSubModules || {};
+
+    const modulesChanged =
+      draftSubscribedModuleIds.length !== savedModuleIds.length ||
+      draftSubscribedModuleIds.some((id) => !savedModuleIds.includes(id));
+
+    const submodulesChanged = JSON.stringify(draftDisabledSubModules) !== JSON.stringify(savedDisabledMap);
+
+    return modulesChanged || submodulesChanged;
+  }, [selectedOrg, selectedOrgId, subscriptions, organizations, draftSubscribedModuleIds, draftDisabledSubModules]);
 
   const handleOrgChange = (orgId: string) => {
     setSelectedOrgId(orgId);
@@ -186,196 +222,99 @@ export const SaasModulesPage: React.FC = () => {
     return 'No Pillars Active';
   };
 
-  // Toggle single module assignment for current selected organization
-  const handleToggleModuleForOrg = async (moduleId: CorporateModuleId) => {
+  // Toggle single module assignment in local draft state
+  const handleToggleModuleForOrg = (moduleId: CorporateModuleId) => {
     if (!selectedOrg) return;
-
-    const isAssigned = assignedModuleIds.includes(moduleId);
+    const isAssigned = draftSubscribedModuleIds.includes(moduleId);
     const newModuleIds = isAssigned
-      ? assignedModuleIds.filter((id) => id !== moduleId)
-      : [...assignedModuleIds, moduleId];
-
-    let newFee = 0;
-    newModuleIds.forEach((id) => {
-      const m = modules.find((mod) => mod.id === id);
-      if (m) newFee += m.basePriceMonthly;
-    });
-    if (newModuleIds.length === 17) newFee = 3699;
-
-    const updatedConfig: ModularSubscriptionConfig = {
-      organizationId: selectedOrg.id,
-      organizationName: selectedOrg.name,
-      planTier: newModuleIds.length === 17 ? 'Enterprise Suite' : 'Business Pro',
-      bundleName: getPillarSummary(newModuleIds),
-      subscribedModuleIds: newModuleIds,
-      monthlyBaseFee: newFee,
-      monthlyTotalFee: newFee,
-      seatQuotas: currentOrgSub?.seatQuotas || selectedOrg.maxEmployees || 100,
-      billingCycle: currentOrgSub?.billingCycle || 'Monthly',
-      status: currentOrgSub?.status || 'Active',
-      lastUpdated: new Date().toISOString().split('T')[0],
-    };
-
-    await saasService.saveModularSubscription(updatedConfig);
-    const updatedSubs = await saasService.getModularSubscriptions();
-    const updatedOrgs = await saasService.getOrganizations();
-    setSubscriptions(updatedSubs);
-    setOrganizations(updatedOrgs);
-
-    const modName = modules.find((m) => m.id === moduleId)?.name || moduleId;
-    showToast(
-      isAssigned
-        ? `Removed "${modName}" from ${selectedOrg.name}`
-        : `Assigned "${modName}" to ${selectedOrg.name}!`
-    );
+      ? draftSubscribedModuleIds.filter((id) => id !== moduleId)
+      : [...draftSubscribedModuleIds, moduleId];
+    setDraftSubscribedModuleIds(newModuleIds);
   };
 
   const isSubModuleDisabled = (moduleId: string, subName: string) => {
-    const disabledMap = currentOrgSub?.disabledSubModules || selectedOrg?.disabledSubModules || {};
-    const disabledList = disabledMap[moduleId] || [];
+    const disabledList = draftDisabledSubModules[moduleId] || [];
     return disabledList.includes(subName);
   };
 
-  const handleToggleSubModule = async (moduleId: string, subName: string) => {
+  const handleToggleSubModule = (moduleId: string, subName: string) => {
     if (!selectedOrg) return;
-
-    const currentDisabledMap = currentOrgSub?.disabledSubModules || selectedOrg?.disabledSubModules || {};
-    const currentList = currentDisabledMap[moduleId] || [];
+    const currentList = draftDisabledSubModules[moduleId] || [];
     const isCurrentlyDisabled = currentList.includes(subName);
+    const updatedList = isCurrentlyDisabled
+      ? currentList.filter((s) => s !== subName)
+      : [...currentList, subName];
 
-    let updatedList: string[];
-    if (isCurrentlyDisabled) {
-      updatedList = currentList.filter((s) => s !== subName);
-    } else {
-      updatedList = [...currentList, subName];
-    }
-
-    const updatedDisabledMap = {
-      ...currentDisabledMap,
+    setDraftDisabledSubModules({
+      ...draftDisabledSubModules,
       [moduleId]: updatedList,
-    };
-
-    const updatedConfig: ModularSubscriptionConfig = {
-      organizationId: selectedOrg.id,
-      organizationName: selectedOrg.name,
-      planTier: currentOrgSub?.planTier || (assignedModuleIds.length === 17 ? 'Enterprise Suite' : 'Business Pro'),
-      bundleName: currentOrgSub?.bundleName || getPillarSummary(assignedModuleIds),
-      subscribedModuleIds: assignedModuleIds,
-      disabledSubModules: updatedDisabledMap,
-      monthlyBaseFee: currentOrgSub?.monthlyBaseFee || 0,
-      monthlyTotalFee: currentOrgSub?.monthlyTotalFee || 0,
-      seatQuotas: currentOrgSub?.seatQuotas || selectedOrg.maxEmployees || 100,
-      billingCycle: currentOrgSub?.billingCycle || 'Monthly',
-      status: currentOrgSub?.status || 'Active',
-      lastUpdated: new Date().toISOString().split('T')[0],
-    };
-
-    await saasService.saveModularSubscription(updatedConfig);
-    const updatedSubs = await saasService.getModularSubscriptions();
-    const updatedOrgs = await saasService.getOrganizations();
-    setSubscriptions(updatedSubs);
-    setOrganizations(updatedOrgs);
-
-    showToast(
-      isCurrentlyDisabled
-        ? `Enabled submodule "${subName}" for ${selectedOrg.name}`
-        : `Disabled submodule "${subName}" for ${selectedOrg.name}`
-    );
+    });
   };
 
-  const handleEnableAllSubModules = async (mod: CorporateModule) => {
+  const handleEnableAllSubModules = (mod: CorporateModule) => {
     if (!selectedOrg) return;
-
-    const currentDisabledMap = currentOrgSub?.disabledSubModules || selectedOrg?.disabledSubModules || {};
-    const updatedDisabledMap = {
-      ...currentDisabledMap,
+    setDraftDisabledSubModules({
+      ...draftDisabledSubModules,
       [mod.id]: [],
-    };
-
-    const updatedConfig: ModularSubscriptionConfig = {
-      organizationId: selectedOrg.id,
-      organizationName: selectedOrg.name,
-      planTier: currentOrgSub?.planTier || (assignedModuleIds.length === 17 ? 'Enterprise Suite' : 'Business Pro'),
-      bundleName: currentOrgSub?.bundleName || getPillarSummary(assignedModuleIds),
-      subscribedModuleIds: assignedModuleIds,
-      disabledSubModules: updatedDisabledMap,
-      monthlyBaseFee: currentOrgSub?.monthlyBaseFee || 0,
-      monthlyTotalFee: currentOrgSub?.monthlyTotalFee || 0,
-      seatQuotas: currentOrgSub?.seatQuotas || selectedOrg.maxEmployees || 100,
-      billingCycle: currentOrgSub?.billingCycle || 'Monthly',
-      status: currentOrgSub?.status || 'Active',
-      lastUpdated: new Date().toISOString().split('T')[0],
-    };
-
-    await saasService.saveModularSubscription(updatedConfig);
-    const updatedSubs = await saasService.getModularSubscriptions();
-    const updatedOrgs = await saasService.getOrganizations();
-    setSubscriptions(updatedSubs);
-    setOrganizations(updatedOrgs);
-    showToast(`Enabled all submodules of ${mod.name} for ${selectedOrg.name}`);
+    });
   };
 
-  const handleDisableAllSubModules = async (mod: CorporateModule) => {
+  const handleDisableAllSubModules = (mod: CorporateModule) => {
     if (!selectedOrg) return;
-
     const allSubNames = mod.subModules || mod.featureGroups.flatMap((g) => g.items);
-    const currentDisabledMap = currentOrgSub?.disabledSubModules || selectedOrg?.disabledSubModules || {};
-    const updatedDisabledMap = {
-      ...currentDisabledMap,
+    setDraftDisabledSubModules({
+      ...draftDisabledSubModules,
       [mod.id]: allSubNames,
-    };
-
-    const updatedConfig: ModularSubscriptionConfig = {
-      organizationId: selectedOrg.id,
-      organizationName: selectedOrg.name,
-      planTier: currentOrgSub?.planTier || (assignedModuleIds.length === 17 ? 'Enterprise Suite' : 'Business Pro'),
-      bundleName: currentOrgSub?.bundleName || getPillarSummary(assignedModuleIds),
-      subscribedModuleIds: assignedModuleIds,
-      disabledSubModules: updatedDisabledMap,
-      monthlyBaseFee: currentOrgSub?.monthlyBaseFee || 0,
-      monthlyTotalFee: currentOrgSub?.monthlyTotalFee || 0,
-      seatQuotas: currentOrgSub?.seatQuotas || selectedOrg.maxEmployees || 100,
-      billingCycle: currentOrgSub?.billingCycle || 'Monthly',
-      status: currentOrgSub?.status || 'Active',
-      lastUpdated: new Date().toISOString().split('T')[0],
-    };
-
-    await saasService.saveModularSubscription(updatedConfig);
-    const updatedSubs = await saasService.getModularSubscriptions();
-    const updatedOrgs = await saasService.getOrganizations();
-    setSubscriptions(updatedSubs);
-    setOrganizations(updatedOrgs);
-    showToast(`Disabled all submodules of ${mod.name} for ${selectedOrg.name}`);
+    });
   };
 
-  // 1-Click Toggle an entire Core Pillar for the selected organization
-  const handleTogglePillarForOrg = async (pillarName: CorporatePillar) => {
+  // 1-Click Toggle an entire Core Pillar in draft state
+  const handleTogglePillarForOrg = (pillarName: CorporatePillar) => {
     if (!selectedOrg) return;
-
     const pillarMods = modules.filter((m) => m.pillar === pillarName).map((m) => m.id);
-    const allAssigned = pillarMods.every((id) => assignedModuleIds.includes(id));
+    const allAssigned = pillarMods.every((id) => draftSubscribedModuleIds.includes(id));
+    const newModuleIds = allAssigned
+      ? draftSubscribedModuleIds.filter((id) => !pillarMods.includes(id))
+      : [...draftSubscribedModuleIds, ...pillarMods.filter((id) => !draftSubscribedModuleIds.includes(id))];
+    setDraftSubscribedModuleIds(newModuleIds);
+  };
 
-    let newModuleIds: CorporateModuleId[] = [];
-    if (allAssigned) {
-      newModuleIds = assignedModuleIds.filter((id) => !pillarMods.includes(id));
-    } else {
-      const toAdd = pillarMods.filter((id) => !assignedModuleIds.includes(id));
-      newModuleIds = [...assignedModuleIds, ...toAdd];
-    }
+  // 1-Click Assign All 6 Core Pillars in draft state
+  const handleSelectAllPillars = () => {
+    if (!selectedOrg) return;
+    setDraftSubscribedModuleIds(modules.map((m) => m.id));
+  };
 
+  // 1-Click Clear all pillars/modules in draft state
+  const handleClearAllPillars = () => {
+    if (!selectedOrg) return;
+    setDraftSubscribedModuleIds([]);
+  };
+
+  // Preset Bundles application in draft state
+  const handleApplyPresetBundle = (presetModuleIds: CorporateModuleId[]) => {
+    if (!selectedOrg) return;
+    setDraftSubscribedModuleIds(presetModuleIds);
+  };
+
+  // EXPLICIT SAVE CHANGES HANDLER
+  const handleSaveChanges = async () => {
+    if (!selectedOrg) return;
+    setIsSaving(true);
     let newFee = 0;
-    newModuleIds.forEach((id) => {
+    draftSubscribedModuleIds.forEach((id) => {
       const m = modules.find((mod) => mod.id === id);
       if (m) newFee += m.basePriceMonthly;
     });
-    if (newModuleIds.length === 17) newFee = 3699;
+    if (draftSubscribedModuleIds.length === 17) newFee = 3699;
 
     const updatedConfig: ModularSubscriptionConfig = {
       organizationId: selectedOrg.id,
       organizationName: selectedOrg.name,
-      planTier: newModuleIds.length === 17 ? 'Enterprise Suite' : 'Business Pro',
-      bundleName: getPillarSummary(newModuleIds),
-      subscribedModuleIds: newModuleIds,
+      planTier: draftSubscribedModuleIds.length === 17 ? 'Enterprise Suite' : 'Business Pro',
+      bundleName: getPillarSummary(draftSubscribedModuleIds),
+      subscribedModuleIds: draftSubscribedModuleIds,
+      disabledSubModules: draftDisabledSubModules,
       monthlyBaseFee: newFee,
       monthlyTotalFee: newFee,
       seatQuotas: currentOrgSub?.seatQuotas || selectedOrg.maxEmployees || 100,
@@ -389,98 +328,21 @@ export const SaasModulesPage: React.FC = () => {
     const updatedOrgs = await saasService.getOrganizations();
     setSubscriptions(updatedSubs);
     setOrganizations(updatedOrgs);
-
-    showToast(
-      allAssigned
-        ? `Removed ${pillarName} Pillar modules from ${selectedOrg.name}`
-        : `Assigned all ${pillarName} Pillar modules to ${selectedOrg.name}!`
-    );
+    setIsSaving(false);
+    showToast(`Successfully saved module assignments for ${selectedOrg.name}!`);
   };
 
-  // 1-Click Assign All 6 Core Pillars
-  const handleSelectAllPillars = async () => {
+  // DISCARD CHANGES HANDLER
+  const handleDiscardChanges = () => {
     if (!selectedOrg) return;
-    const allModuleIds = modules.map((m) => m.id);
-    const fee = 3699;
+    const sub = subscriptions.find((s) => s.organizationId === selectedOrgId);
+    const org = organizations.find((o) => o.id === selectedOrgId);
+    const savedModuleIds: CorporateModuleId[] = sub?.subscribedModuleIds || org?.subscribedModules || [];
+    const savedDisabledMap: Record<string, string[]> = sub?.disabledSubModules || org?.disabledSubModules || {};
 
-    const updatedConfig: ModularSubscriptionConfig = {
-      organizationId: selectedOrg.id,
-      organizationName: selectedOrg.name,
-      planTier: 'Enterprise Suite',
-      bundleName: 'All 6 Core Pillars Active',
-      subscribedModuleIds: allModuleIds,
-      monthlyBaseFee: fee,
-      monthlyTotalFee: fee,
-      seatQuotas: currentOrgSub?.seatQuotas || selectedOrg.maxEmployees || 100,
-      billingCycle: currentOrgSub?.billingCycle || 'Monthly',
-      status: currentOrgSub?.status || 'Active',
-      lastUpdated: new Date().toISOString().split('T')[0],
-    };
-
-    await saasService.saveModularSubscription(updatedConfig);
-    const updatedSubs = await saasService.getModularSubscriptions();
-    const updatedOrgs = await saasService.getOrganizations();
-    setSubscriptions(updatedSubs);
-    setOrganizations(updatedOrgs);
-    showToast(`Assigned all 6 Core Pillars to ${selectedOrg.name}!`);
-  };
-
-  // 1-Click Clear all pillars/modules for the selected organization
-  const handleClearAllPillars = async () => {
-    if (!selectedOrg) return;
-
-    const updatedConfig: ModularSubscriptionConfig = {
-      organizationId: selectedOrg.id,
-      organizationName: selectedOrg.name,
-      planTier: 'Business Pro',
-      bundleName: 'No Pillars Active',
-      subscribedModuleIds: [],
-      monthlyBaseFee: 0,
-      monthlyTotalFee: 0,
-      seatQuotas: currentOrgSub?.seatQuotas || selectedOrg.maxEmployees || 100,
-      billingCycle: currentOrgSub?.billingCycle || 'Monthly',
-      status: currentOrgSub?.status || 'Active',
-      lastUpdated: new Date().toISOString().split('T')[0],
-    };
-
-    await saasService.saveModularSubscription(updatedConfig);
-    const updatedSubs = await saasService.getModularSubscriptions();
-    const updatedOrgs = await saasService.getOrganizations();
-    setSubscriptions(updatedSubs);
-    showToast(`Cleared all pillars for ${selectedOrg.name}.`);
-  };
-
-  // Preset Bundles application handler
-  const handleApplyPresetBundle = async (presetModuleIds: CorporateModuleId[], presetName: string) => {
-    if (!selectedOrg) return;
-
-    let fee = 0;
-    presetModuleIds.forEach((id) => {
-      const m = modules.find((mod) => mod.id === id);
-      if (m) fee += m.basePriceMonthly;
-    });
-    if (presetModuleIds.length === 17) fee = 3699;
-
-    const updatedConfig: ModularSubscriptionConfig = {
-      organizationId: selectedOrg.id,
-      organizationName: selectedOrg.name,
-      planTier: presetModuleIds.length === 17 ? 'Enterprise Suite' : 'Business Pro',
-      bundleName: presetName,
-      subscribedModuleIds: presetModuleIds,
-      monthlyBaseFee: fee,
-      monthlyTotalFee: fee,
-      seatQuotas: currentOrgSub?.seatQuotas || selectedOrg.maxEmployees || 100,
-      billingCycle: currentOrgSub?.billingCycle || 'Monthly',
-      status: currentOrgSub?.status || 'Active',
-      lastUpdated: new Date().toISOString().split('T')[0],
-    };
-
-    await saasService.saveModularSubscription(updatedConfig);
-    const updatedSubs = await saasService.getModularSubscriptions();
-    const updatedOrgs = await saasService.getOrganizations();
-    setSubscriptions(updatedSubs);
-    setOrganizations(updatedOrgs);
-    showToast(`Applied preset "${presetName}" to ${selectedOrg.name}!`);
+    setDraftSubscribedModuleIds(savedModuleIds);
+    setDraftDisabledSubModules(savedDisabledMap);
+    showToast(`Discarded unsaved changes for ${selectedOrg.name}.`);
   };
 
   const PILLARS_FILTER_TABS: { key: string; label: string; count: number; assignedCount: number }[] = [
@@ -1141,26 +1003,62 @@ export const SaasModulesPage: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Action Buttons */}
+                  {/* Action Buttons & Unsaved Changes Status */}
                   <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="primary"
-                      onClick={handleSelectAllPillars}
-                      title="Assign all modules across all 6 Core Pillars"
-                      className="whitespace-nowrap text-xs py-1.5"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
-                      Assign All (17)
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleClearAllPillars}
-                      className="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 border-rose-200 dark:border-rose-900/50 whitespace-nowrap text-xs py-1.5"
-                    >
-                      Clear All
-                    </Button>
+                    {hasUnsavedChanges && (
+                      <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700/60 px-3 py-1.5 rounded-xl mr-1 animate-pulse">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                        <span className="text-xs font-bold text-amber-700 dark:text-amber-300 whitespace-nowrap">
+                          Unsaved Draft Changes
+                        </span>
+                      </div>
+                    )}
+
+                    {hasUnsavedChanges ? (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleDiscardChanges}
+                          disabled={isSaving}
+                          className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-300 dark:border-slate-700 whitespace-nowrap text-xs py-1.5"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5 mr-1" />
+                          Discard
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={handleSaveChanges}
+                          disabled={isSaving}
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold whitespace-nowrap text-xs py-1.5 shadow-md"
+                        >
+                          <Save className="w-3.5 h-3.5 mr-1.5" />
+                          {isSaving ? 'Saving...' : 'Save Changes'}
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={handleSelectAllPillars}
+                          title="Assign all modules across all 6 Core Pillars"
+                          className="whitespace-nowrap text-xs py-1.5"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                          Assign All (17)
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleClearAllPillars}
+                          className="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 border-rose-200 dark:border-rose-900/50 whitespace-nowrap text-xs py-1.5"
+                        >
+                          Clear All
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -1416,6 +1314,48 @@ export const SaasModulesPage: React.FC = () => {
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Floating Bottom Action Bar for Unsaved Draft Changes */}
+      {pageViewMode === 'assign_org' && hasUnsavedChanges && selectedOrg && (
+        <div className="fixed bottom-6 right-6 z-40 bg-slate-900/95 dark:bg-slate-900/95 text-white backdrop-blur-md p-4 rounded-2xl shadow-2xl border border-slate-700/80 flex items-center gap-4 animate-in slide-in-from-bottom-5">
+          <div className="flex items-center gap-3">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+            </span>
+            <div>
+              <p className="text-xs font-bold text-white flex items-center gap-1.5">
+                <span>Unsaved Subscription Modifications</span>
+              </p>
+              <p className="text-[11px] text-slate-300">
+                You have unsaved module changes for <strong className="text-white font-bold">{selectedOrg.name}</strong> ({assignedModuleIds.length}/17 Modules).
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 pl-4 border-l border-slate-700">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleDiscardChanges}
+              disabled={isSaving}
+              className="text-slate-300 hover:text-white border-slate-700 hover:bg-slate-800 text-xs py-1.5"
+            >
+              <RotateCcw className="w-3.5 h-3.5 mr-1" />
+              Discard
+            </Button>
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={handleSaveChanges}
+              disabled={isSaving}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-1.5 shadow-lg flex items-center gap-1.5"
+            >
+              <Save className="w-4 h-4" />
+              <span>{isSaving ? 'Saving Changes...' : 'Save Changes'}</span>
+            </Button>
           </div>
         </div>
       )}
