@@ -97,6 +97,18 @@ import { AssetsPage } from '../pages/operations/AssetsPage';
 import { DocumentsPage } from '../pages/operations/DocumentsPage';
 import { TrainingPage } from '../pages/operations/TrainingPage';
 
+// Manager Dedicated Workspace
+import { ManagerTeamPage } from '../pages/manager/ManagerTeamPage';
+import { ManagerAttendancePage } from '../pages/manager/ManagerAttendancePage';
+import { ManagerLeavePage } from '../pages/manager/ManagerLeavePage';
+import { ManagerTasksPage } from '../pages/manager/ManagerTasksPage';
+import { ManagerPerformancePage } from '../pages/manager/ManagerPerformancePage';
+import { ManagerHiringPage } from '../pages/manager/ManagerHiringPage';
+import { ManagerExpensesPage } from '../pages/manager/ManagerExpensesPage';
+import { ManagerPayrollCompPage } from '../pages/manager/ManagerPayrollCompPage';
+import { ManagerApprovalsCenterPage } from '../pages/manager/ManagerApprovalsCenterPage';
+import { ManagerReportsPage } from '../pages/manager/ManagerReportsPage';
+
 // Calendar, Reports, Settings & Support
 import { CalendarPage } from '../pages/calendar/CalendarPage';
 import { ReportsPage } from '../pages/reports/ReportsPage';
@@ -237,6 +249,18 @@ export const AppRoutes: React.FC = () => {
         <Route path="/recruitment/candidates" element={<ModuleGuard moduleId="recruitment_management"><CandidateDatabasePage /></ModuleGuard>} />
         <Route path="/recruitment/pipeline" element={<ModuleGuard moduleId="recruitment_management"><RecruitmentPipelinePage /></ModuleGuard>} />
         <Route path="/recruitment/interviews" element={<ModuleGuard moduleId="recruitment_management"><InterviewsPage /></ModuleGuard>} />
+
+        {/* Manager Dedicated Workspace */}
+        <Route path="/manager/team" element={<ManagerTeamPage />} />
+        <Route path="/manager/attendance" element={<ManagerAttendancePage />} />
+        <Route path="/manager/leave" element={<ManagerLeavePage />} />
+        <Route path="/manager/tasks" element={<ManagerTasksPage />} />
+        <Route path="/manager/performance" element={<ManagerPerformancePage />} />
+        <Route path="/manager/hiring" element={<ManagerHiringPage />} />
+        <Route path="/manager/expenses" element={<ManagerExpensesPage />} />
+        <Route path="/manager/compensation" element={<ManagerPayrollCompPage />} />
+        <Route path="/manager/approvals" element={<ManagerApprovalsCenterPage />} />
+        <Route path="/manager/reports" element={<ManagerReportsPage />} />
 
         {/* Performance & OKRs */}
         <Route path="/performance/goals" element={<ModuleGuard moduleId="kpi_performance_management"><GoalsPage /></ModuleGuard>} />

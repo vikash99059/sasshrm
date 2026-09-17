@@ -33,6 +33,7 @@ import {
   Boxes,
   Sliders,
   Percent,
+  CheckCircle2,
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { CorporateModuleId } from '../types/saasModules';
@@ -93,19 +94,35 @@ function getRawNavigationForRole(role: UserRole, activeContext: 'organisation' |
     case 'manager':
       return [
         {
-          sectionTitle: 'MANAGEMENT',
+          sectionTitle: 'CORE MANAGEMENT',
           items: [
-            { title: 'Team Dashboard', href: '/dashboard', icon: LayoutDashboard },
-            { title: 'Chat & Teams', href: '/chat', icon: MessageSquare, badge: '3', moduleId: 'chat_communication', subModule: 'Internal employee chat' },
-            { title: 'Email', href: '/email', icon: Mail, badge: '4', moduleId: 'email_management', subModule: 'Inbox / sent / drafts' },
-            { title: 'Team Members', href: '/employees', icon: Users, moduleId: 'organization_management', subModule: 'User management' },
-            { title: 'Team Attendance', href: '/attendance', icon: Clock, moduleId: 'employee_hr_management', subModule: 'Attendance & shifts' },
-            { title: 'Clock In / Out', href: '/clock-in', icon: UserCheck, moduleId: 'employee_hr_management', subModule: 'Attendance & shifts' },
-            { title: 'Leave Approvals', href: '/leave/requests', icon: CalendarDays, badge: '3', moduleId: 'employee_hr_management', subModule: 'Leave management' },
-            { title: 'Team Performance', href: '/performance/goals', icon: Target, moduleId: 'kpi_performance_management', subModule: 'Targets' },
-            { title: 'Expense Approvals', href: '/operations/expenses', icon: Receipt, moduleId: 'finance_management', subModule: 'Income & expenses' },
-            { title: 'Company Calendar', href: '/calendar', icon: Calendar },
-            { title: 'Settings', href: '/settings', icon: Settings },
+            { title: 'Manager Dashboard', href: '/dashboard', icon: LayoutDashboard },
+            { title: 'My Team & Org Chart', href: '/manager/team', icon: Users, moduleId: 'organization_management' },
+            { title: 'Approvals Center', href: '/manager/approvals', icon: CheckCircle2, badge: 'Pending', moduleId: 'employee_hr_management' },
+          ]
+        },
+        {
+          sectionTitle: 'TIME & WORKLOAD',
+          items: [
+            { title: 'Team Attendance & Shifts', href: '/manager/attendance', icon: Clock, moduleId: 'employee_hr_management' },
+            { title: 'Leave & Availability', href: '/manager/leave', icon: CalendarDays, moduleId: 'employee_hr_management' },
+            { title: 'Task & Work Management', href: '/manager/tasks', icon: ListTodo, moduleId: 'kpi_performance_management' },
+          ]
+        },
+        {
+          sectionTitle: 'GROWTH & RECRUITMENT',
+          items: [
+            { title: 'Performance & OKRs', href: '/manager/performance', icon: Target, moduleId: 'kpi_performance_management' },
+            { title: 'Department Hiring & ATS', href: '/manager/hiring', icon: Briefcase, moduleId: 'recruitment_management' },
+          ]
+        },
+        {
+          sectionTitle: 'FINANCE & REPORTS',
+          items: [
+            { title: 'Team Expenses & Claims', href: '/manager/expenses', icon: Receipt, moduleId: 'finance_management' },
+            { title: 'Team Payroll & Hikes', href: '/manager/compensation', icon: DollarSign, moduleId: 'finance_management' },
+            { title: 'Team Analytics Reports', href: '/manager/reports', icon: BarChart3, moduleId: 'mis_analytics_dashboard' },
+            { title: 'Team Chat & Channels', href: '/chat', icon: MessageSquare, badge: '3', moduleId: 'chat_communication' },
           ]
         }
       ];

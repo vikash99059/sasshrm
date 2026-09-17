@@ -18,7 +18,6 @@ import {
   Settings,
   User,
   Check,
-  Globe,
 } from 'lucide-react';
 import { cn } from '../../utils';
 import { ROLE_PERSONAS } from '../../config/roleDashboardConfig';
@@ -38,10 +37,6 @@ export const Header: React.FC = () => {
     setMobileMenuOpen,
     setCommandPaletteOpen,
     setNotificationsOpen,
-    notifications,
-    sidebarCollapsed,
-    isClockedIn,
-    secondsElapsed,
     logout,
   } = useAppStore();
 
@@ -56,7 +51,7 @@ export const Header: React.FC = () => {
   const orgDropdownRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const unreadNotificationsCount = 3; // matching reference badge
+  const unreadNotificationsCount = 3;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,13 +81,6 @@ export const Header: React.FC = () => {
     { role: 'employee', title: 'Employee Self-Service', desc: 'Clock-in, leaves, payslips & assets', badgeColor: 'bg-slate-100 text-slate-700' },
   ];
 
-  const formatTimer = (totalSeconds: number) => {
-    const hrs = Math.floor(totalSeconds / 3600);
-    const mins = Math.floor((totalSeconds % 3600) / 60);
-    const secs = totalSeconds % 60;
-    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
   const currentPersona = ROLE_PERSONAS[currentRole] || ROLE_PERSONAS.employee;
 
   const handleRoleChange = async (newRole: UserRole) => {
@@ -105,30 +93,37 @@ export const Header: React.FC = () => {
 
   return (
     <header
-      className={cn(
-        'sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 sm:px-6 backdrop-blur-md transition-all duration-300 dark:border-slate-800/80 dark:bg-dark-bg/95',
-        sidebarCollapsed ? 'lg:pl-24' : 'lg:pl-68'
-      )}
+      className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200/80 bg-white/95 px-3 sm:px-6 backdrop-blur-md transition-all duration-300 dark:border-slate-800/80 dark:bg-dark-bg/95"
     >
       {/* Left Section: Mobile Menu Button & Global Search Trigger */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         <button
           onClick={() => setMobileMenuOpen(true)}
-          className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden dark:text-slate-400 dark:hover:bg-slate-800"
+          className="flex-shrink-0 rounded-xl border border-slate-200/80 p-2 text-slate-600 hover:bg-slate-100 lg:hidden dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors"
+          title="Open Navigation Menu"
         >
           <Menu className="h-5 w-5" />
         </button>
 
-        {/* Global Search Input Field matching reference image */}
+        {/* Mobile Search Icon Button (Compact for Mobile screens < sm) */}
+        <button
+          onClick={() => setCommandPaletteOpen(true)}
+          className="flex sm:hidden flex-shrink-0 items-center justify-center rounded-xl border border-slate-200/80 p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors"
+          title="Search anything... (Ctrl + K)"
+        >
+          <Search className="h-4 w-4" />
+        </button>
+
+        {/* Desktop & Tablet Search Bar with Ctrl + K Badge */}
         <div
           onClick={() => setCommandPaletteOpen(true)}
-          className="group relative flex items-center w-64 sm:w-80 lg:w-96 cursor-pointer"
+          className="group relative hidden sm:flex items-center w-48 sm:w-64 md:w-80 lg:w-96 cursor-pointer"
         >
           <Search className="absolute left-3.5 h-4 w-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
           <input
             type="text"
             readOnly
-            placeholder="Search anything... (employees, documents, etc.)"
+            placeholder="Search anything... (Ctrl + K)"
             className="w-full rounded-full border border-slate-200/90 bg-slate-50/70 py-1.5 pl-10 pr-16 text-xs text-slate-700 placeholder-slate-400 transition-all hover:bg-white hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer dark:border-slate-800 dark:bg-dark-card dark:text-slate-200 dark:placeholder-slate-500 dark:hover:bg-slate-800/80"
           />
           <div className="absolute right-3 flex items-center">
@@ -137,14 +132,13 @@ export const Header: React.FC = () => {
             </kbd>
           </div>
         </div>
-
       </div>
 
-      {/* Right Section: Context Switcher + Org Selector + Language + Theme + Notifications + Messages + Help + User Profile */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* Dual Context Switcher for Platform Owner / Super Admin */}
+      {/* Right Section: Context Switcher + Org Selector + Theme + Notifications + User Profile */}
+      <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
+        {/* Dual Context Switcher for SaaS Owner (Hidden on mobile < md to prevent navbar overflow) */}
         {currentRole === 'saas_owner' && (
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold">
+          <div className="hidden md:flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold">
             <button
               onClick={() => {
                 setActiveContext('organisation');
@@ -153,15 +147,15 @@ export const Header: React.FC = () => {
                 }
               }}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer',
+                'flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all cursor-pointer text-xs',
                 activeContext === 'organisation'
                   ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-xs font-bold'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               )}
-              title="Switch to Organisation Context (Company Management)"
+              title="Switch to Organisation Context"
             >
               <Building2 className="h-3.5 w-3.5" />
-              <span>Organisation</span>
+              <span className="hidden lg:inline">Organisation</span>
             </button>
             <button
               onClick={() => {
@@ -171,25 +165,25 @@ export const Header: React.FC = () => {
                 }
               }}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer',
+                'flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all cursor-pointer text-xs',
                 activeContext === 'superadmin'
                   ? 'bg-purple-600 text-white shadow-xs font-bold'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               )}
-              title="Switch to Super Admin Context (SaaS Platform Management)"
+              title="Switch to Super Admin Context"
             >
               <Shield className="h-3.5 w-3.5" />
-              <span>Super Admin</span>
+              <span className="hidden lg:inline">Super Admin</span>
             </button>
           </div>
         )}
 
-        {/* Organization Switcher */}
+        {/* Organization Switcher (Hidden on mobile and tablet < lg) */}
         {currentRole !== 'saas_owner' && (
-          <div className="relative hidden md:block" ref={orgDropdownRef}>
+          <div className="relative hidden lg:block" ref={orgDropdownRef}>
             <button
               onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
-              className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-slate-50/80 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors dark:border-slate-800 dark:bg-dark-card dark:text-slate-300 dark:hover:bg-slate-800"
+              className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-slate-50/80 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors dark:border-slate-800 dark:bg-dark-card dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer"
             >
               <Building className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
               <span className="truncate max-w-[120px] font-semibold">{currentOrg?.name || 'Acme Corporation'}</span>
@@ -224,21 +218,19 @@ export const Header: React.FC = () => {
           </div>
         )}
 
-
-
         {/* Dark / Light Mode Toggle */}
         <button
           onClick={toggleDarkMode}
-          className="rounded-xl border border-slate-200/80 p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all hover-magnetic-btn dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+          className="rounded-xl border border-slate-200/80 p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 flex-shrink-0 cursor-pointer"
           title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
-          {isDarkMode ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-600" />}
+          {isDarkMode ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400" />}
         </button>
 
         {/* Notifications Trigger */}
         <button
           onClick={() => setNotificationsOpen(true)}
-          className="group relative rounded-xl border border-slate-200/80 p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all hover-magnetic-btn dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 cursor-pointer"
+          className="group relative rounded-xl border border-slate-200/80 p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 cursor-pointer flex-shrink-0"
           title="Notifications"
         >
           <Bell className="h-4 w-4 text-slate-600 dark:text-slate-300 group-hover:rotate-12 transition-transform duration-200 origin-top" />
@@ -247,25 +239,25 @@ export const Header: React.FC = () => {
           </span>
         </button>
 
-        {/* Help */}
+        {/* Help (Hidden on small mobile screens < sm) */}
         <button
           onClick={() => alert('HRM SaaS Help & Documentation Center')}
-          className="hidden sm:flex rounded-xl border border-slate-200/80 p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all hover-magnetic-btn dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+          className="hidden sm:flex rounded-xl border border-slate-200/80 p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 flex-shrink-0 cursor-pointer"
           title="Help & Support"
         >
           <HelpCircle className="h-4 w-4 text-slate-600 dark:text-slate-300" />
         </button>
 
         {/* User Profile / Menu */}
-        <div className="relative pl-1" ref={userMenuRef}>
+        <div className="relative pl-0.5" ref={userMenuRef}>
           <button
             onClick={() => setUserMenuOpen(!userMenuOpen)}
-            className="flex items-center gap-2.5 rounded-full pl-1 pr-2.5 py-1 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group cursor-pointer"
+            className="flex items-center gap-2 rounded-full p-0.5 sm:pr-2.5 sm:py-1 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group cursor-pointer"
           >
             <img
               src={currentPersona.avatar}
               alt={currentPersona.name}
-              className="h-8 w-8 rounded-full object-cover ring-2 ring-blue-500/20 hover-avatar-ring"
+              className="h-8 w-8 rounded-full object-cover ring-2 ring-blue-500/20 hover-avatar-ring flex-shrink-0"
             />
             <div className="hidden xl:flex flex-col text-left">
               <span className="text-xs font-bold text-slate-900 dark:text-white leading-tight group-hover:text-blue-600 transition-colors">{currentPersona.name}</span>
@@ -276,7 +268,7 @@ export const Header: React.FC = () => {
           </button>
 
           {userMenuOpen && (
-            <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl animate-toast-slide dark:border-dark-border dark:bg-dark-card z-50">
+            <div className="absolute right-0 mt-2 w-64 max-w-[calc(100vw-1.5rem)] rounded-2xl border border-slate-200 bg-white p-2 shadow-xl animate-toast-slide dark:border-dark-border dark:bg-dark-card z-50">
               <div className="px-3 py-2.5 border-b border-slate-100 dark:border-dark-border mb-1">
                 <p className="text-xs font-bold text-slate-900 dark:text-white">{currentPersona.name}</p>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{currentPersona.email}</p>
@@ -291,13 +283,13 @@ export const Header: React.FC = () => {
               <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 Switch Role Persona
               </div>
-              <div className="max-h-48 overflow-y-auto space-y-0.5 mb-2">
+              <div className="max-h-48 overflow-y-auto space-y-0.5 mb-2 scrollbar-thin">
                 {rolesList.map((item) => (
                   <button
                     key={item.role}
                     onClick={() => handleRoleChange(item.role)}
                     className={cn(
-                      'w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs transition-colors',
+                      'w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs transition-colors cursor-pointer',
                       currentRole === item.role
                         ? 'bg-blue-50 text-blue-900 font-semibold dark:bg-blue-950/50 dark:text-blue-300'
                         : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/60'
@@ -327,7 +319,7 @@ export const Header: React.FC = () => {
                   setUserMenuOpen(false);
                   navigate('/settings');
                 }}
-                className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <Settings className="h-4 w-4 text-slate-400" />
                 <span>Account Settings</span>
@@ -337,7 +329,7 @@ export const Header: React.FC = () => {
 
               <button
                 onClick={logout}
-                className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/30 transition-colors"
+                className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Log Out</span>
@@ -349,4 +341,3 @@ export const Header: React.FC = () => {
     </header>
   );
 };
-
