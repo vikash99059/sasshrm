@@ -12,6 +12,7 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 import { Button, Badge } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 
 export const LeaveBalancePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -95,22 +96,19 @@ export const LeaveBalancePage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-slate-800">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Leave Quotas & Balances
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Annual entitlement tracking, utilized PTO, sick days, and policy carry-forward balances.
-          </p>
-        </div>
-
-        <Button size="sm" variant="outline">
-          <Download className="h-4 w-4 mr-1.5" />
-          Export Balances CSV
-        </Button>
-      </div>
+      {/* Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Leave Quotas & Balances"
+        subtitle="Annual entitlement tracking, utilized PTO, sick days, and policy carry-forward balances."
+        icon={Palmtree}
+        badge={<Badge variant="primary">4 Quota Policies Active</Badge>}
+        actions={
+          <Button size="sm" variant="outline" className="font-semibold shadow-xs">
+            <Download className="h-4 w-4 mr-1.5" />
+            Export Balances CSV
+          </Button>
+        }
+      />
 
       {/* Policy Quota Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

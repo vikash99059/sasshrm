@@ -1701,200 +1701,207 @@ export const ChatPage: React.FC = () => {
               </div>
             )}
 
-            {/* Teams Input Box */}
+            {/* Unified Modern Chat Compose Container */}
             <form onSubmit={handleSendMessage} className="space-y-2">
-              <div className="flex items-center gap-2">
+              <div
+                className={cn(
+                  'rounded-2xl border transition-all duration-200 bg-slate-50/80 dark:bg-[#151522] p-2.5 shadow-2xs focus-within:bg-white dark:focus-within:bg-[#181828] focus-within:shadow-sm',
+                  messageUrgency === 'urgent'
+                    ? 'border-rose-400 ring-2 ring-rose-300/30'
+                    : messageUrgency === 'important'
+                    ? 'border-amber-400 ring-2 ring-amber-300/30'
+                    : 'border-slate-200 dark:border-slate-700/80 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20'
+                )}
+              >
+                {/* Input Text Area */}
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   placeholder={`Type a message in ${activeChannel.name}...`}
-                  className={cn(
-                    'flex-1 h-10 px-3.5 text-xs bg-slate-50 dark:bg-[#1A1A26] rounded-xl border text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-[#5B5FC7] transition-all',
-                    messageUrgency === 'urgent'
-                      ? 'border-rose-400 ring-2 ring-rose-200'
-                      : messageUrgency === 'important'
-                      ? 'border-amber-400 ring-1 ring-amber-200'
-                      : 'border-slate-200 dark:border-slate-700'
-                  )}
+                  className="w-full text-xs bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none px-1 py-1"
                 />
 
-                <button
-                  type="submit"
-                  className="h-10 px-4 rounded-xl bg-[#5B5FC7] hover:bg-[#4F52B2] active:scale-95 text-white text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer flex-shrink-0"
-                >
-                  <span>Send</span>
-                  <Send className="h-3.5 w-3.5" />
-                </button>
-              </div>
+                {/* Bottom Integrated Action Toolbar */}
+                <div className="flex items-center justify-between pt-2 mt-1 border-t border-slate-200/50 dark:border-slate-800/60 text-slate-500">
+                  <div className="flex items-center gap-0.5 sm:gap-1">
+                    {/* Format Toggle A */}
+                    <button
+                      type="button"
+                      onClick={() => setIsFormattingOpen(!isFormattingOpen)}
+                      title="Format rich text & subject"
+                      className={cn(
+                        'p-1.5 rounded-lg text-xs font-black transition-colors cursor-pointer',
+                        isFormattingOpen ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400' : 'hover:bg-slate-200/60 dark:hover:bg-slate-800'
+                      )}
+                    >
+                      A
+                    </button>
 
-              {/* Bottom Teams Icons Row (Format, Urgency, Attach, Emoji, GIF, Stickers, Poll, Meeting) */}
-              <div className="flex items-center justify-between pt-1 text-slate-500">
-                <div className="flex items-center gap-1">
-                  {/* Format Toggle A */}
-                  <button
-                    type="button"
-                    onClick={() => setIsFormattingOpen(!isFormattingOpen)}
-                    title="Format rich text & subject"
-                    className={cn(
-                      'p-1.5 rounded-lg text-xs font-black transition-colors cursor-pointer',
-                      isFormattingOpen ? 'bg-[#5B5FC7]/10 text-[#5B5FC7]' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
-                    )}
-                  >
-                    A
-                  </button>
-
-                  {/* Priority / Delivery options */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (messageUrgency === 'standard') setMessageUrgency('important');
-                      else if (messageUrgency === 'important') setMessageUrgency('urgent');
-                      else setMessageUrgency('standard');
-                    }}
-                    title={`Set delivery options (Currently: ${messageUrgency.toUpperCase()})`}
-                    className={cn(
-                      'p-1.5 rounded-lg transition-colors cursor-pointer',
-                      messageUrgency === 'urgent' && 'text-rose-600 bg-rose-50',
-                      messageUrgency === 'important' && 'text-amber-600 bg-amber-50',
-                      messageUrgency === 'standard' && 'hover:bg-slate-100 dark:hover:bg-slate-800'
-                    )}
-                  >
-                    <AlertCircle className="h-4 w-4" />
-                  </button>
-
-                  {/* Attach Document */}
-                  <button
-                    type="button"
-                    onClick={() => setIsAttachmentModalOpen(true)}
-                    title="Attach file from SharePoint or Computer"
-                    className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <Paperclip className="h-4 w-4" />
-                  </button>
-
-                  {/* Emoji Picker Popover Toggle */}
-                  <div className="relative">
+                    {/* Priority / Delivery options */}
                     <button
                       type="button"
                       onClick={() => {
-                        setIsEmojiPickerOpen(!isEmojiPickerOpen);
-                        setIsGifPickerOpen(false);
+                        if (messageUrgency === 'standard') setMessageUrgency('important');
+                        else if (messageUrgency === 'important') setMessageUrgency('urgent');
+                        else setMessageUrgency('standard');
                       }}
-                      title="Emojis"
-                      className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                      title={`Set delivery priority (Currently: ${messageUrgency.toUpperCase()})`}
+                      className={cn(
+                        'p-1.5 rounded-lg transition-colors cursor-pointer',
+                        messageUrgency === 'urgent' && 'text-rose-600 bg-rose-50 dark:bg-rose-950/50',
+                        messageUrgency === 'important' && 'text-amber-600 bg-amber-50 dark:bg-amber-950/50',
+                        messageUrgency === 'standard' && 'hover:bg-slate-200/60 dark:hover:bg-slate-800'
+                      )}
                     >
-                      <Smile className="h-4 w-4" />
+                      <AlertCircle className="h-3.5 w-3.5" />
                     </button>
 
-                    {isEmojiPickerOpen && (
-                      <div className="absolute bottom-10 left-0 w-64 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl dark:border-dark-border dark:bg-dark-card z-50 text-xs animate-toast-slide">
-                        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 mb-2">
-                          <span className="font-bold text-slate-800 dark:text-white">Reactions & Emojis</span>
-                          <button onClick={() => setIsEmojiPickerOpen(false)} className="text-slate-400 hover:text-slate-600">
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                        <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                          {EMOJI_CATEGORIES.map((cat) => (
-                            <div key={cat.name}>
-                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{cat.name}</p>
-                              <div className="grid grid-cols-6 gap-1">
-                                {cat.emojis.map((emoji) => (
-                                  <button
-                                    key={emoji}
-                                    type="button"
-                                    onClick={() => {
-                                      setNewMessage((prev) => `${prev} ${emoji} `);
-                                      setIsEmojiPickerOpen(false);
-                                    }}
-                                    className="h-7 w-7 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center text-sm cursor-pointer"
-                                  >
-                                    {emoji}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* GIF Picker Popover Toggle */}
-                  <div className="relative">
+                    {/* Attach Document */}
                     <button
                       type="button"
-                      onClick={() => {
-                        setIsGifPickerOpen(!isGifPickerOpen);
-                        setIsEmojiPickerOpen(false);
-                      }}
-                      title="Giphy Animated GIFs"
-                      className="p-1.5 rounded-lg text-xs font-black hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                      onClick={() => setIsAttachmentModalOpen(true)}
+                      title="Attach file"
+                      className="p-1.5 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                     >
-                      GIF
+                      <Paperclip className="h-3.5 w-3.5" />
                     </button>
 
-                    {isGifPickerOpen && (
-                      <div className="absolute bottom-10 left-0 w-72 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl dark:border-dark-border dark:bg-dark-card z-50 text-xs animate-toast-slide">
-                        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 mb-2">
-                          <span className="font-bold text-slate-800 dark:text-white">Teams GIFs</span>
-                          <button onClick={() => setIsGifPickerOpen(false)} className="text-slate-400 hover:text-slate-600">
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
-                          {TEAMS_GIFS.map((g) => (
-                            <button
-                              key={g.id}
-                              type="button"
-                              onClick={() => handleSendGif(g)}
-                              className="rounded-xl overflow-hidden border border-slate-200 hover:border-[#5B5FC7] text-left transition-all cursor-pointer group"
-                            >
-                              <img src={g.url} alt={g.title} className="w-full h-20 object-cover group-hover:scale-105 transition-transform" />
-                              <span className="block p-1 text-[10px] font-semibold text-slate-700 dark:text-slate-300 truncate">
-                                {g.tag}
-                              </span>
+                    {/* Emoji Picker Popover Toggle */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsEmojiPickerOpen(!isEmojiPickerOpen);
+                          setIsGifPickerOpen(false);
+                        }}
+                        title="Emojis"
+                        className="p-1.5 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                      >
+                        <Smile className="h-3.5 w-3.5" />
+                      </button>
+
+                      {isEmojiPickerOpen && (
+                        <div className="absolute bottom-10 left-0 w-64 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl dark:border-dark-border dark:bg-dark-card z-50 text-xs animate-toast-slide">
+                          <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 mb-2">
+                            <span className="font-bold text-slate-800 dark:text-white">Reactions & Emojis</span>
+                            <button onClick={() => setIsEmojiPickerOpen(false)} className="text-slate-400 hover:text-slate-600">
+                              <X className="h-3.5 w-3.5" />
                             </button>
-                          ))}
+                          </div>
+                          <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                            {EMOJI_CATEGORIES.map((cat) => (
+                              <div key={cat.name}>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{cat.name}</p>
+                                <div className="grid grid-cols-6 gap-1">
+                                  {cat.emojis.map((emoji) => (
+                                    <button
+                                      key={emoji}
+                                      type="button"
+                                      onClick={() => {
+                                        setNewMessage((prev) => `${prev} ${emoji} `);
+                                        setIsEmojiPickerOpen(false);
+                                      }}
+                                      className="h-7 w-7 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center text-sm cursor-pointer"
+                                    >
+                                      {emoji}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
+
+                    {/* GIF Picker Popover Toggle */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsGifPickerOpen(!isGifPickerOpen);
+                          setIsEmojiPickerOpen(false);
+                        }}
+                        title="GIFs"
+                        className="p-1.5 rounded-lg text-[11px] font-black hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                      >
+                        GIF
+                      </button>
+
+                      {isGifPickerOpen && (
+                        <div className="absolute bottom-10 left-0 w-72 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl dark:border-dark-border dark:bg-dark-card z-50 text-xs animate-toast-slide">
+                          <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 mb-2">
+                            <span className="font-bold text-slate-800 dark:text-white">GIFs</span>
+                            <button onClick={() => setIsGifPickerOpen(false)} className="text-slate-400 hover:text-slate-600">
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
+                            {TEAMS_GIFS.map((g) => (
+                              <button
+                                key={g.id}
+                                type="button"
+                                onClick={() => handleSendGif(g)}
+                                className="rounded-xl overflow-hidden border border-slate-200 hover:border-blue-500 text-left transition-all cursor-pointer group"
+                              >
+                                <img src={g.url} alt={g.title} className="w-full h-20 object-cover group-hover:scale-105 transition-transform" />
+                                <span className="block p-1 text-[10px] font-semibold text-slate-700 dark:text-slate-300 truncate">
+                                  {g.tag}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Praise / Badges */}
+                    <button
+                      type="button"
+                      onClick={() => setIsPraiseModalOpen(true)}
+                      title="Send Praise"
+                      className="p-1.5 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                    >
+                      <Award className="h-3.5 w-3.5 text-amber-500" />
+                    </button>
+
+                    {/* Create Poll */}
+                    <button
+                      type="button"
+                      onClick={() => setIsPollModalOpen(true)}
+                      title="Create Poll"
+                      className="p-1.5 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                    >
+                      <BarChart2 className="h-3.5 w-3.5 text-blue-600" />
+                    </button>
+
+                    {/* Schedule Meeting */}
+                    <button
+                      type="button"
+                      onClick={() => setIsMeetingModalOpen(true)}
+                      title="Schedule Meeting"
+                      className="p-1.5 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                    >
+                      <Calendar className="h-3.5 w-3.5 text-indigo-500" />
+                    </button>
                   </div>
 
-                  {/* Praise / Badges */}
-                  <button
-                    type="button"
-                    onClick={() => setIsPraiseModalOpen(true)}
-                    title="Send Microsoft Praise"
-                    className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <Award className="h-4 w-4 text-amber-500" />
-                  </button>
+                  {/* Right Side: Enter Hint & Send Button */}
+                  <div className="flex items-center gap-2.5">
+                    <span className="hidden sm:inline text-[10px] text-slate-400">
+                      Press <kbd className="px-1 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 font-mono text-[9px]">Enter</kbd> to send
+                    </span>
 
-                  {/* Create Microsoft Forms Poll */}
-                  <button
-                    type="button"
-                    onClick={() => setIsPollModalOpen(true)}
-                    title="Create Team Poll"
-                    className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <BarChart2 className="h-4 w-4 text-[#5B5FC7]" />
-                  </button>
-
-                  {/* Schedule Teams Meeting */}
-                  <button
-                    type="button"
-                    onClick={() => setIsMeetingModalOpen(true)}
-                    title="Schedule Teams Meeting"
-                    className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <Calendar className="h-4 w-4 text-indigo-500" />
-                  </button>
-                </div>
-
-                <div className="text-[10.5px] text-slate-400">
-                  <span>Press <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono">Enter</kbd> to send</span>
+                    <button
+                      type="submit"
+                      disabled={!newMessage.trim() && !attachedFile}
+                      className="h-8 px-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none active:scale-95 text-white text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer flex-shrink-0"
+                    >
+                      <span>Send</span>
+                      <Send className="h-3 w-3" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </form>

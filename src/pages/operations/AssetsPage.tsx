@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { cn } from '../../utils';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
+import { Badge } from '../../components/ui/Badge';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 import {
   Laptop,
   Smartphone,
@@ -243,23 +245,26 @@ export const AssetsPage: React.FC = () => {
 
   return (
     <div className="space-y-3.5 animate-page-enter">
-      {/* =========================================================================
-          HEADER AREA (Breadcrumbs removed as requested, clean and compact)
-         ========================================================================= */}
-      <div className="flex items-center gap-3">
-        {/* Blue 3D Cube Icon Box matching reference */}
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-xs flex-shrink-0">
-          <Boxes className="h-5 w-5 stroke-[2.2]" />
-        </div>
-        <div>
-          <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-            My Assets
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            View and manage your assigned assets, laptops, mobile phones, stationery, books, pens, and accessories.
-          </p>
-        </div>
-      </div>
+      {/* Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="My Assets"
+        subtitle="View and manage your assigned assets, laptops, mobile phones, stationery, books, pens, and accessories."
+        icon={Boxes}
+        badge={<Badge variant="primary" size="sm">{totalAssetsCount} Total Assigned</Badge>}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => setIsRequestModalOpen(true)}
+              className="font-bold shadow-xs whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4 mr-1.5" />
+              Request New Asset
+            </Button>
+          </div>
+        }
+      />
 
       {/* =========================================================================
           TOP ROW: 5 COMPACT KPI CARDS (LEFT) + ASSET SUMMARY DONUT CHART (RIGHT)

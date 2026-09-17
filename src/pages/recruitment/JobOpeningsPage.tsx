@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { recruitmentService } from '../../services/recruitmentService';
 import { JobOpening } from '../../types';
 import { Badge, Button, Modal, Input, Select } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 import {
   Briefcase,
   Plus,
@@ -77,33 +78,26 @@ export const JobOpeningsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
-            <span>Recruitment</span>
-            <span>&gt;</span>
-            <span className="text-slate-600 dark:text-slate-300">Jobs</span>
-          </div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
-            <span>Job Openings</span>
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
-              {jobs.length} Positions
-            </span>
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Manage published job posts, recruitment stages, applicant views, and closed positions.
-          </p>
-        </div>
-
-        <button
-          onClick={() => navigate('/recruiter/jobs/create')}
-          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm shadow-blue-500/20 hover:bg-blue-700 transition-colors cursor-pointer self-start sm:self-auto"
-        >
-          <Plus className="h-4 w-4" />
-          <span>+ Create Job</span>
-        </button>
-      </div>
+      {/* Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Job Openings"
+        subtitle="Manage published job posts, recruitment stages, applicant views, and closed positions."
+        icon={Briefcase}
+        badge={
+          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-50/90 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60">
+            {jobs.length} Positions
+          </span>
+        }
+        actions={
+          <button
+            onClick={() => navigate('/recruiter/jobs/create')}
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-sm shadow-blue-500/20 hover:bg-blue-700 transition-colors cursor-pointer self-start sm:self-auto"
+          >
+            <Plus className="h-4 w-4" />
+            <span>+ Create Job</span>
+          </button>
+        }
+      />
 
       {/* Tabs */}
       <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto scrollbar-thin">

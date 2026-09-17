@@ -13,6 +13,7 @@ import {
   X,
   CheckCircle2
 } from 'lucide-react';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 
 interface TimesheetRow {
   id: string;
@@ -178,75 +179,62 @@ export const TimesheetsPage: React.FC = () => {
         </div>
       )}
 
-      {/* =========================================================================
-          TOP PAGE HEADER WITH ICON, TITLE, DATE RANGE & ADD TIMESHEET
-         ========================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        {/* Left: Icon + Title & Subtitle */}
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-100/80 dark:border-blue-900/60 shadow-xs flex-shrink-0">
-            <Clock className="w-6 h-6 stroke-[2.2]" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-[#0A2540] dark:text-white">
-              Timesheets
-            </h1>
-            <p className="text-xs text-slate-400 dark:text-slate-400 mt-0.5">
-              Track your working hours and manage your timesheets easily.
-            </p>
-          </div>
-        </div>
+      {/* TOP PAGE HEADER WITH CLOUDY WAVE DESIGN */}
+      <PageHeaderCard
+        title="Timesheets"
+        subtitle="Track your working hours and manage your timesheets easily."
+        icon={Clock}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Date Range Picker Button */}
+            <div className="relative">
+              <button
+                onClick={() => setIsRangeOpen(!isRangeOpen)}
+                className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white/90 dark:bg-[#0F172A]/90 border border-slate-200/80 dark:border-slate-800/80 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-xs transition-colors cursor-pointer backdrop-blur-xs"
+              >
+                <Calendar className="w-4 h-4 text-slate-400" />
+                <span>{selectedRange}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-1" />
+              </button>
 
-        {/* Right: Date Range Dropdown + Add Timesheet Button */}
-        <div className="flex items-center gap-3">
-          {/* Date Range Picker Button */}
-          <div className="relative">
+              {isRangeOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl p-2 z-30 animate-fade-in text-xs">
+                  {[
+                    'Apr 21, 2025 – Apr 27, 2025',
+                    'Apr 14, 2025 – Apr 20, 2025',
+                    'Apr 07, 2025 – Apr 13, 2025',
+                    'Mar 31, 2025 – Apr 06, 2025'
+                  ].map((range) => (
+                    <button
+                      key={range}
+                      onClick={() => {
+                        setSelectedRange(range);
+                        setIsRangeOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-xl font-medium transition-colors ${
+                        selectedRange === range
+                          ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-semibold'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      {range}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Add Timesheet Button */}
             <button
-              onClick={() => setIsRangeOpen(!isRangeOpen)}
-              className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-xs transition-colors cursor-pointer"
+              onClick={() => setIsAddModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition-all cursor-pointer hover:shadow-md active:scale-95"
             >
-              <Calendar className="w-4 h-4 text-slate-400" />
-              <span>{selectedRange}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-1" />
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>Add Timesheet</span>
             </button>
-
-            {isRangeOpen && (
-              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl p-2 z-30 animate-fade-in text-xs">
-                {[
-                  'Apr 21, 2025 – Apr 27, 2025',
-                  'Apr 14, 2025 – Apr 20, 2025',
-                  'Apr 07, 2025 – Apr 13, 2025',
-                  'Mar 31, 2025 – Apr 06, 2025'
-                ].map((range) => (
-                  <button
-                    key={range}
-                    onClick={() => {
-                      setSelectedRange(range);
-                      setIsRangeOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 rounded-xl font-medium transition-colors ${
-                      selectedRange === range
-                        ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-semibold'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    {range}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
-
-          {/* Add Timesheet Button */}
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition-all cursor-pointer hover:shadow-md"
-          >
-            <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>Add Timesheet</span>
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* =========================================================================
           TOP 4 METRIC STAT CARDS WITH COMPACT HORIZONTAL ROW LAYOUT & GLASS EFFECT

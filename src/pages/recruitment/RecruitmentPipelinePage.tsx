@@ -10,6 +10,7 @@ import {
   Input,
   Select,
 } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 import {
   Layers,
   Star,
@@ -151,33 +152,24 @@ export const RecruitmentPipelinePage: React.FC = () => {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-dark-border">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
-            <Layers className="w-6 h-6 text-blue-600" />
-            Recruitment Pipeline Kanban
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Interactive drag-and-drop hiring stages across all active candidate evaluations.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
+      {/* Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Recruitment Pipeline Kanban"
+        subtitle="Interactive drag-and-drop hiring stages across all active candidate evaluations."
+        icon={Layers}
+        badge={<Badge variant="primary">{candidates.length} Candidates Active</Badge>}
+        actions={
           <Button
             variant="secondary"
             size="sm"
             onClick={loadCandidates}
             leftIcon={<RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />}
+            className="font-bold shadow-xs"
           >
             Refresh Pipeline
           </Button>
-
-          <Badge variant="primary" size="md">
-            {candidates.length} Candidates Active
-          </Badge>
-        </div>
-      </div>
+        }
+      />
 
       {/* 10-Column Kanban Board */}
       <div className="flex gap-3 overflow-x-auto pb-6 scrollbar-thin">

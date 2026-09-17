@@ -12,6 +12,7 @@ import {
   Select,
   StatCard,
 } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 import { Receipt, Plus, DollarSign, CheckCircle2, Clock, FileText, Check, X } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../utils';
 import { useAppStore } from '../../store/useAppStore';
@@ -154,20 +155,18 @@ export const ExpensesPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-dark-border">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Expense Claims & Reimbursements
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Submit business expenditure claims, review receipts, and disburse reimbursements.
-          </p>
-        </div>
-
-        <Button size="sm" onClick={() => setIsModalOpen(true)} leftIcon={<Plus className="h-4 w-4" />}>
-          Submit Expense Claim
-        </Button>
-      </div>
+      {/* Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Expense Claims & Reimbursements"
+        subtitle="Submit business expenditure claims, review receipts, and disburse reimbursements."
+        icon={Receipt}
+        badge={<Badge variant="primary">{expenses.length} Claims Total</Badge>}
+        actions={
+          <Button size="sm" onClick={() => setIsModalOpen(true)} leftIcon={<Plus className="h-4 w-4" />} className="font-bold shadow-xs">
+            Submit Expense Claim
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard

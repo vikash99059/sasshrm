@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { operationsService } from '../../services/operationsService';
 import { TrainingCourse } from '../../types';
 import { Card, CardHeader, CardTitle, Badge, Button, Avatar } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 import { GraduationCap, Clock, Star, Users, Plus, CheckCircle2, Play } from 'lucide-react';
 
 export const TrainingPage: React.FC = () => {
@@ -17,20 +18,18 @@ export const TrainingPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-dark-border">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Learning Management System (LMS) & Training
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Upskill employees, assign mandatory compliance modules, and award certifications.
-          </p>
-        </div>
-
-        <Button size="sm" leftIcon={<Plus className="h-4 w-4" />}>
-          Create New Course
-        </Button>
-      </div>
+      {/* Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Learning Management System (LMS) & Training"
+        subtitle="Upskill employees, assign mandatory compliance modules, and award certifications."
+        icon={GraduationCap}
+        badge={<Badge variant="primary">{courses.length} Active Modules</Badge>}
+        actions={
+          <Button size="sm" leftIcon={<Plus className="h-4 w-4" />} className="font-bold shadow-xs">
+            Create New Course
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {courses.map((course) => (

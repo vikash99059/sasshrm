@@ -40,6 +40,7 @@ import {
   ArrowUpDown,
   Laptop,
 } from 'lucide-react';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 import { formatDate } from '../../utils';
 
 export const EmployeesListPage: React.FC = () => {
@@ -294,99 +295,83 @@ export const EmployeesListPage: React.FC = () => {
         </div>
       )}
 
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-dark-border">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
-              <Users className="w-6 h-6" />
+      {/* Top Header Card with Cloudy Wavy Background Design */}
+      <PageHeaderCard
+        title="Employee Directory"
+        subtitle="Manage organization workforce, departmental rosters, roles, and 360° talent profiles."
+        icon={Users}
+        badge={<Badge variant="primary" size="sm">{totalCount} Total Members</Badge>}
+        actions={
+          <>
+            {/* View Mode Switcher (Table / Grid / Small Box) */}
+            <div className="flex items-center bg-white/80 dark:bg-slate-800/80 p-1 rounded-xl border border-blue-100 dark:border-slate-700 backdrop-blur-sm shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                title="Table View (Dense List)"
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition ${
+                  viewMode === 'table'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                <List className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Table</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                title="Grid View (Executive Profile Cards)"
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition ${
+                  viewMode === 'grid'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Grid</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewMode('compact')}
+                title="Small Box View (High Density Overview)"
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition ${
+                  viewMode === 'compact'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                <Grid3X3 className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Small Box</span>
+              </button>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                  Employee Directory
-                </h1>
-                <Badge variant="primary" size="sm">
-                  {totalCount} Total Members
-                </Badge>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Manage organization workforce, departmental rosters, roles, and 360° talent profiles.
-              </p>
-            </div>
-          </div>
-        </div>
 
-        {/* Action Controls: View Switcher, Export, Add Employee */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {/* View Mode Switcher (Table / Grid / Small Box) */}
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
-            <button
-              type="button"
-              onClick={() => setViewMode('table')}
-              title="Table View (Dense List)"
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition ${
-                viewMode === 'table'
-                  ? 'bg-white dark:bg-dark-card text-blue-600 dark:text-blue-400 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-              }`}
+            {/* Export CSV Button */}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleExportCSV}
+              leftIcon={<Download className="w-3.5 h-3.5" />}
+              className="text-xs bg-white/90 dark:bg-dark-card/90 shadow-2xs hover:bg-white"
             >
-              <List className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Table</span>
-            </button>
+              Export
+            </Button>
 
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              title="Grid View (Executive Profile Cards)"
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition ${
-                viewMode === 'grid'
-                  ? 'bg-white dark:bg-dark-card text-blue-600 dark:text-blue-400 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-              }`}
+            {/* Add New Employee CTA */}
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => setIsAddModalOpen(true)}
+              leftIcon={<Plus className="w-4 h-4" />}
+              className="shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/30 text-xs font-bold"
             >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Grid</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setViewMode('compact')}
-              title="Small Box View (High Density Overview)"
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition ${
-                viewMode === 'compact'
-                  ? 'bg-white dark:bg-dark-card text-blue-600 dark:text-blue-400 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              <Grid3X3 className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Small Box</span>
-            </button>
-          </div>
-
-          {/* Export CSV Button */}
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleExportCSV}
-            leftIcon={<Download className="w-3.5 h-3.5" />}
-            className="text-xs"
-          >
-            Export
-          </Button>
-
-          {/* Add New Employee CTA */}
-          <Button
-            size="sm"
-            variant="primary"
-            onClick={() => setIsAddModalOpen(true)}
-            leftIcon={<Plus className="w-4 h-4" />}
-            className="shadow-sm hover:shadow-md text-xs font-bold"
-          >
-            Add New Employee
-          </Button>
-        </div>
-      </div>
+              Add New Employee
+            </Button>
+          </>
+        }
+      />
 
       {/* KPI Overview Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

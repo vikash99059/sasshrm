@@ -25,6 +25,7 @@ import {
   X,
 } from 'lucide-react';
 import { formatCurrency } from '../../utils';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 
 const COLOR_PRESETS = [
   { label: 'Blue', value: '#3B82F6', bg: 'bg-blue-500' },
@@ -331,70 +332,55 @@ export const DepartmentsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-dark-border">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
-              <Building2 className="w-6 h-6" />
+      {/* Page Header Card with Cloudy Wave Background */}
+      <PageHeaderCard
+        title="Departments"
+        subtitle="Organize company divisions, departmental budgets, headcount allocation, and leadership reporting lines."
+        icon={Building2}
+        badge={<Badge variant="primary" size="sm">{departments.length} Operational Units</Badge>}
+        actions={
+          <>
+            {/* View Mode Toggle */}
+            <div className="flex items-center bg-white/80 dark:bg-slate-800/80 p-1 rounded-xl border border-blue-100 dark:border-slate-700 backdrop-blur-sm shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                title="Grid View"
+                className={`p-1.5 rounded-lg text-xs font-bold transition ${
+                  viewMode === 'grid'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                title="List View"
+                className={`p-1.5 rounded-lg text-xs font-bold transition ${
+                  viewMode === 'table'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                <List className="w-4 h-4" />
+              </button>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                  Departments
-                </h1>
-                <Badge variant="primary" size="sm">
-                  {departments.length} Operational Units
-                </Badge>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Organize company divisions, departmental budgets, headcount allocation, and leadership reporting lines.
-              </p>
-            </div>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-3">
-          {/* View Mode Toggle */}
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              title="Grid View"
-              className={`p-1.5 rounded-lg text-xs transition ${
-                viewMode === 'grid'
-                  ? 'bg-white dark:bg-dark-card text-blue-600 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-              }`}
+            {/* Add Department CTA */}
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={handleOpenAddModal}
+              leftIcon={<Plus className="w-4 h-4" />}
+              className="shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/30 text-xs font-bold"
             >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('table')}
-              title="List View"
-              className={`p-1.5 rounded-lg text-xs transition ${
-                viewMode === 'table'
-                  ? 'bg-white dark:bg-dark-card text-blue-600 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              <List className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Add Department CTA */}
-          <Button
-            size="sm"
-            variant="primary"
-            onClick={handleOpenAddModal}
-            className="shadow-sm hover:shadow-md transition-all whitespace-nowrap text-xs font-bold py-2"
-          >
-            <Plus className="w-4 h-4 mr-1.5" />
-            Add Department
-          </Button>
-        </div>
-      </div>
+              Add Department
+            </Button>
+          </>
+        }
+      />
 
       {/* KPI Overview Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

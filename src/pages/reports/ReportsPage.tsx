@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, Button, Badge } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 import {
   BarChart3,
   Download,
@@ -59,26 +60,23 @@ export const ReportsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-dark-border">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Reports & Workforce Analytics
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Real-time business intelligence, headcount growth curves, and downloadable audits.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => handleExport('pdf')} leftIcon={<Download className="h-4 w-4" />}>
-            Export PDF
-          </Button>
-          <Button size="sm" onClick={() => handleExport('csv')} leftIcon={<FileSpreadsheet className="h-4 w-4" />}>
-            Export CSV
-          </Button>
-        </div>
-      </div>
+      {/* Top Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Reports & Workforce Analytics"
+        subtitle="Real-time business intelligence, headcount growth curves, and downloadable audits."
+        icon={BarChart3}
+        badge={<Badge variant="primary">124 Total Headcount</Badge>}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => handleExport('pdf')} leftIcon={<Download className="h-4 w-4" />} className="font-semibold shadow-xs">
+              Export PDF
+            </Button>
+            <Button size="sm" onClick={() => handleExport('csv')} leftIcon={<FileSpreadsheet className="h-4 w-4" />} className="font-bold shadow-xs">
+              Export CSV
+            </Button>
+          </div>
+        }
+      />
 
       {/* Filter Bar */}
       <div className="flex flex-wrap items-center gap-3 p-3 rounded-xl bg-white border border-slate-200/80 dark:border-dark-border dark:bg-dark-card shadow-sm text-xs">

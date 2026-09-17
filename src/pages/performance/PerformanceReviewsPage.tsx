@@ -13,6 +13,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { Modal, Input, Select, Button, Badge } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 
 interface ReviewCycleItem {
   id: string;
@@ -50,27 +51,19 @@ export const PerformanceReviewsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-slate-800">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              360° Performance Reviews
-            </h1>
-            <Badge variant="primary">{cycleFilter} Active Cycle</Badge>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Conduct bi-annual appraisals, 360 peer feedback, competency evaluations, and manager ratings.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Button size="sm" onClick={() => setIsNewCycleOpen(true)}>
+      {/* Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="360° Performance Reviews"
+        subtitle="Conduct bi-annual appraisals, 360 peer feedback, competency evaluations, and manager ratings."
+        icon={Award}
+        badge={<Badge variant="primary">{cycleFilter} Active Cycle</Badge>}
+        actions={
+          <Button size="sm" onClick={() => setIsNewCycleOpen(true)} className="font-bold shadow-xs">
             <Plus className="h-4 w-4 mr-1.5" />
             Launch Review Cycle
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Review Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">

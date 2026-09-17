@@ -20,7 +20,8 @@ import {
   Filter,
 } from 'lucide-react';
 import { cn } from '../../utils';
-import { Modal } from '../../components/ui';
+import { Modal, Badge } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 
 interface DayAttendance {
   day: number;
@@ -97,178 +98,170 @@ export const AttendancePage: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-page-enter">
-      {/* =========================================================================
-          TOP HEADER: ICON + TITLE + SUBTITLE & 3D CLOCK/CALENDAR ILLUSTRATION
-         ========================================================================= */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        {/* Left: Icon, Title and Subtitle */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-xs flex-shrink-0">
-            <CalendarCheck className="h-5 w-5" />
+      {/* TOP HEADER: ICON + TITLE + SUBTITLE & 3D CLOCK/CALENDAR ILLUSTRATION WITH CLOUDY WAVES */}
+      <PageHeaderCard
+        title="Attendance Tracker"
+        subtitle="Track your daily attendance, view punch timestamps, and manage working hours."
+        icon={CalendarCheck}
+        badge={
+          <Badge variant="primary" size="sm">
+            {isClockedIn ? '● Currently Active' : 'Offline'}
+          </Badge>
+        }
+        actions={
+          <div className="hidden md:flex items-center justify-end relative pr-2">
+            <div className="relative flex items-center justify-center">
+              {/* Ambient Multi-Tone Radiant Glow */}
+              <div className="absolute -inset-3 bg-gradient-to-r from-blue-500/25 via-sky-400/25 to-indigo-500/20 rounded-full blur-xl pointer-events-none" />
+
+              {/* Enlarged 3D Clock & Calendar Graphic */}
+              <svg width="170" height="90" viewBox="0 0 215 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Soft Leaves Decorative Background */}
+                <path d="M12 68C22 52 40 58 46 76C32 82 20 80 12 68Z" fill="#93C5FD" fillOpacity="0.5" />
+                <path d="M198 30C185 18 168 25 162 44C178 50 192 46 198 30Z" fill="#60A5FA" fillOpacity="0.45" />
+                <path d="M210 58C194 48 184 62 186 80C202 78 208 70 210 58Z" fill="#38BDF8" fillOpacity="0.55" />
+
+                {/* Sparkle Stars */}
+                <path d="M48 24L50 18L52 24L58 26L52 28L50 34L48 28L42 26L48 24Z" fill="#38BDF8" fillOpacity="0.8" />
+                <path d="M174 15L175.5 10L177 15L182 16.5L177 18L175.5 23L174 18L169 16.5L174 15Z" fill="#60A5FA" fillOpacity="0.75" />
+
+                {/* 3D Round Clock Base (Larger, High-Definition) */}
+                <g transform="translate(10, 0)">
+                  {/* Outer Shadow Bezel */}
+                  <circle cx="70" cy="56" r="42" fill="url(#clockOuterBezelGrad)" filter="url(#clockDropShadow)" />
+                  {/* Metallic Chrome Ring */}
+                  <circle cx="70" cy="56" r="38" fill="url(#clockMetallicRingGrad)" />
+                  {/* Dial Face Background */}
+                  <circle cx="70" cy="56" r="33" fill="#FFFFFF" />
+                  <circle cx="70" cy="56" r="33" fill="url(#clockDialSoftGrad)" />
+
+                  {/* Dial Hour Tick Marks */}
+                  <circle cx="70" cy="28" r="2" fill="#2563EB" />
+                  <circle cx="98" cy="56" r="2" fill="#2563EB" />
+                  <circle cx="70" cy="84" r="2" fill="#2563EB" />
+                  <circle cx="42" cy="56" r="2" fill="#2563EB" />
+
+                  {/* Additional subtle minute ticks */}
+                  <circle cx="84" cy="32" r="1" fill="#93C5FD" />
+                  <circle cx="94" cy="42" r="1" fill="#93C5FD" />
+                  <circle cx="94" cy="70" r="1" fill="#93C5FD" />
+                  <circle cx="84" cy="80" r="1" fill="#93C5FD" />
+                  <circle cx="56" cy="80" r="1" fill="#93C5FD" />
+                  <circle cx="46" cy="70" r="1" fill="#93C5FD" />
+                  <circle cx="46" cy="42" r="1" fill="#93C5FD" />
+                  <circle cx="56" cy="32" r="1" fill="#93C5FD" />
+
+                  {/* Clock Hands: 10:10 Aesthetic Position */}
+                  <line x1="70" y1="56" x2="52" y2="38" stroke="#1D4ED8" strokeWidth="3.5" strokeLinecap="round" filter="url(#handsShadow)" />
+                  <line x1="70" y1="56" x2="88" y2="44" stroke="#2563EB" strokeWidth="3" strokeLinecap="round" filter="url(#handsShadow)" />
+                  {/* Second Hand (Cyan Accent) */}
+                  <line x1="70" y1="56" x2="70" y2="28" stroke="#06B6D4" strokeWidth="1.5" strokeLinecap="round" />
+
+                  {/* Center Chrome Nut */}
+                  <circle cx="70" cy="56" r="4" fill="#1E40AF" />
+                  <circle cx="70" cy="56" r="2" fill="#E2E8F0" />
+
+                  {/* Glossy Curved Glass Reflection Arc */}
+                  <path d="M 44 42 A 30 30 0 0 1 96 42 A 28 28 0 0 0 44 42 Z" fill="url(#clockGlossGrad)" opacity="0.6" />
+                </g>
+
+                {/* 3D Slanted Calendar (Enlarged, Rich isometric tilt) */}
+                <g transform="translate(112, 22) rotate(6)">
+                  {/* Drop shadow & Calendar Backboard */}
+                  <rect x="0" y="6" width="60" height="66" rx="10" fill="url(#calBaseGrad)" filter="url(#calDropShadow)" />
+                  
+                  {/* Deep Royal Blue Header Spine */}
+                  <rect x="0" y="0" width="60" height="20" rx="8" fill="url(#calHeaderGrad)" />
+                  
+                  {/* Silver / Metallic Binding Rings */}
+                  <circle cx="12" cy="3" r="3" fill="#F8FAFC" stroke="#1D4ED8" strokeWidth="1.5" />
+                  <circle cx="30" cy="3" r="3" fill="#F8FAFC" stroke="#1D4ED8" strokeWidth="1.5" />
+                  <circle cx="48" cy="3" r="3" fill="#F8FAFC" stroke="#1D4ED8" strokeWidth="1.5" />
+
+                  {/* Calendar Grid Status Pills & Dates */}
+                  {/* Row 1 */}
+                  <rect x="8" y="27" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
+                  <rect x="20" y="27" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
+                  <rect x="32" y="27" width="8" height="6" rx="2" fill="#10B981" />
+                  <rect x="44" y="27" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
+
+                  {/* Row 2 */}
+                  <rect x="8" y="38" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
+                  <rect x="20" y="38" width="8" height="6" rx="2" fill="#2563EB" />
+                  <rect x="32" y="38" width="8" height="6" rx="2" fill="#10B981" />
+                  <rect x="44" y="38" width="8" height="6" rx="2" fill="#8B5CF6" />
+
+                  {/* Row 3 */}
+                  <rect x="8" y="49" width="8" height="6" rx="2" fill="#10B981" />
+                  <rect x="20" y="49" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
+                  <rect x="32" y="49" width="8" height="6" rx="2" fill="#2563EB" />
+                  <rect x="44" y="49" width="8" height="6" rx="2" fill="#10B981" />
+
+                  {/* Row 4 */}
+                  <rect x="8" y="60" width="8" height="5" rx="1.5" fill="#93C5FD" opacity="0.4" />
+                  <rect x="20" y="60" width="8" height="5" rx="1.5" fill="#93C5FD" opacity="0.4" />
+                  <rect x="32" y="60" width="8" height="5" rx="1.5" fill="#93C5FD" opacity="0.4" />
+                  <rect x="44" y="60" width="8" height="5" rx="1.5" fill="#93C5FD" opacity="0.4" />
+                </g>
+
+                {/* Floating 3D Check Badge over the setup */}
+                <g transform="translate(150, 75)" filter="url(#badgeShadow)">
+                  <rect x="0" y="0" width="54" height="20" rx="10" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1" />
+                  <circle cx="10" cy="10" r="5.5" fill="#10B981" />
+                  <path d="M8 10L9.5 11.5L12.5 8.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  <text x="19" y="13.5" fill="#0F172A" fontSize="8.5" fontWeight="bold" fontFamily="sans-serif">Present</text>
+                </g>
+
+                <defs>
+                  {/* Clock Bezel & Dial Gradients */}
+                  <linearGradient id="clockOuterBezelGrad" x1="30" y1="20" x2="110" y2="100" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#38BDF8" />
+                    <stop offset="0.5" stopColor="#2563EB" />
+                    <stop offset="1" stopColor="#1E3A8A" />
+                  </linearGradient>
+                  <linearGradient id="clockMetallicRingGrad" x1="40" y1="24" x2="100" y2="92" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#F8FAFC" />
+                    <stop offset="0.5" stopColor="#E2E8F0" />
+                    <stop offset="1" stopColor="#CBD5E1" />
+                  </linearGradient>
+                  <linearGradient id="clockDialSoftGrad" x1="70" y1="23" x2="70" y2="89" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#FFFFFF" />
+                    <stop offset="1" stopColor="#EFF6FF" />
+                  </linearGradient>
+                  <linearGradient id="clockGlossGrad" x1="70" y1="30" x2="70" y2="50" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#FFFFFF" stopOpacity="0.8" />
+                    <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
+                  </linearGradient>
+
+                  {/* Calendar Gradients */}
+                  <linearGradient id="calBaseGrad" x1="0" y1="0" x2="60" y2="72" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#FFFFFF" />
+                    <stop offset="1" stopColor="#F8FAFC" />
+                  </linearGradient>
+                  <linearGradient id="calHeaderGrad" x1="0" y1="0" x2="60" y2="20" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#3B82F6" />
+                    <stop offset="1" stopColor="#1D4ED8" />
+                  </linearGradient>
+
+                  {/* High Fidelity Drop Shadows */}
+                  <filter id="clockDropShadow" x="18" y="8" width="104" height="104" filterUnits="userSpaceOnUse">
+                    <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#1E40AF" floodOpacity="0.28" />
+                  </filter>
+                  <filter id="handsShadow" x="40" y="30" width="60" height="40" filterUnits="userSpaceOnUse">
+                    <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#0F172A" floodOpacity="0.25" />
+                  </filter>
+                  <filter id="calDropShadow" x="-6" y="0" width="76" height="84" filterUnits="userSpaceOnUse">
+                    <feDropShadow dx="0" dy="8" stdDeviation="6" floodColor="#1E40AF" floodOpacity="0.2" />
+                  </filter>
+                  <filter id="badgeShadow" x="-4" y="-2" width="64" height="28" filterUnits="userSpaceOnUse">
+                    <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#0F172A" floodOpacity="0.15" />
+                  </filter>
+                </defs>
+              </svg>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Attendance
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Track your daily attendance, view your attendance history and manage your time effectively.
-            </p>
-          </div>
-        </div>
-
-        {/* Right: Big, Vibrant, Highly-Attractive 3D Clock & Calendar Illustration */}
-        <div className="hidden md:flex items-center justify-end relative pr-2">
-          <div className="relative flex items-center justify-center">
-            {/* Ambient Multi-Tone Radiant Glow */}
-            <div className="absolute -inset-3 bg-gradient-to-r from-blue-500/25 via-sky-400/25 to-indigo-500/20 rounded-full blur-xl pointer-events-none" />
-
-            {/* Enlarged 3D Clock & Calendar Graphic */}
-            <svg width="180" height="98" viewBox="0 0 215 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Soft Leaves Decorative Background */}
-              <path d="M12 68C22 52 40 58 46 76C32 82 20 80 12 68Z" fill="#93C5FD" fillOpacity="0.5" />
-              <path d="M198 30C185 18 168 25 162 44C178 50 192 46 198 30Z" fill="#60A5FA" fillOpacity="0.45" />
-              <path d="M210 58C194 48 184 62 186 80C202 78 208 70 210 58Z" fill="#38BDF8" fillOpacity="0.55" />
-
-              {/* Sparkle Stars */}
-              <path d="M48 24L50 18L52 24L58 26L52 28L50 34L48 28L42 26L48 24Z" fill="#38BDF8" fillOpacity="0.8" />
-              <path d="M174 15L175.5 10L177 15L182 16.5L177 18L175.5 23L174 18L169 16.5L174 15Z" fill="#60A5FA" fillOpacity="0.75" />
-
-              {/* 3D Round Clock Base (Larger, High-Definition) */}
-              <g transform="translate(10, 0)">
-                {/* Outer Shadow Bezel */}
-                <circle cx="70" cy="56" r="42" fill="url(#clockOuterBezelGrad)" filter="url(#clockDropShadow)" />
-                {/* Metallic Chrome Ring */}
-                <circle cx="70" cy="56" r="38" fill="url(#clockMetallicRingGrad)" />
-                {/* Dial Face Background */}
-                <circle cx="70" cy="56" r="33" fill="#FFFFFF" />
-                <circle cx="70" cy="56" r="33" fill="url(#clockDialSoftGrad)" />
-
-                {/* Dial Hour Tick Marks */}
-                <circle cx="70" cy="28" r="2" fill="#2563EB" />
-                <circle cx="98" cy="56" r="2" fill="#2563EB" />
-                <circle cx="70" cy="84" r="2" fill="#2563EB" />
-                <circle cx="42" cy="56" r="2" fill="#2563EB" />
-
-                {/* Additional subtle minute ticks */}
-                <circle cx="84" cy="32" r="1" fill="#93C5FD" />
-                <circle cx="94" cy="42" r="1" fill="#93C5FD" />
-                <circle cx="94" cy="70" r="1" fill="#93C5FD" />
-                <circle cx="84" cy="80" r="1" fill="#93C5FD" />
-                <circle cx="56" cy="80" r="1" fill="#93C5FD" />
-                <circle cx="46" cy="70" r="1" fill="#93C5FD" />
-                <circle cx="46" cy="42" r="1" fill="#93C5FD" />
-                <circle cx="56" cy="32" r="1" fill="#93C5FD" />
-
-                {/* Clock Hands: 10:10 Aesthetic Position */}
-                <line x1="70" y1="56" x2="52" y2="38" stroke="#1D4ED8" strokeWidth="3.5" strokeLinecap="round" filter="url(#handsShadow)" />
-                <line x1="70" y1="56" x2="88" y2="44" stroke="#2563EB" strokeWidth="3" strokeLinecap="round" filter="url(#handsShadow)" />
-                {/* Second Hand (Cyan Accent) */}
-                <line x1="70" y1="56" x2="70" y2="28" stroke="#06B6D4" strokeWidth="1.5" strokeLinecap="round" />
-
-                {/* Center Chrome Nut */}
-                <circle cx="70" cy="56" r="4" fill="#1E40AF" />
-                <circle cx="70" cy="56" r="2" fill="#E2E8F0" />
-
-                {/* Glossy Curved Glass Reflection Arc */}
-                <path d="M 44 42 A 30 30 0 0 1 96 42 A 28 28 0 0 0 44 42 Z" fill="url(#clockGlossGrad)" opacity="0.6" />
-              </g>
-
-              {/* 3D Slanted Calendar (Enlarged, Rich isometric tilt) */}
-              <g transform="translate(112, 22) rotate(6)">
-                {/* Drop shadow & Calendar Backboard */}
-                <rect x="0" y="6" width="60" height="66" rx="10" fill="url(#calBaseGrad)" filter="url(#calDropShadow)" />
-                
-                {/* Deep Royal Blue Header Spine */}
-                <rect x="0" y="0" width="60" height="20" rx="8" fill="url(#calHeaderGrad)" />
-                
-                {/* Silver / Metallic Binding Rings */}
-                <circle cx="12" cy="3" r="3" fill="#F8FAFC" stroke="#1D4ED8" strokeWidth="1.5" />
-                <circle cx="30" cy="3" r="3" fill="#F8FAFC" stroke="#1D4ED8" strokeWidth="1.5" />
-                <circle cx="48" cy="3" r="3" fill="#F8FAFC" stroke="#1D4ED8" strokeWidth="1.5" />
-
-                {/* Calendar Grid Status Pills & Dates */}
-                {/* Row 1 */}
-                <rect x="8" y="27" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
-                <rect x="20" y="27" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
-                <rect x="32" y="27" width="8" height="6" rx="2" fill="#10B981" />
-                <rect x="44" y="27" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
-
-                {/* Row 2 */}
-                <rect x="8" y="38" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
-                <rect x="20" y="38" width="8" height="6" rx="2" fill="#2563EB" />
-                <rect x="32" y="38" width="8" height="6" rx="2" fill="#10B981" />
-                <rect x="44" y="38" width="8" height="6" rx="2" fill="#8B5CF6" />
-
-                {/* Row 3 */}
-                <rect x="8" y="49" width="8" height="6" rx="2" fill="#10B981" />
-                <rect x="20" y="49" width="8" height="6" rx="2" fill="#93C5FD" opacity="0.6" />
-                <rect x="32" y="49" width="8" height="6" rx="2" fill="#2563EB" />
-                <rect x="44" y="49" width="8" height="6" rx="2" fill="#10B981" />
-
-                {/* Row 4 */}
-                <rect x="8" y="60" width="8" height="5" rx="1.5" fill="#93C5FD" opacity="0.4" />
-                <rect x="20" y="60" width="8" height="5" rx="1.5" fill="#93C5FD" opacity="0.4" />
-                <rect x="32" y="60" width="8" height="5" rx="1.5" fill="#93C5FD" opacity="0.4" />
-                <rect x="44" y="60" width="8" height="5" rx="1.5" fill="#93C5FD" opacity="0.4" />
-              </g>
-
-              {/* Floating 3D Check Badge over the setup */}
-              <g transform="translate(150, 75)" filter="url(#badgeShadow)">
-                <rect x="0" y="0" width="54" height="20" rx="10" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1" />
-                <circle cx="10" cy="10" r="5.5" fill="#10B981" />
-                <path d="M8 10L9.5 11.5L12.5 8.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                <text x="19" y="13.5" fill="#0F172A" fontSize="8.5" fontWeight="bold" fontFamily="sans-serif">Present</text>
-              </g>
-
-              <defs>
-                {/* Clock Bezel & Dial Gradients */}
-                <linearGradient id="clockOuterBezelGrad" x1="30" y1="20" x2="110" y2="100" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#38BDF8" />
-                  <stop offset="0.5" stopColor="#2563EB" />
-                  <stop offset="1" stopColor="#1E3A8A" />
-                </linearGradient>
-                <linearGradient id="clockMetallicRingGrad" x1="40" y1="24" x2="100" y2="92" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#F8FAFC" />
-                  <stop offset="0.5" stopColor="#E2E8F0" />
-                  <stop offset="1" stopColor="#CBD5E1" />
-                </linearGradient>
-                <linearGradient id="clockDialSoftGrad" x1="70" y1="23" x2="70" y2="89" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#FFFFFF" />
-                  <stop offset="1" stopColor="#EFF6FF" />
-                </linearGradient>
-                <linearGradient id="clockGlossGrad" x1="70" y1="30" x2="70" y2="50" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#FFFFFF" stopOpacity="0.8" />
-                  <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
-                </linearGradient>
-
-                {/* Calendar Gradients */}
-                <linearGradient id="calBaseGrad" x1="0" y1="0" x2="60" y2="72" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#FFFFFF" />
-                  <stop offset="1" stopColor="#F8FAFC" />
-                </linearGradient>
-                <linearGradient id="calHeaderGrad" x1="0" y1="0" x2="60" y2="20" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#3B82F6" />
-                  <stop offset="1" stopColor="#1D4ED8" />
-                </linearGradient>
-
-                {/* High Fidelity Drop Shadows */}
-                <filter id="clockDropShadow" x="18" y="8" width="104" height="104" filterUnits="userSpaceOnUse">
-                  <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#1E40AF" floodOpacity="0.28" />
-                </filter>
-                <filter id="handsShadow" x="40" y="30" width="60" height="40" filterUnits="userSpaceOnUse">
-                  <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#0F172A" floodOpacity="0.25" />
-                </filter>
-                <filter id="calDropShadow" x="-8" y="0" width="76" height="82" filterUnits="userSpaceOnUse">
-                  <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#0F172A" floodOpacity="0.18" />
-                </filter>
-                <filter id="badgeShadow" x="-4" y="-2" width="62" height="28" filterUnits="userSpaceOnUse">
-                  <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#0F172A" floodOpacity="0.12" />
-                </filter>
-              </defs>
-            </svg>
-          </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* =========================================================================
           TOP 4 KPI STAT CARDS (COMPACT HEIGHT, BALANCED PADDING, SHARP ALIGNMENT)

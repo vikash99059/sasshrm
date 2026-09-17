@@ -38,9 +38,7 @@ export const Sidebar: React.FC = () => {
   );
   const currentPersona = ROLE_PERSONAS[currentRole] || ROLE_PERSONAS.employee;
 
-  const [openDropdowns, setOpenDropdowns] = React.useState<{ [key: string]: boolean }>({
-    '/chat': true,
-  });
+  const [openDropdowns, setOpenDropdowns] = React.useState<{ [key: string]: boolean }>({});
 
   const toggleDropdown = (href: string, e?: React.MouseEvent) => {
     if (e) {

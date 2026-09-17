@@ -13,6 +13,7 @@ import {
   Column,
   Modal,
 } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 import {
   DollarSign,
   CreditCard,
@@ -145,31 +146,26 @@ export const PayrollDashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-dark-border">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Payroll & Compensation Engine
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Automated salary calculations, statutory tax withholdings, and payslip distribution.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm dark:border-dark-border dark:bg-dark-card dark:text-slate-300">
-            May 2024 Cycle
+      {/* Top Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Payroll & Compensation Engine"
+        subtitle="Automated salary calculations, statutory tax withholdings, and payslip distribution."
+        icon={DollarSign}
+        badge={<Badge variant="primary">May 2024 Cycle Active</Badge>}
+        actions={
+          <div className="flex items-center gap-3">
+            <Button
+              size="sm"
+              onClick={handleProcessBatch}
+              isLoading={isProcessing}
+              leftIcon={<CreditCard className="h-4 w-4" />}
+              className="font-bold shadow-xs"
+            >
+              Process Batch Payroll
+            </Button>
           </div>
-          <Button
-            size="sm"
-            onClick={handleProcessBatch}
-            isLoading={isProcessing}
-            leftIcon={<CreditCard className="h-4 w-4" />}
-          >
-            Process Batch Payroll
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {batchSuccess && (
         <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 flex items-center justify-between dark:bg-emerald-950/40 dark:border-emerald-800 animate-fade-in">

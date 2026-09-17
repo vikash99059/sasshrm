@@ -10,6 +10,7 @@ import {
   Download
 } from 'lucide-react';
 import { Modal, Input, Select, Button, Badge } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 
 interface HolidayItem {
   id: string;
@@ -44,35 +45,30 @@ export const HolidaysPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-slate-800">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Company Holiday Calendar
-            </h1>
-            <Badge variant="primary">{holidays.length} Days in {selectedYear}</Badge>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Official paid public holidays, regional observances, and floating time-off schedules.
-          </p>
-        </div>
+      {/* Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Company Holiday Calendar"
+        subtitle="Official paid public holidays, regional observances, and floating time-off schedules."
+        icon={CalendarIcon}
+        badge={<Badge variant="primary">{holidays.length} Days in {selectedYear}</Badge>}
+        actions={
+          <div className="flex items-center gap-3">
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="px-3 py-2 text-xs rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-800/90 text-slate-900 dark:text-white font-semibold focus:outline-none backdrop-blur-xs"
+            >
+              <option value="2024">Calendar 2024</option>
+              <option value="2025">Calendar 2025</option>
+            </select>
 
-        <div className="flex items-center gap-3">
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
-            className="px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-white focus:outline-none"
-          >
-            <option value="2024">Calendar 2024</option>
-            <option value="2025">Calendar 2025</option>
-          </select>
-          <Button size="sm" onClick={() => setIsAddModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-1.5" />
-            Add Holiday
-          </Button>
-        </div>
-      </div>
+            <Button size="sm" onClick={() => setIsAddModalOpen(true)} className="font-bold shadow-xs">
+              <Plus className="h-4 w-4 mr-1.5" />
+              Add Holiday
+            </Button>
+          </div>
+        }
+      />
 
       {/* Next Upcoming Holiday Highlight Card */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4">
