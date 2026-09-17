@@ -15,6 +15,7 @@ import {
   Input,
   Select,
 } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 import {
   Target,
   CheckCircle2,
@@ -73,21 +74,18 @@ export const GoalsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-dark-border">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Performance, OKRs & Appraisals
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Track company key results, align departmental objectives, and manage 360° reviews.
-          </p>
-        </div>
-
-        <Button size="sm" onClick={() => setIsGoalModalOpen(true)} leftIcon={<Plus className="h-4 w-4" />}>
-          Set New OKR Goal
-        </Button>
-      </div>
+      {/* Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Performance, OKRs & Appraisals"
+        subtitle="Track company key results, align departmental objectives, and manage 360° reviews."
+        icon={Target}
+        badge={<Badge variant="primary">Q2 2024 Cycle Active</Badge>}
+        actions={
+          <Button size="sm" onClick={() => setIsGoalModalOpen(true)} leftIcon={<Plus className="h-4 w-4" />} className="font-bold shadow-xs">
+            Set New OKR Goal
+          </Button>
+        }
+      />
 
       {/* Stats Cards Row (Matching Reference) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

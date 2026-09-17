@@ -27,7 +27,8 @@ import {
   Filter,
 } from 'lucide-react';
 import { cn } from '../../utils';
-import { Modal, Button, Input, Select } from '../../components/ui';
+import { Modal, Button, Input, Select, Badge } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 
 interface LeaveRecordItem {
   id: number;
@@ -210,93 +211,93 @@ export const LeaveManagementPage: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-page-enter">
-      {/* =========================================================================
-          HEADER AREA: TITLE + SUBTITLE & 3D CALENDAR / CLOCK ILLUSTRATION
-         ========================================================================= */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        {/* Left: Icon, Title and Subtitle */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-xs flex-shrink-0">
-            <CalendarDays className="h-5 w-5" />
+      {/* HEADER AREA: CLOUDY WAVE DESIGN WITH 3D SVG ILLUSTRATION */}
+      <PageHeaderCard
+        title="Leave Management"
+        subtitle="Apply for leaves, check your leave balance and track your leave history — all in one place."
+        icon={CalendarDays}
+        badge={<Badge variant="primary" size="sm">18 Days Available</Badge>}
+        actions={
+          <div className="flex items-center gap-3">
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => setIsApplyModalOpen(true)}
+              className="font-bold shadow-xs whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4 mr-1.5" />
+              Apply Leave
+            </Button>
+            {/* Right: Soft 3D Calendar & Clock Illustration */}
+            <div className="hidden lg:flex items-center justify-end relative pr-2">
+              <div className="relative flex items-center justify-center">
+                {/* Ambient Soft Glow Behind Graphic */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400/20 via-sky-300/20 to-blue-500/20 rounded-full blur-lg pointer-events-none" />
+
+                {/* SVG 3D Calendar & Clock Graphic */}
+                <svg width="95" height="52" viewBox="0 0 170 95" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Soft Leaves Decorative Background */}
+                  <path d="M12 55C24 42 38 48 44 64C31 70 20 66 12 55Z" fill="#BFDBFE" fillOpacity="0.6" />
+                  <path d="M152 28C142 16 128 22 122 38C134 44 146 40 152 28Z" fill="#BFDBFE" fillOpacity="0.5" />
+                  <path d="M162 48C148 40 140 52 142 66C155 66 161 58 162 48Z" fill="#93C5FD" fillOpacity="0.5" />
+
+                  {/* 3D Slanted Calendar */}
+                  <g transform="translate(48, 14)">
+                    <rect x="0" y="6" width="68" height="68" rx="10" fill="url(#calBaseGrad)" filter="url(#leaveCalShadow)" />
+                    <rect x="0" y="0" width="68" height="20" rx="8" fill="#2563EB" />
+                    {/* Spiral ring binders */}
+                    <circle cx="14" cy="3" r="3" fill="#E2E8F0" stroke="#1D4ED8" strokeWidth="1" />
+                    <circle cx="34" cy="3" r="3" fill="#E2E8F0" stroke="#1D4ED8" strokeWidth="1" />
+                    <circle cx="54" cy="3" r="3" fill="#E2E8F0" stroke="#1D4ED8" strokeWidth="1" />
+
+                    {/* Grid checkboxes / lines */}
+                    <rect x="10" y="28" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
+                    <rect x="23" y="28" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
+                    <rect x="36" y="28" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
+                    <rect x="49" y="28" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
+
+                    <rect x="10" y="39" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
+                    <rect x="23" y="39" width="9" height="7" rx="2" fill="#2563EB" />
+                    <rect x="36" y="39" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
+                    <rect x="49" y="39" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
+
+                    <rect x="10" y="50" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
+                    <rect x="23" y="50" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
+                    <rect x="36" y="50" width="9" height="7" rx="2" fill="#2563EB" />
+                    <rect x="49" y="50" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
+                  </g>
+
+                  {/* Overlapping Round Clock on Bottom-Right of Calendar */}
+                  <g transform="translate(108, 48)">
+                    <circle cx="20" cy="20" r="18" fill="url(#clockMiniGrad)" filter="url(#leaveClockShadow)" />
+                    <circle cx="20" cy="20" r="15" fill="#FFFFFF" />
+                    <circle cx="20" cy="20" r="2" fill="#2563EB" />
+                    <line x1="20" y1="20" x2="20" y2="10" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" />
+                    <line x1="20" y1="20" x2="28" y2="16" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" />
+                  </g>
+
+                  <defs>
+                    <linearGradient id="calBaseGrad" x1="0" y1="0" x2="68" y2="74" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#FFFFFF" />
+                      <stop offset="1" stopColor="#F8FAFC" />
+                    </linearGradient>
+                    <linearGradient id="clockMiniGrad" x1="5" y1="5" x2="35" y2="35" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#38BDF8" />
+                      <stop offset="1" stopColor="#2563EB" />
+                    </linearGradient>
+                    <filter id="leaveCalShadow" x="-6" y="0" width="80" height="84" filterUnits="userSpaceOnUse">
+                      <feDropShadow dx="0" dy="5" stdDeviation="6" floodColor="#0F172A" floodOpacity="0.14" />
+                    </filter>
+                    <filter id="leaveClockShadow" x="0" y="0" width="42" height="42" filterUnits="userSpaceOnUse">
+                      <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="#1E40AF" floodOpacity="0.25" />
+                    </filter>
+                  </defs>
+                </svg>
+              </div>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Leave Management
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Apply for leaves, check your leave balance and track your leave history — all in one place.
-            </p>
-          </div>
-        </div>
-
-        {/* Right: Soft 3D Calendar & Clock Illustration matching reference */}
-        <div className="hidden md:flex items-center justify-end relative pr-2">
-          <div className="relative flex items-center justify-center">
-            {/* Ambient Soft Glow Behind Graphic */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400/20 via-sky-300/20 to-blue-500/20 rounded-full blur-lg pointer-events-none" />
-
-            {/* SVG 3D Calendar & Clock Graphic */}
-            <svg width="105" height="58" viewBox="0 0 170 95" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Soft Leaves Decorative Background */}
-              <path d="M12 55C24 42 38 48 44 64C31 70 20 66 12 55Z" fill="#BFDBFE" fillOpacity="0.6" />
-              <path d="M152 28C142 16 128 22 122 38C134 44 146 40 152 28Z" fill="#BFDBFE" fillOpacity="0.5" />
-              <path d="M162 48C148 40 140 52 142 66C155 66 161 58 162 48Z" fill="#93C5FD" fillOpacity="0.5" />
-
-              {/* 3D Slanted Calendar */}
-              <g transform="translate(48, 14)">
-                <rect x="0" y="6" width="68" height="68" rx="10" fill="url(#calBaseGrad)" filter="url(#leaveCalShadow)" />
-                <rect x="0" y="0" width="68" height="20" rx="8" fill="#2563EB" />
-                {/* Spiral ring binders */}
-                <circle cx="14" cy="3" r="3" fill="#E2E8F0" stroke="#1D4ED8" strokeWidth="1" />
-                <circle cx="34" cy="3" r="3" fill="#E2E8F0" stroke="#1D4ED8" strokeWidth="1" />
-                <circle cx="54" cy="3" r="3" fill="#E2E8F0" stroke="#1D4ED8" strokeWidth="1" />
-
-                {/* Grid checkboxes / lines */}
-                <rect x="10" y="28" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
-                <rect x="23" y="28" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
-                <rect x="36" y="28" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
-                <rect x="49" y="28" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
-
-                <rect x="10" y="39" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
-                <rect x="23" y="39" width="9" height="7" rx="2" fill="#2563EB" />
-                <rect x="36" y="39" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
-                <rect x="49" y="39" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
-
-                <rect x="10" y="50" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
-                <rect x="23" y="50" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
-                <rect x="36" y="50" width="9" height="7" rx="2" fill="#2563EB" />
-                <rect x="49" y="50" width="9" height="7" rx="2" fill="#93C5FD" opacity="0.6" />
-              </g>
-
-              {/* Overlapping Round Clock on Bottom-Right of Calendar */}
-              <g transform="translate(108, 48)">
-                <circle cx="20" cy="20" r="18" fill="url(#clockMiniGrad)" filter="url(#leaveClockShadow)" />
-                <circle cx="20" cy="20" r="15" fill="#FFFFFF" />
-                <circle cx="20" cy="20" r="2" fill="#2563EB" />
-                <line x1="20" y1="20" x2="20" y2="10" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" />
-                <line x1="20" y1="20" x2="28" y2="16" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" />
-              </g>
-
-              <defs>
-                <linearGradient id="calBaseGrad" x1="0" y1="0" x2="68" y2="74" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#FFFFFF" />
-                  <stop offset="1" stopColor="#F8FAFC" />
-                </linearGradient>
-                <linearGradient id="clockMiniGrad" x1="5" y1="5" x2="35" y2="35" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#38BDF8" />
-                  <stop offset="1" stopColor="#2563EB" />
-                </linearGradient>
-                <filter id="leaveCalShadow" x="-6" y="0" width="80" height="84" filterUnits="userSpaceOnUse">
-                  <feDropShadow dx="0" dy="5" stdDeviation="6" floodColor="#0F172A" floodOpacity="0.14" />
-                </filter>
-                <filter id="leaveClockShadow" x="0" y="0" width="42" height="42" filterUnits="userSpaceOnUse">
-                  <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="#1E40AF" floodOpacity="0.25" />
-                </filter>
-              </defs>
-            </svg>
-          </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* =========================================================================
           TOP 4 KPI METRIC CARDS (COMPACT HEIGHT, BALANCED PADDING, SHARP ALIGNMENT)

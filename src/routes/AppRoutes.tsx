@@ -53,11 +53,22 @@ import { LeaveRequestsPage } from '../pages/leave/LeaveRequestsPage';
 import { LeaveBalancePage } from '../pages/leave/LeaveBalancePage';
 import { HolidaysPage } from '../pages/leave/HolidaysPage';
 
-// Payroll
+// Payroll & Compensation
 import { PayrollDashboardPage } from '../pages/payroll/PayrollDashboardPage';
 import { SalaryStructurePage } from '../pages/payroll/SalaryStructurePage';
 import { PayslipsPage } from '../pages/payroll/PayslipsPage';
 import { PayrollAdjustmentsPage } from '../pages/payroll/PayrollAdjustmentsPage';
+import { LoansAdvancesPage } from '../pages/payroll/LoansAdvancesPage';
+import { StatutoryCompliancePage } from '../pages/payroll/StatutoryCompliancePage';
+
+// Accounting & Finance
+import { ChartOfAccountsPage } from '../pages/finance/ChartOfAccountsPage';
+import { InvoicesReceivablesPage } from '../pages/finance/InvoicesReceivablesPage';
+import { BillsPayablesPage } from '../pages/finance/BillsPayablesPage';
+import { PaymentsReceiptsPage } from '../pages/finance/PaymentsReceiptsPage';
+import { BankReconciliationPage } from '../pages/finance/BankReconciliationPage';
+import { TaxGstPage } from '../pages/finance/TaxGstPage';
+import { FinancialStatementsPage } from '../pages/finance/FinancialStatementsPage';
 
 // Recruitment ATS & Talent Acquisition
 import { JobOpeningsPage } from '../pages/recruitment/JobOpeningsPage';
@@ -165,12 +176,25 @@ export const AppRoutes: React.FC = () => {
         <Route path="/leave/balance" element={<ModuleGuard moduleId="employee_hr_management"><LeaveBalancePage /></ModuleGuard>} />
         <Route path="/leave/holidays" element={<ModuleGuard moduleId="employee_hr_management"><HolidaysPage /></ModuleGuard>} />
 
-        {/* Payroll */}
+        {/* Payroll & Compensation */}
         <Route path="/payroll" element={<ModuleGuard moduleId="finance_management"><PayrollDashboardPage /></ModuleGuard>} />
         <Route path="/payroll/salary-structure" element={<ModuleGuard moduleId="finance_management"><SalaryStructurePage /></ModuleGuard>} />
         <Route path="/payroll/payslips" element={<ModuleGuard moduleId="finance_management"><PayslipsPage /></ModuleGuard>} />
         <Route path="/payroll/adjustments" element={<ModuleGuard moduleId="finance_management"><PayrollAdjustmentsPage /></ModuleGuard>} />
+        <Route path="/payroll/loans" element={<ModuleGuard moduleId="finance_management"><LoansAdvancesPage /></ModuleGuard>} />
+        <Route path="/payroll/compliance" element={<ModuleGuard moduleId="finance_management"><StatutoryCompliancePage /></ModuleGuard>} />
         <Route path="/my-payroll" element={<ModuleGuard moduleId="finance_management"><PayslipsPage /></ModuleGuard>} />
+
+        {/* Core Accounting & Finance */}
+        <Route path="/finance/chart-of-accounts" element={<ModuleGuard moduleId="finance_management"><ChartOfAccountsPage /></ModuleGuard>} />
+        <Route path="/finance/invoices" element={<ModuleGuard moduleId="finance_management"><InvoicesReceivablesPage /></ModuleGuard>} />
+        <Route path="/finance/receivables" element={<ModuleGuard moduleId="finance_management"><InvoicesReceivablesPage /></ModuleGuard>} />
+        <Route path="/finance/bills" element={<ModuleGuard moduleId="finance_management"><BillsPayablesPage /></ModuleGuard>} />
+        <Route path="/finance/payables" element={<ModuleGuard moduleId="finance_management"><BillsPayablesPage /></ModuleGuard>} />
+        <Route path="/finance/vouchers" element={<ModuleGuard moduleId="finance_management"><PaymentsReceiptsPage /></ModuleGuard>} />
+        <Route path="/finance/reconciliation" element={<ModuleGuard moduleId="finance_management"><BankReconciliationPage /></ModuleGuard>} />
+        <Route path="/finance/gst" element={<ModuleGuard moduleId="finance_management"><TaxGstPage /></ModuleGuard>} />
+        <Route path="/finance/statements" element={<ModuleGuard moduleId="finance_management"><FinancialStatementsPage /></ModuleGuard>} />
 
         {/* Recruiter / Talent Acquisition Dedicated Workspace */}
         <Route path="/recruiter/manpower-requirements" element={<ModuleGuard moduleId="recruitment_management"><ManpowerRequirementsPage /></ModuleGuard>} />

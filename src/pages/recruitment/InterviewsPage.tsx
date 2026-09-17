@@ -15,6 +15,7 @@ import {
   Select,
   Avatar,
 } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 import {
   Calendar as CalendarIcon,
   Video,
@@ -287,46 +288,43 @@ export const InterviewsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-dark-border">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
-            <CalendarIcon className="w-6 h-6 text-blue-600" />
-            Interview Management & Panel Schedules
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Synchronize panel interviews, video conferencing links, reminders and stage completions.
-          </p>
-        </div>
+      {/* Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Interview Management & Panel Schedules"
+        subtitle="Synchronize panel interviews, video conferencing links, reminders and stage completions."
+        icon={CalendarIcon}
+        badge={<Badge variant="primary">{allInterviews.length} Total Scheduled</Badge>}
+        actions={
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* View Switcher */}
+            <div className="flex items-center bg-slate-100/90 dark:bg-slate-800/90 backdrop-blur-xs rounded-xl p-1 text-xs font-semibold border border-slate-200/80 dark:border-slate-700/80">
+              {(['table', 'month', 'week', 'day'] as ViewMode[]).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setViewMode(mode)}
+                  className={`px-3 py-1.5 rounded-lg capitalize transition cursor-pointer ${
+                    viewMode === mode
+                      ? 'bg-white dark:bg-dark-card text-blue-600 dark:text-blue-400 shadow-xs font-bold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {mode}
+                </button>
+              ))}
+            </div>
 
-        <div className="flex items-center gap-2.5">
-          {/* View Switcher */}
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 text-xs font-semibold">
-            {(['table', 'month', 'week', 'day'] as ViewMode[]).map((mode) => (
-              <button
-                key={mode}
-                onClick={() => setViewMode(mode)}
-                className={`px-3 py-1.5 rounded-md capitalize transition ${
-                  viewMode === mode
-                    ? 'bg-white dark:bg-dark-card text-blue-600 dark:text-blue-400 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                {mode}
-              </button>
-            ))}
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsScheduleModalOpen(true)}
+              leftIcon={<Plus className="w-3.5 h-3.5" />}
+              className="font-bold shadow-xs"
+            >
+              Schedule Interview
+            </Button>
           </div>
-
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setIsScheduleModalOpen(true)}
-            leftIcon={<Plus className="w-3.5 h-3.5" />}
-          >
-            Schedule Interview
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Tabs */}
       <div className="flex items-center gap-1 border-b border-slate-200 dark:border-dark-border overflow-x-auto">

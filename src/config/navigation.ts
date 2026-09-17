@@ -32,6 +32,7 @@ import {
   Bell,
   Boxes,
   Sliders,
+  Percent,
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { CorporateModuleId } from '../types/saasModules';
@@ -95,21 +96,7 @@ function getRawNavigationForRole(role: UserRole, activeContext: 'organisation' |
           sectionTitle: 'MANAGEMENT',
           items: [
             { title: 'Team Dashboard', href: '/dashboard', icon: LayoutDashboard },
-            {
-              title: 'Chat & Teams',
-              href: '/chat',
-              icon: MessageSquare,
-              badge: '3',
-              moduleId: 'chat_communication',
-              subModule: 'Internal employee chat',
-              children: [
-                { title: 'Chat', href: '/chat?tab=chat', subModule: 'Internal employee chat' },
-                { title: 'Teams', href: '/chat?tab=teams', subModule: 'Project/team chat' },
-                { title: 'Calendar', href: '/chat?tab=calendar', subModule: 'Internal employee chat' },
-                { title: 'Calls', href: '/chat?tab=calls', subModule: 'Internal employee chat' },
-                { title: 'Files', href: '/chat?tab=files', subModule: 'File sharing' },
-              ]
-            },
+            { title: 'Chat & Teams', href: '/chat', icon: MessageSquare, badge: '3', moduleId: 'chat_communication', subModule: 'Internal employee chat' },
             { title: 'Email', href: '/email', icon: Mail, badge: '4', moduleId: 'email_management', subModule: 'Inbox / sent / drafts' },
             { title: 'Team Members', href: '/employees', icon: Users, moduleId: 'organization_management', subModule: 'User management' },
             { title: 'Team Attendance', href: '/attendance', icon: Clock, moduleId: 'employee_hr_management', subModule: 'Attendance & shifts' },
@@ -126,190 +113,50 @@ function getRawNavigationForRole(role: UserRole, activeContext: 'organisation' |
     case 'recruiter':
       return [
         {
-          sectionTitle: 'RECRUITMENT',
+          sectionTitle: 'OVERVIEW',
           items: [
-            { title: 'Dashboard', href: '/recruiter/dashboard', icon: LayoutDashboard, moduleId: 'recruitment_management' },
-            {
-              title: 'Manpower Requirements',
-              href: '/recruiter/manpower-requirements',
-              icon: Users,
-              badge: '5',
-              moduleId: 'recruitment_management',
-              children: [
-                { title: 'Workforce Requests', href: '/recruiter/manpower-requirements?tab=workforce' },
-                { title: 'Department Requirements', href: '/recruiter/manpower-requirements?tab=departments' },
-                { title: 'Position Requirements', href: '/recruiter/manpower-requirements?tab=positions' },
-                { title: 'Pending Approvals', href: '/recruiter/manpower-requirements?tab=pending' },
-              ],
-            },
-            {
-              title: 'Job Requisitions',
-              href: '/recruiter/requisitions',
-              icon: FileText,
-              badge: '3',
-              moduleId: 'recruitment_management',
-              children: [
-                { title: 'All Requisitions', href: '/recruiter/requisitions?tab=all' },
-                { title: 'My Requisitions', href: '/recruiter/requisitions?tab=my' },
-                { title: 'Pending Approval', href: '/recruiter/requisitions?tab=pending' },
-                { title: 'Approved', href: '/recruiter/requisitions?tab=approved' },
-                { title: 'Rejected', href: '/recruiter/requisitions?tab=rejected' },
-                { title: 'Closed', href: '/recruiter/requisitions?tab=closed' },
-              ],
-            },
-            {
-              title: 'Jobs',
-              href: '/recruiter/jobs',
-              icon: Briefcase,
-              badge: '4',
-              moduleId: 'recruitment_management',
-              children: [
-                { title: 'All Jobs', href: '/recruiter/jobs?tab=all' },
-                { title: 'Create Job', href: '/recruiter/jobs/create' },
-                { title: 'Draft Jobs', href: '/recruiter/jobs?tab=draft' },
-                { title: 'Published Jobs', href: '/recruiter/jobs?tab=published' },
-                { title: 'Expired Jobs', href: '/recruiter/jobs?tab=expired' },
-                { title: 'Closed Jobs', href: '/recruiter/jobs?tab=closed' },
-              ],
-            },
-            {
-              title: 'Candidate Database',
-              href: '/recruiter/candidates',
-              icon: UserCheck,
-              moduleId: 'recruitment_management',
-              children: [
-                { title: 'All Candidates', href: '/recruiter/candidates?tab=all' },
-                { title: 'Talent Pool', href: '/recruiter/candidates?tab=talent-pool' },
-                { title: 'New Candidates', href: '/recruiter/candidates?tab=new' },
-                { title: 'Shortlisted', href: '/recruiter/candidates?tab=shortlisted' },
-                { title: 'Rejected', href: '/recruiter/candidates?tab=rejected' },
-                { title: 'Hired', href: '/recruiter/candidates?tab=hired' },
-              ],
-            },
-            {
-              title: 'Resume Management',
-              href: '/recruiter/resumes',
-              icon: FileSpreadsheet,
-              moduleId: 'recruitment_management',
-              children: [
-                { title: 'All Resumes', href: '/recruiter/resumes?tab=all' },
-                { title: 'Resume Screening', href: '/recruiter/resumes?tab=screening' },
-                { title: 'Resume Parsing', href: '/recruiter/resumes?tab=parsing' },
-                { title: 'Resume Downloads', href: '/recruiter/resumes?tab=downloads' },
-                { title: 'Candidate Documents', href: '/recruiter/resumes?tab=documents' },
-              ],
-            },
-            {
-              title: 'Applications',
-              href: '/recruiter/applications',
-              icon: Target,
-              badge: '7',
-              moduleId: 'recruitment_management',
-              children: [
-                { title: 'All Applications', href: '/recruiter/applications?tab=all' },
-                { title: 'New Applications', href: '/recruiter/applications?tab=new' },
-                { title: 'Under Review', href: '/recruiter/applications?tab=review' },
-                { title: 'Shortlisted', href: '/recruiter/applications?tab=shortlisted' },
-                { title: 'Rejected', href: '/recruiter/applications?tab=rejected' },
-                { title: 'Withdrawn', href: '/recruiter/applications?tab=withdrawn' },
-              ],
-            },
-            {
-              title: 'Screening & Shortlisting',
-              href: '/recruiter/screening',
-              icon: Sparkles,
-              moduleId: 'recruitment_management',
-              children: [
-                { title: 'Screening Queue', href: '/recruiter/screening?tab=queue' },
-                { title: 'Screening Results', href: '/recruiter/screening?tab=results' },
-                { title: 'Shortlisted Candidates', href: '/recruiter/screening?tab=shortlisted' },
-                { title: 'Rejected Candidates', href: '/recruiter/screening?tab=rejected' },
-              ],
-            },
-            {
-              title: 'Interviews',
-              href: '/recruiter/interviews',
-              icon: Calendar,
-              badge: '6',
-              moduleId: 'recruitment_management',
-              children: [
-                { title: 'Interview Calendar', href: '/recruiter/interviews/calendar' },
-                { title: 'Schedule Interview', href: '/recruiter/interviews?action=schedule' },
-                { title: 'Upcoming Interviews', href: '/recruiter/interviews?tab=upcoming' },
-                { title: 'Completed Interviews', href: '/recruiter/interviews?tab=completed' },
-                { title: 'Cancelled Interviews', href: '/recruiter/interviews?tab=cancelled' },
-              ],
-            },
-            {
-              title: 'Interview Evaluation',
-              href: '/recruiter/evaluations',
-              icon: Award,
-              badge: '2',
-              moduleId: 'recruitment_management',
-              children: [
-                { title: 'Pending Evaluation', href: '/recruiter/evaluations?tab=pending' },
-                { title: 'Completed Evaluations', href: '/recruiter/evaluations?tab=completed' },
-                { title: 'Interview Feedback', href: '/recruiter/evaluations?tab=feedback' },
-                { title: 'Evaluation History', href: '/recruiter/evaluations?tab=history' },
-              ],
-            },
-            {
-              title: 'Selection & Offers',
-              href: '/recruiter/offers',
-              icon: CreditCard,
-              badge: '3',
-              moduleId: 'recruitment_management',
-              children: [
-                { title: 'Selected Candidates', href: '/recruiter/offers?tab=selected' },
-                { title: 'Offer Drafts', href: '/recruiter/offers?tab=drafts' },
-                { title: 'Offers Sent', href: '/recruiter/offers?tab=sent' },
-                { title: 'Offers Accepted', href: '/recruiter/offers?tab=accepted' },
-                { title: 'Offers Rejected', href: '/recruiter/offers?tab=rejected' },
-                { title: 'Offer Expired', href: '/recruiter/offers?tab=expired' },
-              ],
-            },
-            {
-              title: 'Recruitment Pipeline',
-              href: '/recruiter/pipeline',
-              icon: Layers,
-              moduleId: 'recruitment_management',
-            },
-            {
-              title: 'Recruitment Analytics',
-              href: '/recruiter/analytics',
-              icon: BarChart3,
-              moduleId: 'recruitment_management',
-              children: [
-                { title: 'Recruitment Overview', href: '/recruiter/analytics?tab=overview' },
-                { title: 'Source Analytics', href: '/recruiter/analytics?tab=sources' },
-                { title: 'Time to Hire', href: '/recruiter/analytics?tab=time-to-hire' },
-                { title: 'Cost per Hire', href: '/recruiter/analytics?tab=cost' },
-                { title: 'Hiring Funnel', href: '/recruiter/analytics?tab=funnel' },
-                { title: 'Recruiter Performance', href: '/recruiter/analytics?tab=performance' },
-              ],
-            },
-            {
-              title: 'Joining & Onboarding Handover',
-              href: '/recruiter/handover',
-              icon: User,
-              badge: '3',
-              moduleId: 'recruitment_management',
-              children: [
-                { title: 'Joining Pending', href: '/recruiter/handover?tab=pending' },
-                { title: 'Joining Confirmed', href: '/recruiter/handover?tab=confirmed' },
-                { title: 'Documents Pending', href: '/recruiter/handover?tab=documents' },
-                { title: 'Ready for Onboarding', href: '/recruiter/handover?tab=ready' },
-                { title: 'Handover to HR', href: '/recruiter/handover?tab=handover' },
-              ],
-            },
+            { title: 'Recruiter Command Center', href: '/recruiter/dashboard', icon: LayoutDashboard, moduleId: 'recruitment_management' },
           ],
         },
         {
-          sectionTitle: 'SUPPORT',
+          sectionTitle: 'WORKFORCE PLANNING',
           items: [
-            { title: 'Clock In / Out', href: '/clock-in', icon: Clock, badge: 'Live', moduleId: 'employee_hr_management' },
-            { title: 'Notifications', href: '/recruiter/notifications', icon: Bell, badge: '5', moduleId: 'recruitment_management' },
-            { title: 'Help & Support', href: '/support', icon: HelpCircle },
+            { title: 'Headcount & Manpower Planning', href: '/recruiter/manpower-requirements', icon: Users, badge: '5', moduleId: 'recruitment_management' },
+            { title: 'Hiring Requisitions', href: '/recruiter/requisitions', icon: FileText, badge: '3', moduleId: 'recruitment_management' },
+          ],
+        },
+        {
+          sectionTitle: 'TALENT SOURCING',
+          items: [
+            { title: 'Published Job Openings', href: '/recruiter/jobs', icon: Briefcase, badge: '4', moduleId: 'recruitment_management' },
+            { title: 'Candidate Talent Pool', href: '/recruiter/candidates', icon: UserCheck, moduleId: 'recruitment_management' },
+            { title: 'Resume & CV Bank', href: '/recruiter/resumes', icon: FileSpreadsheet, moduleId: 'recruitment_management' },
+            { title: 'Applicant Submissions', href: '/recruiter/applications', icon: Target, badge: '7', moduleId: 'recruitment_management' },
+          ],
+        },
+        {
+          sectionTitle: 'ASSESSMENT & PIPELINE',
+          items: [
+            { title: 'Candidate Screening Queue', href: '/recruiter/screening', icon: Sparkles, moduleId: 'recruitment_management' },
+            { title: 'ATS Hiring Pipeline', href: '/recruiter/pipeline', icon: Layers, moduleId: 'recruitment_management' },
+            { title: 'Interview Schedule & Calendar', href: '/recruiter/interviews', icon: Calendar, badge: '6', moduleId: 'recruitment_management' },
+            { title: 'Scorecards & Evaluations', href: '/recruiter/evaluations', icon: Award, badge: '2', moduleId: 'recruitment_management' },
+          ],
+        },
+        {
+          sectionTitle: 'OFFERS & ONBOARDING',
+          items: [
+            { title: 'Offer Letters & Rollout', href: '/recruiter/offers', icon: CreditCard, badge: '3', moduleId: 'recruitment_management' },
+            { title: 'Pre-Onboarding & HR Handover', href: '/recruiter/handover', icon: User, badge: '3', moduleId: 'recruitment_management' },
+          ],
+        },
+        {
+          sectionTitle: 'INSIGHTS & WORKSPACE',
+          items: [
+            { title: 'Recruitment Intelligence & Metrics', href: '/recruiter/analytics', icon: BarChart3, moduleId: 'recruitment_management' },
+            { title: 'My Shift Clock In / Out', href: '/clock-in', icon: Clock, badge: 'Live', moduleId: 'employee_hr_management' },
+            { title: 'Recruitment Alerts', href: '/recruiter/notifications', icon: Bell, badge: '5', moduleId: 'recruitment_management' },
+            { title: 'Support & Knowledge Base', href: '/support', icon: HelpCircle },
           ],
         },
       ];
@@ -317,32 +164,56 @@ function getRawNavigationForRole(role: UserRole, activeContext: 'organisation' |
     case 'payroll_admin':
       return [
         {
-          sectionTitle: 'FINANCE & PAYROLL',
+          sectionTitle: 'OVERVIEW',
           items: [
-            { title: 'Payroll Dashboard', href: '/dashboard', icon: LayoutDashboard, moduleId: 'finance_management' },
-            {
-              title: 'Chat & Teams',
-              href: '/chat',
-              icon: MessageSquare,
-              moduleId: 'chat_communication',
-              children: [
-                { title: 'Chat', href: '/chat?tab=chat' },
-                { title: 'Teams', href: '/chat?tab=teams' },
-                { title: 'Calendar', href: '/chat?tab=calendar' },
-                { title: 'Calls', href: '/chat?tab=calls' },
-                { title: 'Files', href: '/chat?tab=files' },
-              ]
-            },
-            { title: 'Email', href: '/email', icon: Mail, moduleId: 'email_management' },
-            { title: 'Process Payroll', href: '/payroll', icon: DollarSign, moduleId: 'finance_management' },
-            { title: 'Salary Structures', href: '/payroll/salary-structure', icon: CreditCard, moduleId: 'finance_management' },
-            { title: 'Employee Payslips', href: '/payroll/payslips', icon: FileSpreadsheet, moduleId: 'finance_management' },
-            { title: 'Expenses & Claims', href: '/operations/expenses', icon: Receipt, moduleId: 'finance_management' },
-            { title: 'Payroll Reports', href: '/reports', icon: BarChart3, moduleId: 'finance_management' },
-            { title: 'Clock In / Out', href: '/clock-in', icon: Clock, moduleId: 'employee_hr_management' },
-            { title: 'Settings', href: '/settings', icon: Settings },
-          ]
-        }
+            { title: 'Finance Command Center', href: '/dashboard', icon: LayoutDashboard, moduleId: 'finance_management' },
+            { title: 'My Shift Clock In / Out', href: '/clock-in', icon: Clock, badge: 'Live', moduleId: 'employee_hr_management' },
+          ],
+        },
+        {
+          sectionTitle: 'ACCOUNTING & LEDGER',
+          items: [
+            { title: 'Chart of Accounts', href: '/finance/chart-of-accounts', icon: Layers, moduleId: 'finance_management', subModule: 'Chart of accounts' },
+            { title: 'Invoices & Receivables', href: '/finance/invoices', icon: FileText, badge: '4 Due', moduleId: 'finance_management', subModule: 'Invoicing' },
+            { title: 'Bills & Payables', href: '/finance/bills', icon: Receipt, badge: '6 Bills', moduleId: 'finance_management', subModule: 'Receivables & payables' },
+            { title: 'Payments & Receipts', href: '/finance/vouchers', icon: CreditCard, moduleId: 'finance_management', subModule: 'Payments & receipts' },
+            { title: 'Bank Reconciliation', href: '/finance/reconciliation', icon: Building2, badge: 'Auto', moduleId: 'finance_management', subModule: 'Bank reconciliation' },
+            { title: 'GST & Tax Filings', href: '/finance/gst', icon: Percent, moduleId: 'finance_management', subModule: 'GST & statutory reports' },
+            { title: 'Financial Statements (P&L)', href: '/finance/statements', icon: BarChart3, moduleId: 'finance_management', subModule: 'P&L & Balance Sheet' },
+          ],
+        },
+        {
+          sectionTitle: 'PAYROLL PROCESSING',
+          items: [
+            { title: 'Batch Payroll Engine', href: '/payroll', icon: DollarSign, badge: 'Batch', moduleId: 'finance_management', subModule: 'Salary structure & payroll processing' },
+            { title: 'Salary Structure Bands', href: '/payroll/salary-structure', icon: Sliders, moduleId: 'finance_management', subModule: 'Salary structure & payroll processing' },
+            { title: 'Employee Payslips Archive', href: '/payroll/payslips', icon: FileSpreadsheet, moduleId: 'finance_management', subModule: 'Payslips, deductions & advances' },
+            { title: 'Adjustments & Overtime', href: '/payroll/adjustments', icon: Receipt, moduleId: 'finance_management', subModule: 'Payslips, deductions & advances' },
+          ],
+        },
+        {
+          sectionTitle: 'ADVANCES & CLAIMS',
+          items: [
+            { title: 'Employee Loans & Advances', href: '/payroll/loans', icon: CreditCard, badge: 'EMI', moduleId: 'finance_management', subModule: 'Payslips, deductions & advances' },
+            { title: 'Expense Reimbursements', href: '/operations/expenses', icon: Receipt, moduleId: 'finance_management', subModule: 'Income & expenses' },
+          ],
+        },
+        {
+          sectionTitle: 'STATUTORY & COMPLIANCE',
+          items: [
+            { title: 'EPF, ESI, PT & TDS', href: '/payroll/compliance', icon: ShieldCheck, badge: '98%', moduleId: 'finance_management', subModule: 'Statutory compliance (PF, ESI, PT, TDS)' },
+            { title: 'Compliance Reports', href: '/reports', icon: BarChart3, moduleId: 'finance_management', subModule: 'GST & statutory reports' },
+          ],
+        },
+        {
+          sectionTitle: 'COMMUNICATION & SETTINGS',
+          items: [
+            { title: 'Chat & Teams', href: '/chat', icon: MessageSquare, badge: '3', moduleId: 'chat_communication' },
+            { title: 'Email', href: '/email', icon: Mail, badge: '4', moduleId: 'email_management' },
+            { title: 'Finance Settings', href: '/settings', icon: Settings },
+            { title: 'Support & Helpdesk', href: '/support', icon: HelpCircle },
+          ],
+        },
       ];
 
     case 'employee':
@@ -361,20 +232,7 @@ function getRawNavigationForRole(role: UserRole, activeContext: 'organisation' |
         {
           sectionTitle: 'Communication',
           items: [
-            {
-              title: 'Chat & Teams',
-              href: '/chat',
-              icon: MessageSquare,
-              badge: '3',
-              moduleId: 'chat_communication',
-              children: [
-                { title: 'Chat', href: '/chat?tab=chat' },
-                { title: 'Teams', href: '/chat?tab=teams' },
-                { title: 'Calendar', href: '/chat?tab=calendar' },
-                { title: 'Calls', href: '/chat?tab=calls' },
-                { title: 'Files', href: '/chat?tab=files' },
-              ]
-            },
+            { title: 'Chat & Teams', href: '/chat', icon: MessageSquare, badge: '3', moduleId: 'chat_communication' },
             { title: 'Email', href: '/email', icon: Mail, badge: '4', moduleId: 'email_management' },
           ]
         },
@@ -412,21 +270,7 @@ function getRawNavigationForRole(role: UserRole, activeContext: 'organisation' |
           sectionTitle: 'MAIN',
           items: [
             { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-            {
-              title: 'Chat & Teams',
-              href: '/chat',
-              icon: MessageSquare,
-              badge: '3',
-              moduleId: 'chat_communication',
-              subModule: 'Internal employee chat',
-              children: [
-                { title: 'Chat', href: '/chat?tab=chat', subModule: 'Internal employee chat' },
-                { title: 'Teams', href: '/chat?tab=teams', subModule: 'Project/team chat' },
-                { title: 'Calendar', href: '/chat?tab=calendar', subModule: 'Internal employee chat' },
-                { title: 'Calls', href: '/chat?tab=calls', subModule: 'Internal employee chat' },
-                { title: 'Files', href: '/chat?tab=files', subModule: 'File sharing' },
-              ]
-            },
+            { title: 'Chat & Teams', href: '/chat', icon: MessageSquare, badge: '3', moduleId: 'chat_communication', subModule: 'Internal employee chat' },
             { title: 'Email', href: '/email', icon: Mail, badge: '4', moduleId: 'email_management', subModule: 'Inbox / sent / drafts' },
             { title: 'Analytics', href: '/reports', icon: BarChart3, moduleId: 'mis_analytics_dashboard', subModule: 'HR dashboard' },
           ]

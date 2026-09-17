@@ -14,6 +14,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Modal, Input, Select, Button, Badge } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 
 interface LeaveRequestItem {
   id: string;
@@ -114,25 +115,19 @@ export const LeaveRequestsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-slate-800">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Leave Requests Queue
-            </h1>
-            <Badge variant="warning">{requests.filter(r => r.status === 'Pending').length} Pending</Badge>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Review, approve, or reject employee time-off applications and PTO requests.
-          </p>
-        </div>
-
-        <Button size="sm" onClick={() => setIsApplyModalOpen(true)}>
-          <Plus className="h-4 w-4 mr-1.5" />
-          Apply on Behalf
-        </Button>
-      </div>
+      {/* Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Leave Requests Queue"
+        subtitle="Review, approve, or reject employee time-off applications and PTO requests."
+        icon={CalendarDays}
+        badge={<Badge variant="warning">{requests.filter(r => r.status === 'Pending').length} Pending</Badge>}
+        actions={
+          <Button size="sm" onClick={() => setIsApplyModalOpen(true)} className="font-bold shadow-xs">
+            <Plus className="h-4 w-4 mr-1.5" />
+            Apply on Behalf
+          </Button>
+        }
+      />
 
       {/* KPI Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

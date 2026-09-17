@@ -1,5 +1,6 @@
 import { CorporateModuleId } from './saasModules';
 export * from './saasModules';
+export * from './finance';
 
 export type UserRole =
   | 'saas_owner'

@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { cn } from '../../utils';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
+import { Badge } from '../../components/ui/Badge';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 import {
   FileText,
   FileCheck,
@@ -317,105 +319,105 @@ export const DocumentsPage: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-page-enter">
-      {/* =========================================================================
-          TOP HEADER: ICON + TITLE + SUBTITLE & 3D FOLDERS/DOCUMENTS ILLUSTRATION
-         ========================================================================= */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        {/* Left: Icon, Title and Subtitle */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 shadow-xs flex-shrink-0">
-            <FileText className="h-5 w-5" />
+      {/* TOP HEADER: CLOUDY WAVE DESIGN & 3D FOLDERS/DOCUMENTS ILLUSTRATION */}
+      <PageHeaderCard
+        title="My Documents"
+        subtitle="Access and manage your official documents, certificates and important files in one place."
+        icon={FileText}
+        badge={<Badge variant="primary" size="sm">{documents.length} Total Files</Badge>}
+        actions={
+          <div className="flex items-center gap-3">
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => setIsUploadModalOpen(true)}
+              className="font-bold shadow-xs whitespace-nowrap"
+            >
+              <Upload className="w-4 h-4 mr-1.5" />
+              Upload Document
+            </Button>
+            {/* Right: Soft 3D Documents & Folder Graphic */}
+            <div className="hidden lg:flex items-center justify-end relative pr-2">
+              <div className="relative flex items-center justify-center">
+                {/* Ambient Multi-Tone Radiant Glow */}
+                <div className="absolute -inset-3 bg-gradient-to-r from-blue-500/20 via-sky-400/20 to-blue-600/20 rounded-full blur-xl pointer-events-none" />
+
+                {/* 3D Folders & Sheets Graphic */}
+                <svg width="150" height="82" viewBox="0 0 210 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Decorative Soft Leaves */}
+                  <path d="M12 60C22 46 38 52 44 68C30 74 18 72 12 60Z" fill="#BFDBFE" fillOpacity="0.55" />
+                  <path d="M196 26C184 16 168 22 162 38C176 44 188 40 196 26Z" fill="#BFDBFE" fillOpacity="0.5" />
+                  <path d="M206 52C192 42 182 56 184 72C198 70 204 62 206 52Z" fill="#93C5FD" fillOpacity="0.5" />
+
+                  {/* Background Document Sheets */}
+                  <g transform="translate(90, 10) rotate(12)">
+                    <rect x="0" y="0" width="54" height="74" rx="6" fill="#F8FAFC" stroke="#E2E8F0" strokeWidth="1" />
+                    <rect x="8" y="10" width="28" height="4" rx="2" fill="#CBD5E1" />
+                    <rect x="8" y="18" width="38" height="3" rx="1.5" fill="#E2E8F0" />
+                    <rect x="8" y="24" width="34" height="3" rx="1.5" fill="#E2E8F0" />
+                    <rect x="8" y="30" width="38" height="3" rx="1.5" fill="#E2E8F0" />
+                  </g>
+
+                  <g transform="translate(68, 6) rotate(-4)">
+                    <rect x="0" y="0" width="56" height="76" rx="6" fill="#FFFFFF" filter="url(#sheetShadow)" />
+                    <rect x="8" y="12" width="26" height="4" rx="2" fill="#93C5FD" />
+                    <rect x="8" y="20" width="40" height="3" rx="1.5" fill="#E2E8F0" />
+                    <rect x="8" y="26" width="34" height="3" rx="1.5" fill="#E2E8F0" />
+                    <rect x="8" y="32" width="38" height="3" rx="1.5" fill="#E2E8F0" />
+                    <rect x="8" y="38" width="30" height="3" rx="1.5" fill="#E2E8F0" />
+                  </g>
+
+                  {/* Main 3D Blue Front Folder */}
+                  <g transform="translate(54, 26)">
+                    {/* Back Tab */}
+                    <path d="M0 8C0 3.58172 3.58172 0 8 0H32C36.4183 0 40 3.58172 40 8V12H0V8Z" fill="#1D4ED8" />
+                    {/* Front Pocket */}
+                    <rect x="0" y="8" width="82" height="58" rx="8" fill="url(#folderBlueGrad)" filter="url(#folderShadow)" />
+                    {/* Glossy Top Edge Highlight */}
+                    <rect x="2" y="10" width="78" height="2" rx="1" fill="#FFFFFF" fillOpacity="0.4" />
+                  </g>
+
+                  {/* Foreground Floating Document with Blue Header & Checklist */}
+                  <g transform="translate(76, 18) rotate(4)">
+                    <rect x="0" y="0" width="58" height="72" rx="7" fill="#FFFFFF" filter="url(#fgDocShadow)" />
+                    <rect x="0" y="0" width="58" height="14" rx="7" fill="#3B82F6" />
+                    {/* Header title placeholder */}
+                    <rect x="6" y="5" width="22" height="4" rx="2" fill="#FFFFFF" />
+                    {/* Checklist items */}
+                    <circle cx="10" cy="24" r="3" fill="#10B981" />
+                    <rect x="16" y="22" width="34" height="4" rx="1.5" fill="#CBD5E1" />
+
+                    <circle cx="10" cy="34" r="3" fill="#10B981" />
+                    <rect x="16" y="32" width="30" height="4" rx="1.5" fill="#CBD5E1" />
+
+                    <circle cx="10" cy="44" r="3" fill="#3B82F6" />
+                    <rect x="16" y="42" width="34" height="4" rx="1.5" fill="#CBD5E1" />
+
+                    <circle cx="10" cy="54" r="3" fill="#E2E8F0" />
+                    <rect x="16" y="52" width="26" height="4" rx="1.5" fill="#E2E8F0" />
+                  </g>
+
+                  <defs>
+                    <linearGradient id="folderBlueGrad" x1="0" y1="8" x2="82" y2="66" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#3B82F6" />
+                      <stop offset="1" stopColor="#1D4ED8" />
+                    </linearGradient>
+                    <filter id="sheetShadow" x="-4" y="-2" width="68" height="86" filterUnits="userSpaceOnUse">
+                      <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#0F172A" floodOpacity="0.1" />
+                    </filter>
+                    <filter id="folderShadow" x="-6" y="4" width="94" height="72" filterUnits="userSpaceOnUse">
+                      <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#1E40AF" floodOpacity="0.25" />
+                    </filter>
+                    <filter id="fgDocShadow" x="-6" y="-2" width="72" height="84" filterUnits="userSpaceOnUse">
+                      <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#0F172A" floodOpacity="0.15" />
+                    </filter>
+                  </defs>
+                </svg>
+              </div>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              My Documents
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Access and manage your official documents, certificates and important files in one place.
-            </p>
-          </div>
-        </div>
-
-        {/* Right: Soft 3D Documents & Folder Graphic matching reference image */}
-        <div className="hidden md:flex items-center justify-end relative pr-2">
-          <div className="relative flex items-center justify-center">
-            {/* Ambient Multi-Tone Radiant Glow */}
-            <div className="absolute -inset-3 bg-gradient-to-r from-blue-500/20 via-sky-400/20 to-blue-600/20 rounded-full blur-xl pointer-events-none" />
-
-            {/* 3D Folders & Sheets Graphic */}
-            <svg width="170" height="92" viewBox="0 0 210 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Decorative Soft Leaves */}
-              <path d="M12 60C22 46 38 52 44 68C30 74 18 72 12 60Z" fill="#BFDBFE" fillOpacity="0.55" />
-              <path d="M196 26C184 16 168 22 162 38C176 44 188 40 196 26Z" fill="#BFDBFE" fillOpacity="0.5" />
-              <path d="M206 52C192 42 182 56 184 72C198 70 204 62 206 52Z" fill="#93C5FD" fillOpacity="0.5" />
-
-              {/* Background Document Sheets */}
-              <g transform="translate(90, 10) rotate(12)">
-                <rect x="0" y="0" width="54" height="74" rx="6" fill="#F8FAFC" stroke="#E2E8F0" strokeWidth="1" />
-                <rect x="8" y="10" width="28" height="4" rx="2" fill="#CBD5E1" />
-                <rect x="8" y="18" width="38" height="3" rx="1.5" fill="#E2E8F0" />
-                <rect x="8" y="24" width="34" height="3" rx="1.5" fill="#E2E8F0" />
-                <rect x="8" y="30" width="38" height="3" rx="1.5" fill="#E2E8F0" />
-              </g>
-
-              <g transform="translate(68, 6) rotate(-4)">
-                <rect x="0" y="0" width="56" height="76" rx="6" fill="#FFFFFF" filter="url(#sheetShadow)" />
-                <rect x="8" y="12" width="26" height="4" rx="2" fill="#93C5FD" />
-                <rect x="8" y="20" width="40" height="3" rx="1.5" fill="#E2E8F0" />
-                <rect x="8" y="26" width="34" height="3" rx="1.5" fill="#E2E8F0" />
-                <rect x="8" y="32" width="38" height="3" rx="1.5" fill="#E2E8F0" />
-                <rect x="8" y="38" width="30" height="3" rx="1.5" fill="#E2E8F0" />
-              </g>
-
-              {/* Main 3D Blue Front Folder */}
-              <g transform="translate(54, 26)">
-                {/* Back Tab */}
-                <path d="M0 8C0 3.58172 3.58172 0 8 0H32C36.4183 0 40 3.58172 40 8V12H0V8Z" fill="#1D4ED8" />
-                {/* Front Pocket */}
-                <rect x="0" y="8" width="82" height="58" rx="8" fill="url(#folderBlueGrad)" filter="url(#folderShadow)" />
-                {/* Glossy Top Edge Highlight */}
-                <rect x="2" y="10" width="78" height="2" rx="1" fill="#FFFFFF" fillOpacity="0.4" />
-              </g>
-
-              {/* Foreground Floating Document with Blue Header & Checklist */}
-              <g transform="translate(76, 18) rotate(4)">
-                <rect x="0" y="0" width="58" height="72" rx="7" fill="#FFFFFF" filter="url(#fgDocShadow)" />
-                <rect x="0" y="0" width="58" height="14" rx="7" fill="#3B82F6" />
-                {/* Header title placeholder */}
-                <rect x="6" y="5" width="22" height="4" rx="2" fill="#FFFFFF" />
-                {/* Checklist items */}
-                <circle cx="10" cy="24" r="3" fill="#10B981" />
-                <rect x="16" y="22" width="34" height="4" rx="1.5" fill="#CBD5E1" />
-
-                <circle cx="10" cy="34" r="3" fill="#10B981" />
-                <rect x="16" y="32" width="30" height="4" rx="1.5" fill="#CBD5E1" />
-
-                <circle cx="10" cy="44" r="3" fill="#3B82F6" />
-                <rect x="16" y="42" width="34" height="4" rx="1.5" fill="#CBD5E1" />
-
-                <circle cx="10" cy="54" r="3" fill="#E2E8F0" />
-                <rect x="16" y="52" width="26" height="4" rx="1.5" fill="#E2E8F0" />
-              </g>
-
-              <defs>
-                <linearGradient id="folderBlueGrad" x1="0" y1="8" x2="82" y2="66" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#3B82F6" />
-                  <stop offset="1" stopColor="#1D4ED8" />
-                </linearGradient>
-                <filter id="sheetShadow" x="-4" y="-2" width="68" height="86" filterUnits="userSpaceOnUse">
-                  <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#0F172A" floodOpacity="0.1" />
-                </filter>
-                <filter id="folderShadow" x="-6" y="4" width="94" height="72" filterUnits="userSpaceOnUse">
-                  <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#1E40AF" floodOpacity="0.25" />
-                </filter>
-                <filter id="fgDocShadow" x="-6" y="-2" width="72" height="84" filterUnits="userSpaceOnUse">
-                  <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#0F172A" floodOpacity="0.15" />
-                </filter>
-              </defs>
-            </svg>
-          </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* =========================================================================
           TOP 4 KPI METRIC CARDS (HORIZONTAL ROW, COMPACT BOX HEIGHT, SHARP ALIGNMENT)

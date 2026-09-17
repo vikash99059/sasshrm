@@ -27,6 +27,7 @@ import {
 import { recruitmentService } from '../../services/recruitmentService';
 import { Candidate, CandidateStage, JobOpening } from '../../types';
 import { Modal, Input, Select, Button, Badge } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 
 export const CandidateDatabasePage: React.FC = () => {
   const navigate = useNavigate();
@@ -173,45 +174,39 @@ export const CandidateDatabasePage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in relative">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
-            <span>Recruitment</span>
-            <span>&gt;</span>
-            <span className="text-slate-600 dark:text-slate-300">Candidate Database</span>
+      {/* Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Candidate Database"
+        subtitle="Searchable candidate profiles, talent pool tags, skills matrices, and stage history."
+        icon={Users}
+        badge={
+          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-50/90 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60">
+            {candidates.length} Profiles
+          </span>
+        }
+        actions={
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={exportCandidatesCSV}
+              className="flex items-center gap-1.5 font-semibold shadow-xs"
+            >
+              <Download className="h-3.5 w-3.5" />
+              <span>Export CSV</span>
+            </Button>
+
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-sm shadow-blue-500/20 hover:bg-blue-700 transition-colors cursor-pointer"
+            >
+              <Plus className="h-4 w-4" />
+              <span>+ Add Candidate</span>
+            </button>
           </div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
-            <span>Candidate Database</span>
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
-              {candidates.length} Profiles
-            </span>
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Searchable candidate profiles, talent pool tags, skills matrices, and stage history.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={exportCandidatesCSV}
-            className="flex items-center gap-1.5"
-          >
-            <Download className="h-3.5 w-3.5" />
-            <span>Export CSV</span>
-          </Button>
-
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm shadow-blue-500/20 hover:bg-blue-700 transition-colors cursor-pointer"
-          >
-            <Plus className="h-4 w-4" />
-            <span>+ Add Candidate</span>
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Tabs Row */}
       <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto scrollbar-thin">

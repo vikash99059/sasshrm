@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { attendanceService } from '../../services/attendanceService';
 import { ShiftSchedule } from '../../types';
 import { Card, CardHeader, CardTitle, Button, Badge } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 import { Clock, Plus, Sparkles } from 'lucide-react';
 
 export const ShiftSchedulePage: React.FC = () => {
@@ -17,20 +18,17 @@ export const ShiftSchedulePage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-dark-border">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Shift Management & Work Schedules
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Define organizational shift timings, grace periods, and break allowances.
-          </p>
-        </div>
-
-        <Button size="sm" leftIcon={<Plus className="h-4 w-4" />}>
-          Create New Shift
-        </Button>
-      </div>
+      <PageHeaderCard
+        title="Shift Management & Work Schedules"
+        subtitle="Define organizational shift timings, grace periods, and break allowances."
+        icon={Clock}
+        badge={<Badge variant="primary">{shifts.length} Active Schedules</Badge>}
+        actions={
+          <Button size="sm" leftIcon={<Plus className="h-4 w-4" />} className="font-bold shadow-xs">
+            Create New Shift
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {shifts.map((shift) => (

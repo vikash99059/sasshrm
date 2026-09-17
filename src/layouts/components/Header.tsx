@@ -50,24 +50,13 @@ export const Header: React.FC = () => {
 
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
   const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
-  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState({ code: 'en', name: 'English', flag: '🇺🇸' });
 
   const roleDropdownRef = useRef<HTMLDivElement>(null);
   const orgDropdownRef = useRef<HTMLDivElement>(null);
-  const langDropdownRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   const unreadNotificationsCount = 3; // matching reference badge
-
-  const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-    { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
-  ];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -76,9 +65,6 @@ export const Header: React.FC = () => {
       }
       if (orgDropdownRef.current && !orgDropdownRef.current.contains(event.target as Node)) {
         setOrgDropdownOpen(false);
-      }
-      if (langDropdownRef.current && !langDropdownRef.current.contains(event.target as Node)) {
-        setLangDropdownOpen(false);
       }
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setUserMenuOpen(false);
@@ -238,40 +224,7 @@ export const Header: React.FC = () => {
           </div>
         )}
 
-        {/* Language Selector */}
-        <div className="relative hidden sm:block" ref={langDropdownRef}>
-          <button
-            onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-slate-50/80 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors dark:border-slate-800 dark:bg-dark-card dark:text-slate-300 dark:hover:bg-slate-800"
-          >
-            <span className="text-sm">{currentLang.flag}</span>
-            <span className="text-xs font-medium">{currentLang.name}</span>
-            <ChevronDown className="h-3 w-3 text-slate-400" />
-          </button>
 
-          {langDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-40 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl animate-toast-slide dark:border-dark-border dark:bg-dark-card z-50">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => {
-                    setCurrentLang(lang);
-                    setLangDropdownOpen(false);
-                  }}
-                  className={cn(
-                    'w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-left text-xs transition-colors',
-                    currentLang.code === lang.code
-                      ? 'bg-blue-50 text-blue-900 font-semibold dark:bg-blue-950/50 dark:text-blue-300'
-                      : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/60'
-                  )}
-                >
-                  <span>{lang.flag}</span>
-                  <span>{lang.name}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
 
         {/* Dark / Light Mode Toggle */}
         <button

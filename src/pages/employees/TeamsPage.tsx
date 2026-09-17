@@ -14,6 +14,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Modal, Input, Select, Button, Badge } from '../../components/ui';
+import { PageHeaderCard } from '../../components/common/PageHeaderCard';
 
 interface TeamData {
   id: string;
@@ -143,27 +144,19 @@ export const TeamsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-slate-800">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Teams & Pods
-            </h1>
-            <Badge variant="primary">{initialTeams.length} Active Teams</Badge>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Cross-functional squads, reporting pods, sprint OKRs, and team lead delegations.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Button size="sm" onClick={() => setIsAddTeamOpen(true)}>
+      {/* Page Header with Cloudy Wave Design */}
+      <PageHeaderCard
+        title="Teams & Pods"
+        subtitle="Cross-functional squads, reporting pods, sprint OKRs, and team lead delegations."
+        icon={Users}
+        badge={<Badge variant="primary">{initialTeams.length} Active Teams</Badge>}
+        actions={
+          <Button size="sm" onClick={() => setIsAddTeamOpen(true)} className="font-bold shadow-xs">
             <Plus className="h-4 w-4 mr-1.5" />
             Create New Team
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Filters Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
