@@ -9,14 +9,18 @@ import {
   TrendingUp,
   Award,
   Calendar,
-  ChevronDown,
-  Check,
-  X,
-  Target,
   Sparkles,
   Plus,
   ArrowRight,
-  Filter,
+  Receipt,
+  Flame,
+  Cake,
+  Check,
+  X,
+  ShieldCheck,
+  AlertCircle,
+  Briefcase,
+  ChevronRight
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -24,271 +28,675 @@ import {
   Area,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip
 } from 'recharts';
-import { Modal, Input, Select, Button, Badge } from '../../../components/ui';
 import { DashboardHeroBanner } from '../../../components/common/DashboardHeroBanner';
+import { Button, Badge, Modal } from '../../../components/ui';
+import { managerService } from '../../../services/managerService';
 
 export const ManagerDashboardView: React.FC = () => {
   const navigate = useNavigate();
 
-  const [dateRange, setDateRange] = useState('This Week (May 20 - May 26)');
-  const [dateDropdownOpen, setDateDropdownOpen] = useState(false);
-  const [isAssignGoalOpen, setIsAssignGoalOpen] = useState(false);
+  // Dynamic service data
+  const teamMembers = managerService.getTeamMembers();
+  const [leaves, setLeaves] = useState(managerService.getTeamLeaves());
+  const [regs, setRegs] = useState(managerService.getRegularizationRequests());
+  const [ots, setOts] = useState(managerService.getTeamOvertime());
+  const [expenses, setExpenses] = useState(managerService.getTeamExpenses());
+  const tasks = managerService.getTeamTasks();
+  const goals = managerService.getTeamGoals();
+  const requisitions = managerService.getManpowerRequests();
 
-  // Manager KPI Cards
-  const managerKpis = [
-    { title: 'My Team', value: '14', change: '+2 new', isPositive: true, subtext: 'Engineering Squad', icon: Users, iconBg: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400', stroke: '#3B82F6' },
-    { title: 'Present Today', value: '12', change: '86%', isPositive: true, subtext: '2 On Leave', icon: UserCheck, iconBg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400', stroke: '#10B981' },
-    { title: 'On Leave', value: '2', change: '-1 vs last week', isPositive: false, subtext: 'Sophia & James', icon: CalendarMinus, iconBg: 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400', stroke: '#F43F5E' },
-    { title: 'Leave Approvals', value: '3', change: 'Action Required', isNeutral: true, subtext: 'Pending Review', icon: Clock, iconBg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400', stroke: '#F59E0B' },
-    { title: 'Pending Timesheets', value: '4', change: '4 to verify', isNeutral: true, subtext: 'Due Friday', icon: CheckCircle2, iconBg: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400', stroke: '#8B5CF6' },
-    { title: 'Team Performance', value: '92%', change: '+4% vs Q1', isPositive: true, subtext: 'Sprint on track', icon: TrendingUp, iconBg: 'bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400', stroke: '#06B6D4' },
+  // Quick modals
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isKudosModalOpen, setIsKudosModalOpen] = useState(false);
+
+  // Quick Task Form
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskAssignee, setTaskAssignee] = useState(teamMembers[0]?.id || '');
+  const [taskPriority, setTaskPriority] = useState<'High' | 'Medium' | 'Low'>('High');
+  const [taskDueDate, setTaskDueDate] = useState('');
+
+  // Quick Kudos Form
+  const [kudosEmployee, setKudosEmployee] = useState(teamMembers[0]?.id || '');
+  const [kudosBadge, setKudosBadge] = useState('Sprint MVP 🏆');
+  const [kudosText, setKudosText] = useState('');
+
+  // Calculations
+  const presentCount = teamMembers.filter((m) => m.todayStatus === 'Present').length;
+  const onLeaveCount = teamMembers.filter((m) => m.todayStatus === 'On-Leave').length;
+  const lateCount = teamMembers.filter((m) => m.todayStatus === 'Late').length;
+  const pendingLeaves = leaves.filter((l) => l.status === 'Pending');
+  const pendingRegs = regs.filter((r) => r.status === 'Pending');
+  const pendingOts = ots.filter((o) => o.status === 'Pending');
+  const pendingExpenses = expenses.filter((e) => e.status === 'Pending');
+  const totalPendingApprovals =
+    pendingLeaves.length + pendingRegs.length + pendingOts.length + pendingExpenses.length;
+
+  const attendanceChartData = [
+    { day: 'Mon', present: 5, late: 1, leave: 0 },
+    { day: 'Tue', present: 6, late: 0, leave: 0 },
+    { day: 'Wed', present: 4, late: 1, leave: 1 },
+    { day: 'Thu', present: 5, late: 0, leave: 1 },
+    { day: 'Fri', present: 5, late: 1, leave: 0 },
   ];
 
-  // Team Attendance Data
-  const teamAttendanceData = [
-    { day: 'Mon', present: 13, remote: 8, leave: 1 },
-    { day: 'Tue', present: 14, remote: 7, leave: 0 },
-    { day: 'Wed', present: 12, remote: 9, leave: 2 },
-    { day: 'Thu', present: 13, remote: 8, leave: 1 },
-    { day: 'Fri', present: 12, remote: 10, leave: 2 },
+  const upcomingBirthdays = [
+    { name: 'Sophia Davis', date: 'Sep 22', role: 'Lead Architect', avatar: teamMembers[0]?.avatar },
+    { name: 'Liam Vance', date: 'Oct 04', role: 'Full Stack Engineer', avatar: teamMembers[1]?.avatar }
   ];
 
-  // Team Goals Progress
-  const teamGoals = [
-    { title: 'Migrate Core API to Microservices', assignee: 'Alex Rivera', progress: 85, dueDate: 'May 30', status: 'On Track', color: 'from-blue-500 to-indigo-600' },
-    { title: 'Optimize Database Query Indexes', assignee: 'Liam Vance', progress: 65, dueDate: 'Jun 05', status: 'In Progress', color: 'from-purple-500 to-violet-600' },
-    { title: 'Security Pen Testing Fixes', assignee: 'Sophia Davis', progress: 95, dueDate: 'May 24', status: 'Almost Done', color: 'from-emerald-400 to-teal-500' },
-    { title: 'Implement Realtime WebSockets', assignee: 'David Anderson', progress: 40, dueDate: 'Jun 15', status: 'In Progress', color: 'from-amber-400 to-orange-500' },
+  const upcomingHolidays = [
+    { title: 'Gandhi Jayanti', date: 'Oct 02, 2026', type: 'Public Holiday' },
+    { title: 'Dussehra / Vijayadashami', date: 'Oct 20, 2026', type: 'Festival Holiday' }
   ];
-
-  // Direct Reports (Team Members)
-  const [teamMembers] = useState([
-    { id: 'TM-1', name: 'Sophia Davis', designation: 'Senior Backend Engineer', status: 'Online', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80', hoursThisWeek: '38.5 hrs' },
-    { id: 'TM-2', name: 'Liam Vance', designation: 'Fullstack Developer', status: 'In Meeting', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80', hoursThisWeek: '40.0 hrs' },
-    { id: 'TM-3', name: 'Alex Rivera', designation: 'DevOps Architect', status: 'Online', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80', hoursThisWeek: '37.0 hrs' },
-    { id: 'TM-4', name: 'James Miller', designation: 'Frontend Specialist', status: 'On Leave', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80', hoursThisWeek: '0 hrs' },
-    { id: 'TM-5', name: 'Emily Clark', designation: 'QA Automation Engineer', status: 'Online', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80', hoursThisWeek: '39.0 hrs' },
-  ]);
-
-  // Pending Leave Requests for Manager's Team
-  const [leaveRequests, setLeaveRequests] = useState([
-    { id: 'LR-1', name: 'Sophia Davis', type: 'Annual Leave', dates: 'May 28 - May 30 (3 days)', reason: 'Family vacation' },
-    { id: 'LR-2', name: 'Alex Rivera', type: 'Sick Leave', dates: 'May 23 (1 day)', reason: 'Doctor appointment' },
-    { id: 'LR-3', name: 'Liam Vance', type: 'Casual Leave', dates: 'Jun 02 (1 day)', reason: 'Personal work' },
-  ]);
 
   const handleApproveLeave = (id: string) => {
-    setLeaveRequests(leaveRequests.filter(r => r.id !== id));
-    alert('Leave request approved for team member!');
+    managerService.approveLeaveRequest(id);
+    setLeaves(managerService.getTeamLeaves());
   };
 
   const handleRejectLeave = (id: string) => {
-    setLeaveRequests(leaveRequests.filter(r => r.id !== id));
-    alert('Leave request rejected.');
+    managerService.rejectLeaveRequest(id);
+    setLeaves(managerService.getTeamLeaves());
+  };
+
+  const handleCreateQuickTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    const emp = teamMembers.find((m) => m.id === taskAssignee);
+    if (!emp || !taskTitle) return;
+
+    managerService.createTeamTask({
+      title: taskTitle,
+      description: 'Delegated directly from Manager Dashboard quick action.',
+      assigneeId: emp.id,
+      assigneeName: emp.name,
+      assigneeAvatar: emp.avatar,
+      priority: taskPriority,
+      status: 'To-Do',
+      dueDate: taskDueDate || '2026-09-30',
+      progress: 0
+    });
+
+    setIsTaskModalOpen(false);
+    setTaskTitle('');
+    navigate('/manager/tasks');
+  };
+
+  const handleCreateQuickKudos = (e: React.FormEvent) => {
+    e.preventDefault();
+    const emp = teamMembers.find((m) => m.id === kudosEmployee);
+    if (!emp || !kudosText) return;
+
+    managerService.addSpotRecognition({
+      employeeId: emp.id,
+      employeeName: emp.name,
+      employeeAvatar: emp.avatar,
+      badgeTitle: kudosBadge,
+      category: 'Leadership',
+      points: 300,
+      citation: kudosText,
+      awardedDate: 'Today'
+    });
+
+    setIsKudosModalOpen(false);
+    setKudosText('');
+    navigate('/manager/performance');
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* TOP HERO BANNER + WORK TIMER WITH COMPACT QUICK ACTIONS */}
+    <div className="space-y-6 animate-fade-in pb-8">
+      {/* Top Hero Banner */}
       <DashboardHeroBanner
+        customGreeting="Welcome back, Engineering Manager"
         actions={
-          <>
-            <button
-              onClick={() => setIsAssignGoalOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-xs font-bold text-white px-3 py-1.5 shadow-sm shadow-blue-500/20 transition-all cursor-pointer whitespace-nowrap"
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-white/10 text-white border-white/20 hover:bg-white/20 text-xs"
+              onClick={() => setIsKudosModalOpen(true)}
             >
-              <Plus className="h-3.5 w-3.5" />
-              <span>Assign Goal</span>
-            </button>
-            <button
-              onClick={() => navigate('/attendance')}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white/85 dark:bg-slate-800/85 backdrop-blur-md px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700/60 shadow-2xs hover:shadow-xs active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+              <Sparkles className="h-3.5 w-3.5 mr-1.5 text-amber-300" />
+              Give Kudos
+            </Button>
+            <Button
+              size="sm"
+              className="bg-white text-emerald-900 hover:bg-emerald-50 text-xs font-semibold shadow"
+              onClick={() => setIsTaskModalOpen(true)}
             >
-              <Clock className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span>Team Timesheets</span>
-            </button>
-          </>
+              <Plus className="h-3.5 w-3.5 mr-1.5" />
+              Delegate Task
+            </Button>
+          </div>
         }
       />
 
-      {/* 6 MANAGER KPI CARDS */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
-        {managerKpis.map((kpi, idx) => {
-          const Icon = kpi.icon;
-          return (
-            <div
-              key={idx}
-              className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <div className={`flex h-8 w-8 items-center justify-center rounded-xl ${kpi.iconBg}`}>
-                  <Icon className="h-4 w-4" />
-                </div>
-                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">
-                  {kpi.title}
-                </span>
-              </div>
-              <div className="flex items-baseline justify-between mt-1">
-                <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{kpi.value}</span>
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${kpi.isPositive ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' :
-                  kpi.isNeutral ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400' :
-                    'bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400'
-                  }`}>
-                  {kpi.change}
-                </span>
-              </div>
-              <p className="text-[10px] text-slate-400 mt-1">{kpi.subtext}</p>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* CHARTS ROW: TEAM ATTENDANCE & TEAM GOALS */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Team Attendance Chart */}
-        <div className="lg:col-span-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Team Attendance & Working Modes</h2>
-              <p className="text-[11px] text-slate-400 mt-0.5">Direct reports daily attendance (Mon - Fri)</p>
-            </div>
-            <div className="flex items-center gap-3 text-[11px] font-medium text-slate-500">
-              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-blue-500" />Office</span>
-              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-indigo-500" />Remote</span>
-              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-rose-500" />Leave</span>
-            </div>
+      {/* 6 High Impact KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div
+          onClick={() => navigate('/manager/team')}
+          className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition cursor-pointer"
+        >
+          <div className="flex items-center justify-between text-xs font-semibold text-gray-500 mb-2">
+            <span>Team Strength</span>
+            <Users className="h-4 w-4 text-blue-500" />
           </div>
-
-          <div className="h-60 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={teamAttendanceData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.6} />
-                <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} domain={[0, 15]} />
-                <Tooltip contentStyle={{ backgroundColor: '#0F172A', borderRadius: '10px', color: '#fff', fontSize: '11px', border: 'none' }} />
-                <Bar dataKey="present" fill="#3B82F6" radius={[4, 4, 0, 0]} barSize={18} name="In Office" />
-                <Bar dataKey="remote" fill="#6366F1" radius={[4, 4, 0, 0]} barSize={18} name="Remote" />
-                <Bar dataKey="leave" fill="#F43F5E" radius={[4, 4, 0, 0]} barSize={18} name="On Leave" />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="text-2xl font-bold text-gray-900 dark:text-white">
+            {teamMembers.length}
           </div>
+          <p className="text-[11px] text-emerald-600 font-medium mt-1">100% Allocated</p>
         </div>
 
-        {/* Team Goals Progress Card */}
-        <div className="lg:col-span-5 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white">Active Team Sprint OKRs</h2>
-            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full dark:bg-blue-950/40 dark:text-blue-300">Q2 Objectives</span>
+        <div
+          onClick={() => navigate('/manager/attendance')}
+          className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition cursor-pointer"
+        >
+          <div className="flex items-center justify-between text-xs font-semibold text-gray-500 mb-2">
+            <span>Present Today</span>
+            <UserCheck className="h-4 w-4 text-emerald-500" />
           </div>
+          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+            {presentCount}
+          </div>
+          <p className="text-[11px] text-gray-400 mt-1">In Office / Active</p>
+        </div>
 
-          <div className="space-y-3.5 my-auto">
-            {teamGoals.map((g, idx) => (
-              <div key={idx} className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[200px]">{g.title}</span>
-                  <span className="font-bold text-slate-900 dark:text-white tabular-nums">{g.progress}%</span>
-                </div>
-                <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                  <div className={`h-full rounded-full bg-gradient-to-r ${g.color}`} style={{ width: `${g.progress}%` }} />
-                </div>
-                <div className="flex items-center justify-between text-[10px] text-slate-400">
-                  <span>Assignee: {g.assignee}</span>
-                  <span>Due {g.dueDate}</span>
-                </div>
-              </div>
-            ))}
+        <div
+          onClick={() => navigate('/manager/attendance')}
+          className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition cursor-pointer"
+        >
+          <div className="flex items-center justify-between text-xs font-semibold text-gray-500 mb-2">
+            <span>Late Arrivals</span>
+            <Clock className="h-4 w-4 text-amber-500" />
           </div>
+          <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+            {lateCount}
+          </div>
+          <p className="text-[11px] text-amber-600 mt-1">Check-in past 09:30</p>
+        </div>
+
+        <div
+          onClick={() => navigate('/manager/leave')}
+          className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition cursor-pointer"
+        >
+          <div className="flex items-center justify-between text-xs font-semibold text-gray-500 mb-2">
+            <span>On Leave Today</span>
+            <CalendarMinus className="h-4 w-4 text-rose-500" />
+          </div>
+          <div className="text-2xl font-bold text-rose-600 dark:text-rose-400">
+            {onLeaveCount}
+          </div>
+          <p className="text-[11px] text-gray-400 mt-1">Scheduled PTO</p>
+        </div>
+
+        <div
+          onClick={() => navigate('/manager/approvals')}
+          className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-amber-300 dark:border-amber-800/60 shadow-sm hover:shadow-md transition cursor-pointer bg-gradient-to-br from-white to-amber-50/40 dark:from-gray-800 dark:to-amber-950/20"
+        >
+          <div className="flex items-center justify-between text-xs font-semibold text-amber-700 dark:text-amber-400 mb-2">
+            <span>Pending Approvals</span>
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+          </div>
+          <div className="text-2xl font-bold text-amber-600">
+            {totalPendingApprovals}
+          </div>
+          <p className="text-[11px] text-amber-700 font-semibold mt-1">Action Required</p>
+        </div>
+
+        <div
+          onClick={() => navigate('/manager/tasks')}
+          className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition cursor-pointer"
+        >
+          <div className="flex items-center justify-between text-xs font-semibold text-gray-500 mb-2">
+            <span>Sprint Velocity</span>
+            <TrendingUp className="h-4 w-4 text-purple-500" />
+          </div>
+          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+            92%
+          </div>
+          <p className="text-[11px] text-purple-600 mt-1">Tasks on schedule</p>
         </div>
       </div>
 
-      {/* TEAM MEMBERS & APPROVAL PANELS */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Direct Team Members List */}
-        <div className="lg:col-span-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold text-slate-900 dark:text-white">My Direct Reports (Engineering Squad)</h3>
-            <button onClick={() => navigate('/employees')} className="text-[10px] font-bold text-blue-600 hover:text-blue-700">View All 14 ↗</button>
-          </div>
+      {/* Main 2-Column Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left 2 Cols: Live Team Roster + Attendance Area Chart */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Real-time Team Status Roster */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-gray-900 dark:text-white text-base">
+                  Live Direct Reports Roster
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Today's presence, check-in timestamps, and active projects
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs"
+                onClick={() => navigate('/manager/team')}
+              >
+                View 360 Team <ArrowRight className="h-3.5 w-3.5 ml-1" />
+              </Button>
+            </div>
 
-          <div className="divide-y divide-slate-100 dark:divide-slate-800">
-            {teamMembers.map((tm) => (
-              <div key={tm.id} className="py-2.5 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-3">
-                  <img src={tm.avatar} alt={tm.name} className="h-8 w-8 rounded-full object-cover ring-1 ring-slate-200" />
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-white text-xs">{tm.name}</p>
-                    <p className="text-[10px] text-slate-400">{tm.designation}</p>
+            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+              {teamMembers.map((member) => (
+                <div
+                  key={member.id}
+                  className="p-4 flex items-center justify-between hover:bg-gray-50/50 dark:hover:bg-gray-700/20 transition-colors"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className="relative">
+                      <img
+                        src={member.avatar}
+                        alt={member.name}
+                        className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-700"
+                      />
+                      <span
+                        className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-gray-800 ${
+                          member.todayStatus === 'Present'
+                            ? 'bg-emerald-500'
+                            : member.todayStatus === 'Late'
+                            ? 'bg-amber-500'
+                            : 'bg-rose-500'
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-bold text-gray-900 dark:text-white text-sm">
+                          {member.name}
+                        </h4>
+                        <span className="text-xs text-gray-400">•</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {member.designation}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Project: <strong className="text-gray-700 dark:text-gray-300">{member.project}</strong>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 text-right">
+                    <div>
+                      <span className="text-xs text-gray-400 block">Check-In</span>
+                      <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
+                        {member.checkInTime}
+                      </span>
+                    </div>
+                    <Badge
+                      variant={
+                        member.todayStatus === 'Present'
+                          ? 'success'
+                          : member.todayStatus === 'Late'
+                          ? 'warning'
+                          : 'danger'
+                      }
+                      size="sm"
+                    >
+                      {member.todayStatus}
+                    </Badge>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${tm.status === 'Online' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300' :
-                    tm.status === 'On Leave' ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-300' :
-                      'bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300'
-                    }`}>
-                    {tm.status}
-                  </span>
-                  <span className="text-[11px] font-semibold text-slate-500 tabular-nums hidden sm:inline">{tm.hoursThisWeek}</span>
-                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Attendance Trend Chart */}
+          <div className="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-bold text-gray-900 dark:text-white text-base">
+                  Weekly Attendance & Punctuality Trend
+                </h3>
+                <p className="text-xs text-gray-500">
+                  Daily headcount breakdown (Present vs Late vs On-Leave)
+                </p>
               </div>
-            ))}
+              <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full">
+                Avg 94.6% Attendance
+              </span>
+            </div>
+
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={attendanceChartData}>
+                  <defs>
+                    <linearGradient id="presentColor" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0.0} />
+                    </linearGradient>
+                    <linearGradient id="lateColor" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="day" tickLine={false} />
+                  <YAxis tickLine={false} />
+                  <Tooltip />
+                  <Area
+                    type="monotone"
+                    dataKey="present"
+                    stroke="#10B981"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#presentColor)"
+                    name="Present On Time"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="late"
+                    stroke="#F59E0B"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#lateColor)"
+                    name="Late Arrivals"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
 
-        {/* Pending Team Leave Approvals */}
-        <div className="lg:col-span-5 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-dark-card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold text-slate-900 dark:text-white">Pending Team Leave Approvals</h3>
-            <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full dark:bg-amber-950/40 dark:text-amber-300">{leaveRequests.length} Pending</span>
+        {/* Right Col: Pending Approvals Queue + Birthdays & Holidays + Headcount */}
+        <div className="space-y-6">
+          {/* Quick Pending Approvals Widget */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-amber-50/40 dark:bg-amber-950/20">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-amber-600" />
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">
+                  Pending Authorizations ({totalPendingApprovals})
+                </h3>
+              </div>
+              <button
+                onClick={() => navigate('/manager/approvals')}
+                className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+              >
+                Approvals Hub
+              </button>
+            </div>
+
+            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+              {pendingLeaves.slice(0, 3).map((l) => (
+                <div key={l.id} className="p-3.5 space-y-2 text-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={l.employeeAvatar}
+                        alt={l.employeeName}
+                        className="w-7 h-7 rounded-full object-cover"
+                      />
+                      <span className="font-bold text-gray-900 dark:text-white">
+                        {l.employeeName}
+                      </span>
+                    </div>
+                    <Badge variant="info" size="sm">{l.leaveType}</Badge>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {l.startDate} ({l.days} days) • "{l.reason}"
+                  </p>
+                  <div className="flex justify-end gap-2 pt-1">
+                    <button
+                      onClick={() => handleRejectLeave(l.id)}
+                      className="px-2.5 py-1 text-red-600 font-semibold hover:bg-red-50 dark:hover:bg-red-950/30 rounded"
+                    >
+                      Reject
+                    </button>
+                    <button
+                      onClick={() => handleApproveLeave(l.id)}
+                      className="px-2.5 py-1 bg-emerald-600 text-white font-semibold rounded hover:bg-emerald-700"
+                    >
+                      Approve
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {pendingExpenses.slice(0, 2).map((exp) => (
+                <div key={exp.id} className="p-3.5 space-y-2 text-xs bg-emerald-50/20">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      {exp.employeeName}
+                    </span>
+                    <span className="font-bold text-emerald-600">${exp.amount.toFixed(2)}</span>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {exp.category}: {exp.description}
+                  </p>
+                  <div className="flex justify-end gap-2 pt-1">
+                    <button
+                      onClick={() => navigate('/manager/expenses')}
+                      className="px-2.5 py-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold rounded"
+                    >
+                      Review Claim
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {totalPendingApprovals === 0 && (
+                <div className="p-8 text-center text-xs text-gray-500">
+                  <CheckCircle2 className="h-6 w-6 text-emerald-500 mx-auto mb-1.5" />
+                  All requests processed!
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="space-y-3">
-            {leaveRequests.map((req) => (
-              <div key={req.id} className="p-3 rounded-xl bg-slate-50 border border-slate-100 dark:bg-slate-800/40 dark:border-slate-800">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-slate-900 dark:text-white">{req.name}</span>
-                  <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded dark:bg-blue-950/50 dark:text-blue-300">{req.type}</span>
-                </div>
-                <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1">{req.dates}</p>
-                <p className="text-[10px] text-slate-400 italic mt-0.5">"{req.reason}"</p>
-                <div className="mt-2.5 flex items-center justify-end gap-2">
-                  <button
-                    onClick={() => handleRejectLeave(req.id)}
-                    className="flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1 text-[10px] font-bold text-rose-600 hover:bg-rose-50 transition-colors"
-                  >
-                    <X className="h-3 w-3" />
-                    <span>Reject</span>
-                  </button>
-                  <button
-                    onClick={() => handleApproveLeave(req.id)}
-                    className="flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1 text-[10px] font-bold text-white hover:bg-blue-700 transition-colors shadow-xs"
-                  >
-                    <Check className="h-3 w-3" />
-                    <span>Approve</span>
-                  </button>
-                </div>
+          {/* Upcoming Birthdays & Public Holidays */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 space-y-4">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold text-purple-600 dark:text-purple-400 mb-2">
+                <Cake className="h-4 w-4" />
+                <span>Upcoming Team Birthdays</span>
               </div>
-            ))}
+              <div className="space-y-2">
+                {upcomingBirthdays.map((b, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-xs p-2 bg-purple-50/50 dark:bg-purple-950/20 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <img src={b.avatar} alt={b.name} className="w-6 h-6 rounded-full object-cover" />
+                      <span className="font-semibold text-gray-900 dark:text-white">{b.name}</span>
+                    </div>
+                    <span className="text-purple-600 dark:text-purple-400 font-bold">{b.date}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+              <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2">
+                <Calendar className="h-4 w-4" />
+                <span>Upcoming Holidays</span>
+              </div>
+              <div className="space-y-2">
+                {upcomingHolidays.map((h, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-xs p-2 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-lg">
+                    <span className="font-semibold text-gray-900 dark:text-white">{h.title}</span>
+                    <span className="text-emerald-700 dark:text-emerald-300 font-medium">{h.date}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Hiring / Requisitions Status */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-gray-900 dark:text-white">
+                <Briefcase className="h-4 w-4 text-emerald-600" />
+                <span>Hiring & Requisitions</span>
+              </div>
+              <button
+                onClick={() => navigate('/manager/hiring')}
+                className="text-xs text-emerald-600 hover:underline"
+              >
+                Manage
+              </button>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              {requisitions.map((req) => (
+                <div key={req.id} className="p-2.5 bg-gray-50 dark:bg-gray-700/40 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-gray-900 dark:text-white">{req.jobTitle}</span>
+                    <Badge variant={req.status === 'Approved' ? 'success' : 'neutral'} size="sm">
+                      {req.status}
+                    </Badge>
+                  </div>
+                  <p className="text-gray-500 mt-0.5">{req.count} open headcount • {req.urgency} Priority</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ASSIGN GOAL MODAL */}
-      <Modal isOpen={isAssignGoalOpen} onClose={() => setIsAssignGoalOpen(false)} title="Assign Team Goal" size="md">
-        <form onSubmit={(e) => { e.preventDefault(); alert('Goal assigned to team member!'); setIsAssignGoalOpen(false); }} className="space-y-4">
-          <Input label="Goal Title" placeholder="e.g. Implement End-to-End Tests" required />
-          <Select label="Assignee" options={teamMembers.map(t => ({ value: t.name, label: `${t.name} (${t.designation})` }))} />
-          <Input label="Target Due Date" type="date" required defaultValue="2024-06-15" />
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-            <Button type="button" variant="outline" onClick={() => setIsAssignGoalOpen(false)}>Cancel</Button>
-            <Button type="submit" variant="primary">Assign Goal</Button>
+      {/* Quick Delegate Task Modal */}
+      <Modal
+        isOpen={isTaskModalOpen}
+        onClose={() => setIsTaskModalOpen(false)}
+        title="Delegate Sprint Task"
+      >
+        <form onSubmit={handleCreateQuickTask} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Select Assignee
+            </label>
+            <select
+              value={taskAssignee}
+              onChange={(e) => setTaskAssignee(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+              {teamMembers.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name} ({m.designation})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Task Title
+            </label>
+            <input
+              type="text"
+              required
+              value={taskTitle}
+              onChange={(e) => setTaskTitle(e.target.value)}
+              placeholder="e.g. Implement Webhook Retries for Payments"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Priority
+              </label>
+              <select
+                value={taskPriority}
+                onChange={(e) => setTaskPriority(e.target.value as 'High' | 'Medium' | 'Low')}
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="High">High Priority 🔥</option>
+                <option value="Medium">Medium Priority</option>
+                <option value="Low">Low Priority</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Due Date
+              </label>
+              <input
+                type="date"
+                value={taskDueDate}
+                onChange={(e) => setTaskDueDate(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <Button variant="outline" type="button" onClick={() => setIsTaskModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit">
+              Assign Task
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Quick Kudos Modal */}
+      <Modal
+        isOpen={isKudosModalOpen}
+        onClose={() => setIsKudosModalOpen(false)}
+        title="Award Spot Kudos to Direct Report"
+      >
+        <form onSubmit={handleCreateQuickKudos} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Select Team Member
+            </label>
+            <select
+              value={kudosEmployee}
+              onChange={(e) => setKudosEmployee(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+              {teamMembers.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name} ({m.designation})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Kudos Badge
+            </label>
+            <input
+              type="text"
+              required
+              value={kudosBadge}
+              onChange={(e) => setKudosBadge(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Appreciation Message
+            </label>
+            <textarea
+              rows={3}
+              required
+              value={kudosText}
+              onChange={(e) => setKudosText(e.target.value)}
+              placeholder="Why are they being celebrated today?"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <Button variant="outline" type="button" onClick={() => setIsKudosModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit">
+              Send Kudos
+            </Button>
           </div>
         </form>
       </Modal>
