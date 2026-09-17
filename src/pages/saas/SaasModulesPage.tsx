@@ -63,6 +63,8 @@ export const SaasModulesPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<'order' | 'price_asc' | 'price_desc' | 'features'>('order');
   const [selectedModule, setSelectedModule] = useState<CorporateModule | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [submoduleDrawerModule, setSubmoduleDrawerModule] = useState<CorporateModule | null>(null);
+  const [drawerSearchQuery, setDrawerSearchQuery] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -445,8 +447,40 @@ export const SaasModulesPage: React.FC = () => {
     const updatedSubs = await saasService.getModularSubscriptions();
     const updatedOrgs = await saasService.getOrganizations();
     setSubscriptions(updatedSubs);
-    setOrganizations(updatedOrgs);
     showToast(`Cleared all pillars for ${selectedOrg.name}.`);
+  };
+
+  // Preset Bundles application handler
+  const handleApplyPresetBundle = async (presetModuleIds: CorporateModuleId[], presetName: string) => {
+    if (!selectedOrg) return;
+
+    let fee = 0;
+    presetModuleIds.forEach((id) => {
+      const m = modules.find((mod) => mod.id === id);
+      if (m) fee += m.basePriceMonthly;
+    });
+    if (presetModuleIds.length === 17) fee = 3699;
+
+    const updatedConfig: ModularSubscriptionConfig = {
+      organizationId: selectedOrg.id,
+      organizationName: selectedOrg.name,
+      planTier: presetModuleIds.length === 17 ? 'Enterprise Suite' : 'Business Pro',
+      bundleName: presetName,
+      subscribedModuleIds: presetModuleIds,
+      monthlyBaseFee: fee,
+      monthlyTotalFee: fee,
+      seatQuotas: currentOrgSub?.seatQuotas || selectedOrg.maxEmployees || 100,
+      billingCycle: currentOrgSub?.billingCycle || 'Monthly',
+      status: currentOrgSub?.status || 'Active',
+      lastUpdated: new Date().toISOString().split('T')[0],
+    };
+
+    await saasService.saveModularSubscription(updatedConfig);
+    const updatedSubs = await saasService.getModularSubscriptions();
+    const updatedOrgs = await saasService.getOrganizations();
+    setSubscriptions(updatedSubs);
+    setOrganizations(updatedOrgs);
+    showToast(`Applied preset "${presetName}" to ${selectedOrg.name}!`);
   };
 
   const PILLARS_FILTER_TABS: { key: string; label: string; count: number; assignedCount: number }[] = [
@@ -932,73 +966,32 @@ export const SaasModulesPage: React.FC = () => {
                               {mod.description}
                             </p>
 
-                            {/* Submodules & Feature Toggles directly inside Card */}
-                            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-2">
-                              <div className="flex items-center justify-between border-b pb-1.5 border-slate-200/70 dark:border-slate-800">
-                                <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px] uppercase tracking-wider">
-                                  Submodules ({(mod.subModules || []).length || mod.subFeaturesCount})
-                                </span>
-                                {selectedOrg && (
-                                  <div className="flex items-center gap-1.5 text-[10px]">
-                                    <button
-                                      type="button"
-                                      onClick={() => handleEnableAllSubModules(mod)}
-                                      className="text-emerald-600 hover:underline font-bold"
-                                    >
-                                      Enable All
-                                    </button>
-                                    <span className="text-slate-300">|</span>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleDisableAllSubModules(mod)}
-                                      className="text-rose-600 hover:underline font-bold"
-                                    >
-                                      Disable All
-                                    </button>
-                                  </div>
-                                )}
+                            {/* Submodules Summary & Fast Config Action Pill */}
+                            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <SlidersHorizontal className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                                <div className="truncate">
+                                  <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 block truncate">
+                                    {(mod.subModules || []).length || mod.subFeaturesCount} Submodules
+                                  </span>
+                                  {selectedOrg && (
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block truncate">
+                                      {(mod.subModules || []).filter((s) => !isSubModuleDisabled(mod.id, s)).length} Active for tenant
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-
-                              {/* Submodule Items List with Toggle Switches */}
-                              <div className="space-y-1 max-h-[180px] overflow-y-auto pr-1 scrollbar-thin">
-                                {(mod.subModules || mod.featureGroups.flatMap((g) => g.items)).map((subName, sIdx) => {
-                                  const disabled = isSubModuleDisabled(mod.id, subName);
-
-                                  return (
-                                    <div
-                                      key={sIdx}
-                                      className={`flex items-center justify-between text-xs py-1 px-2 rounded-lg transition-colors ${disabled
-                                        ? 'bg-rose-50/60 dark:bg-rose-950/20 text-slate-400 dark:text-slate-500'
-                                        : 'bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-800'
-                                        }`}
-                                    >
-                                      <div className="flex items-center gap-1.5 min-w-0 pr-2">
-                                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${disabled ? 'bg-rose-400' : 'bg-emerald-500'}`} />
-                                        <span className={`text-[11px] font-medium truncate ${disabled ? 'line-through text-slate-400' : ''}`}>
-                                          {subName}
-                                        </span>
-                                      </div>
-
-                                      {selectedOrg ? (
-                                        <button
-                                          type="button"
-                                          onClick={() => handleToggleSubModule(mod.id, subName)}
-                                          className={`px-2 py-0.5 rounded text-[10px] font-bold shrink-0 transition ${disabled
-                                            ? 'bg-slate-200 hover:bg-emerald-100 text-slate-600 hover:text-emerald-700 dark:bg-slate-700 dark:text-slate-300'
-                                            : 'bg-emerald-100 hover:bg-rose-100 text-emerald-700 hover:text-rose-700 dark:bg-emerald-950/80 dark:text-emerald-300'
-                                            }`}
-                                        >
-                                          {disabled ? 'Disabled' : '✓ Active'}
-                                        </button>
-                                      ) : (
-                                        <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${disabled ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                                          {disabled ? 'Off' : 'On'}
-                                        </span>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSubmoduleDrawerModule(mod);
+                                  setDrawerSearchQuery('');
+                                }}
+                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-blue-50 hover:bg-blue-100 text-blue-600 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/50 transition flex items-center gap-1 shrink-0"
+                              >
+                                <Sliders className="w-3 h-3" />
+                                <span>Config</span>
+                              </button>
                             </div>
                           </div>
 
@@ -1140,7 +1133,7 @@ export const SaasModulesPage: React.FC = () => {
                   {/* Monthly Total Pill */}
                   <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-200/70 dark:border-slate-700">
                     <span className="text-[10px] uppercase font-bold text-slate-400 whitespace-nowrap">
-                      Total:
+                      Total MRR:
                     </span>
                     <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
                       {formatCurrency(currentOrgSub?.monthlyTotalFee || selectedOrg.monthlyFee || 0)}
@@ -1340,73 +1333,32 @@ export const SaasModulesPage: React.FC = () => {
                               {mod.description}
                             </p>
 
-                            {/* Submodules & Feature Toggles directly inside Card */}
-                            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-2">
-                              <div className="flex items-center justify-between border-b pb-1.5 border-slate-200/70 dark:border-slate-800">
-                                <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px] uppercase tracking-wider">
-                                  Submodules ({(mod.subModules || []).length || mod.subFeaturesCount})
-                                </span>
-                                {selectedOrg && (
-                                  <div className="flex items-center gap-1.5 text-[10px]">
-                                    <button
-                                      type="button"
-                                      onClick={() => handleEnableAllSubModules(mod)}
-                                      className="text-emerald-600 hover:underline font-bold"
-                                    >
-                                      Enable All
-                                    </button>
-                                    <span className="text-slate-300">|</span>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleDisableAllSubModules(mod)}
-                                      className="text-rose-600 hover:underline font-bold"
-                                    >
-                                      Disable All
-                                    </button>
-                                  </div>
-                                )}
+                            {/* Submodules Summary & Fast Config Action Pill */}
+                            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <SlidersHorizontal className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                                <div className="truncate">
+                                  <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 block truncate">
+                                    {(mod.subModules || []).length || mod.subFeaturesCount} Submodules
+                                  </span>
+                                  {selectedOrg && (
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block truncate">
+                                      {(mod.subModules || []).filter((s) => !isSubModuleDisabled(mod.id, s)).length} Active for tenant
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-
-                              {/* Submodule Items List with Toggle Switches */}
-                              <div className="space-y-1 max-h-[180px] overflow-y-auto pr-1 scrollbar-thin">
-                                {(mod.subModules || mod.featureGroups.flatMap((g) => g.items)).map((subName, sIdx) => {
-                                  const disabled = isSubModuleDisabled(mod.id, subName);
-
-                                  return (
-                                    <div
-                                      key={sIdx}
-                                      className={`flex items-center justify-between text-xs py-1 px-2 rounded-lg transition-colors ${disabled
-                                          ? 'bg-rose-50/60 dark:bg-rose-950/20 text-slate-400 dark:text-slate-500'
-                                          : 'bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-800'
-                                        }`}
-                                    >
-                                      <div className="flex items-center gap-1.5 min-w-0 pr-2">
-                                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${disabled ? 'bg-rose-400' : 'bg-emerald-500'}`} />
-                                        <span className={`text-[11px] font-medium truncate ${disabled ? 'line-through text-slate-400' : ''}`}>
-                                          {subName}
-                                        </span>
-                                      </div>
-
-                                      {selectedOrg ? (
-                                        <button
-                                          type="button"
-                                          onClick={() => handleToggleSubModule(mod.id, subName)}
-                                          className={`px-2 py-0.5 rounded text-[10px] font-bold shrink-0 transition ${disabled
-                                              ? 'bg-slate-200 hover:bg-emerald-100 text-slate-600 hover:text-emerald-700 dark:bg-slate-700 dark:text-slate-300'
-                                              : 'bg-emerald-100 hover:bg-rose-100 text-emerald-700 hover:text-rose-700 dark:bg-emerald-950/80 dark:text-emerald-300'
-                                            }`}
-                                        >
-                                          {disabled ? 'Disabled' : '✓ Active'}
-                                        </button>
-                                      ) : (
-                                        <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${disabled ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                                          {disabled ? 'Off' : 'On'}
-                                        </span>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSubmoduleDrawerModule(mod);
+                                  setDrawerSearchQuery('');
+                                }}
+                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-blue-50 hover:bg-blue-100 text-blue-600 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/50 transition flex items-center gap-1 shrink-0"
+                              >
+                                <Sliders className="w-3 h-3" />
+                                <span>Config</span>
+                              </button>
                             </div>
                           </div>
 
@@ -1661,6 +1613,133 @@ export const SaasModulesPage: React.FC = () => {
                   Close
                 </Button>
               </div>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Submodule Fast Config Slide-Over Drawer / Modal */}
+      {submoduleDrawerModule && (
+        <Modal
+          isOpen={!!submoduleDrawerModule}
+          onClose={() => setSubmoduleDrawerModule(null)}
+          title={`⚙️ Submodule Control Panel: ${submoduleDrawerModule.name}`}
+          size="lg"
+        >
+          <div className="space-y-4 text-xs">
+            <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="primary" size="sm">{submoduleDrawerModule.pillar}</Badge>
+                  <span className="font-bold text-slate-900 dark:text-white text-sm">
+                    {submoduleDrawerModule.name}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                  Enable or disable granular submodules for tenant: <strong className="text-slate-800 dark:text-slate-200">{selectedOrg?.name || 'All Organizations'}</strong>
+                </p>
+              </div>
+
+              {selectedOrg && (
+                <div className="flex items-center gap-2 shrink-0">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleEnableAllSubModules(submoduleDrawerModule)}
+                    className="text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
+                  >
+                    Enable All Submodules
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleDisableAllSubModules(submoduleDrawerModule)}
+                    className="text-xs border-rose-300 text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                  >
+                    Disable All
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Fast Submodule Search inside Drawer */}
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                placeholder="Search submodules..."
+                value={drawerSearchQuery}
+                onChange={(e) => setDrawerSearchQuery(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Grid of Submodules with Smooth Toggle Controls */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[350px] overflow-y-auto pr-1 scrollbar-thin">
+              {(submoduleDrawerModule.subModules || submoduleDrawerModule.featureGroups.flatMap((g) => g.items))
+                .filter((sub) => sub.toLowerCase().includes(drawerSearchQuery.toLowerCase()))
+                .map((subName, i) => {
+                  const disabled = isSubModuleDisabled(submoduleDrawerModule.id, subName);
+
+                  return (
+                    <div
+                      key={i}
+                      className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-all ${disabled
+                        ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40'
+                        : 'bg-white dark:bg-dark-card border-slate-200/80 dark:border-dark-border shadow-xs'
+                        }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span
+                          className={`w-2.5 h-2.5 rounded-full shrink-0 ${disabled ? 'bg-rose-500 shadow-rose-500/50' : 'bg-emerald-500 shadow-emerald-500/50'
+                            }`}
+                        />
+                        <span
+                          className={`text-xs font-semibold truncate ${disabled ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-900 dark:text-white'
+                            }`}
+                        >
+                          {subName}
+                        </span>
+                      </div>
+
+                      {selectedOrg ? (
+                        <button
+                          type="button"
+                          onClick={() => handleToggleSubModule(submoduleDrawerModule.id, subName)}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${disabled
+                            ? 'bg-slate-200 hover:bg-emerald-100 text-slate-700 hover:text-emerald-800 dark:bg-slate-800 dark:text-slate-300'
+                            : 'bg-emerald-100 hover:bg-rose-100 text-emerald-800 hover:text-rose-800 dark:bg-emerald-950 dark:text-emerald-300'
+                            }`}
+                        >
+                          {disabled ? (
+                            <>
+                              <Plus className="w-3 h-3" />
+                              <span>Enable</span>
+                            </>
+                          ) : (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-600" />
+                              <span>Active</span>
+                            </>
+                          )}
+                        </button>
+                      ) : (
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded ${disabled ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'
+                            }`}
+                        >
+                          {disabled ? 'Off' : 'On'}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+
+            <div className="flex justify-end pt-3 border-t border-slate-200 dark:border-dark-border">
+              <Button variant="primary" size="sm" onClick={() => setSubmoduleDrawerModule(null)}>
+                Done
+              </Button>
             </div>
           </div>
         </Modal>
