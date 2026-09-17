@@ -337,6 +337,25 @@ function getRawNavigationForRole(role: UserRole, activeContext: 'organisation' |
           ]
         },
         {
+          sectionTitle: 'CRM & SALES',
+          items: [
+            { title: 'CRM Dashboard', href: '/crm', icon: Target },
+            { title: 'Leads & Opportunities', href: '/crm/leads', icon: Users },
+            { title: 'Customers Master', href: '/crm/customers', icon: Building2 },
+            { title: 'Quotations', href: '/sales/quotations', icon: FileText },
+            { title: 'Sales Pipeline', href: '/sales/pipeline', icon: BarChart3 },
+          ]
+        },
+        {
+          sectionTitle: 'FINANCE & ERP',
+          items: [
+            { title: 'Finance Dashboard', href: '/finance', icon: DollarSign },
+            { title: 'Billing & Invoices', href: '/billing/invoices', icon: Receipt },
+            { title: 'Costing & Budget', href: '/costing', icon: Compass },
+            { title: 'Procurement', href: '/procurement/vendors', icon: Package },
+          ]
+        },
+        {
           sectionTitle: 'REPORTS',
           items: [
             { title: 'Reports & Analytics', href: '/reports', icon: BarChart3, moduleId: 'mis_analytics_dashboard', subModule: 'HR dashboard' },

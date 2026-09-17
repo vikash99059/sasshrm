@@ -461,12 +461,12 @@ export const LeaveManagementPage: React.FC = () => {
           RIGHT: LEAVE CALENDAR & LEAVE CATEGORY PROGRESS BARS
          ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        
+
         {/* =======================================================================
             LEFT COLUMN: LEAVE HISTORY TABLE (7-8 COLS)
            ======================================================================= */}
         <div className="lg:col-span-7 xl:col-span-8 rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-dark-border dark:bg-dark-card space-y-3.5">
-          
+
           {/* Filter Bar */}
           <div className="flex flex-wrap items-center gap-2.5 pb-2">
             {/* Filter 1: Leave Types */}
@@ -622,8 +622,8 @@ export const LeaveManagementPage: React.FC = () => {
                           row.status === 'Approved'
                             ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
                             : row.status === 'Rejected'
-                            ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300'
-                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                              ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300'
+                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
                         )}
                       >
                         {row.status}
@@ -678,7 +678,7 @@ export const LeaveManagementPage: React.FC = () => {
             RIGHT COLUMN: LEAVE CALENDAR & LEAVE BALANCE PROGRESS CARDS (4-5 COLS)
            ======================================================================= */}
         <div className="lg:col-span-5 xl:col-span-4 space-y-4">
-          
+
           {/* Card 1: Leave Calendar */}
           <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs hover-card-lift transition-all duration-200 dark:border-dark-border dark:bg-dark-card space-y-3.5">
             {/* Header */}

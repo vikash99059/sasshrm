@@ -62,6 +62,7 @@ import { LoansAdvancesPage } from '../pages/payroll/LoansAdvancesPage';
 import { StatutoryCompliancePage } from '../pages/payroll/StatutoryCompliancePage';
 
 // Accounting & Finance
+import { FinanceDashboardPage } from '../pages/finance/FinanceDashboardPage';
 import { ChartOfAccountsPage } from '../pages/finance/ChartOfAccountsPage';
 import { InvoicesReceivablesPage } from '../pages/finance/InvoicesReceivablesPage';
 import { BillsPayablesPage } from '../pages/finance/BillsPayablesPage';
@@ -101,6 +102,19 @@ import { CalendarPage } from '../pages/calendar/CalendarPage';
 import { ReportsPage } from '../pages/reports/ReportsPage';
 import { SettingsPage } from '../pages/settings/SettingsPage';
 import { HelpSupportPage } from '../pages/support/HelpSupportPage';
+
+// ERP Expansion Modules
+import { ProjectCostingPage } from '../pages/costing/ProjectCostingPage';
+import { VendorManagementPage } from '../pages/procurement/VendorManagementPage';
+import { PurchaseOrdersPage } from '../pages/procurement/PurchaseOrdersPage';
+
+// CRM & Billing Modules
+import { CrmDashboardPage } from '../pages/crm/CrmDashboardPage';
+import { CustomersDatabasePage } from '../pages/crm/CustomersDatabasePage';
+import { LeadsKanbanPage } from '../pages/crm/LeadsKanbanPage';
+import { ClientInvoicesPage } from '../pages/billing/ClientInvoicesPage';
+import { QuotationsPage } from '../pages/sales/QuotationsPage';
+import { SalesPipelineAnalytics } from '../pages/sales/SalesPipelineAnalytics';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -246,6 +260,26 @@ export const AppRoutes: React.FC = () => {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/help" element={<HelpSupportPage />} />
         <Route path="/support" element={<HelpSupportPage />} />
+
+        {/* --- ERP & CRM Modules --- */}
+        {/* CRM & Sales */}
+        <Route path="/crm" element={<ModuleGuard moduleId="sales_crm"><CrmDashboardPage /></ModuleGuard>} />
+        <Route path="/crm/leads" element={<ModuleGuard moduleId="sales_crm"><LeadsKanbanPage /></ModuleGuard>} />
+        <Route path="/crm/customers" element={<ModuleGuard moduleId="sales_crm"><CustomersDatabasePage /></ModuleGuard>} />
+        <Route path="/sales/quotations" element={<ModuleGuard moduleId="sales_crm"><QuotationsPage /></ModuleGuard>} />
+        <Route path="/sales/pipeline" element={<ModuleGuard moduleId="sales_crm"><SalesPipelineAnalytics /></ModuleGuard>} />
+
+        {/* Finance & ERP */}
+        <Route path="/finance" element={<ModuleGuard moduleId="finance_management"><FinanceDashboardPage /></ModuleGuard>} />
+        <Route path="/finance/invoices" element={<ModuleGuard moduleId="finance_management"><InvoicesReceivablesPage /></ModuleGuard>} />
+        <Route path="/costing" element={<ProjectCostingPage />} />
+        <Route path="/finance/coa" element={<ChartOfAccountsPage />} />
+        <Route path="/finance/vouchers" element={<PaymentsReceiptsPage />} />
+        <Route path="/billing/invoices" element={<ModuleGuard moduleId="finance_management"><ClientInvoicesPage /></ModuleGuard>} />
+        <Route path="/billing/receipts" element={<PaymentsReceiptsPage />} />
+        <Route path="/procurement" element={<ModuleGuard moduleId="inventory_asset_management"><VendorManagementPage /></ModuleGuard>} />
+        <Route path="/procurement/vendors" element={<ModuleGuard moduleId="inventory_asset_management"><VendorManagementPage /></ModuleGuard>} />
+        <Route path="/procurement/purchase-orders" element={<ModuleGuard moduleId="inventory_asset_management"><VendorManagementPage /></ModuleGuard>} />
       </Route>
 
       {/* Fallback */}
